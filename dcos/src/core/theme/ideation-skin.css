@@ -455,3 +455,31 @@ button.lead-row:hover { background: var(--vw-color-slate-50); }
 :is(.module-ui, .ops-root, .vw-page-container) :is(.lt-search, .ant-input-affix-wrapper, .ant-input-group-wrapper, .ant-select-selector, .ant-picker, .topbar-search, .rail-filter, [class*="search"]) input:focus,
 :is(.module-ui, .ops-root, .vw-page-container) :is(.lt-search, .ant-input-affix-wrapper, .ant-input-group-wrapper, .ant-select-selector, .ant-picker, .topbar-search, .rail-filter, [class*="search"]) input:focus-visible { outline: none !important; box-shadow: none !important; }
 .lt-search:focus-within { border-color: var(--primaryColor500); box-shadow: 0 0 0 3px var(--primaryColor100, rgba(59, 130, 246, .18)); }
+
+/* ── Estate scope (persona · geography) in the header ── */
+.scope-switcher { display: flex; align-items: center; gap: 10px; min-width: 0; flex-shrink: 0; margin-left: 6px; }
+.scope-card { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px 0 8px; border: 1px solid var(--vw-color-slate-200); border-radius: 14px; background: #fff; font: inherit; color: var(--vw-color-slate-900); cursor: pointer; text-align: left; transition: border-color .12s, box-shadow .12s, background .12s; }
+.scope-card:hover { border-color: var(--primaryColor300, var(--vw-color-slate-300)); background: var(--vw-color-slate-50); }
+.scope-card[aria-expanded="true"], .scope-card:focus-visible { border-color: var(--primaryColor500); box-shadow: 0 0 0 3px var(--primaryColor100, rgba(59, 130, 246, .18)); outline: none; }
+.scope-ico { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--primaryColor50); color: var(--primaryColor600); flex-shrink: 0; }
+.scope-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.scope-txt small { font-size: 10.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--vw-color-slate-500); }
+.scope-txt b { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+.scope-chev { color: var(--vw-color-slate-400); flex-shrink: 0; }
+.scope-pop { width: 380px; max-width: calc(100vw - 24px); padding: 8px; background: #fff; border: 1px solid var(--vw-color-slate-200); border-radius: 16px; box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .22); }
+.scope-pop-title { padding: 8px 12px 6px; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--vw-color-slate-500); }
+.scope-pop-row { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 8px 12px; border: 0; border-radius: 12px; background: transparent; font: inherit; text-align: left; cursor: pointer; color: var(--vw-color-slate-900); }
+.scope-pop-row:hover { background: var(--vw-color-slate-50); }
+.scope-pop-row.is-on { background: var(--primaryColor50); }
+.scope-pop-ico { margin-top: 2px; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--primaryColor50); color: var(--primaryColor600); flex-shrink: 0; }
+.scope-pop-row.is-on .scope-pop-ico { background: transparent; }
+.scope-pop-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.35; }
+.scope-pop-txt b { font-size: 14px; font-weight: 500; }
+.scope-pop-txt small { font-size: 12.5px; color: var(--vw-color-slate-500); }
+.scope-pop-check { color: var(--primaryColor600); flex-shrink: 0; }
+.scope-pop-foot { margin: 6px 4px 0; padding: 10px 8px 6px; border-top: 1px solid var(--vw-color-slate-100); font-size: 12.5px; line-height: 1.45; color: var(--vw-color-slate-500); }
+@media (max-width: 1500px) { .scope-txt small { display: none; } .scope-card { height: 36px; } .scope-txt b { max-width: 150px; } }
+@media (max-width: 1180px) { .scope-txt b { display: none; } .scope-card { padding: 0 8px 0 6px; } .scope-chev { display: none; } }
+@media (max-width: 900px) { .scope-switcher { display: none; } }
+.scope-empty { font-size: 12px; font-weight: 500; color: var(--vw-color-amber-700); background: var(--vw-color-amber-50); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+@media (max-width: 1500px) { .scope-empty { display: none; } }

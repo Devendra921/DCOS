@@ -20,6 +20,7 @@ import { db } from '../../mock/db';
 import { useEntityList } from '../../shared/hooks/useEntityCRUD';
 import { DC_TYPE_CATALOG, dcTypeProfile } from '../../mock/data/dcTypes';
 import type { DataCenter } from '../../mock/data/types';
+import { EstateScopeSwitcher } from '../scope/EstateScopeSwitcher';
 import { useBalancedRows } from './useBalancedRows';
 import { useTruncationTitles } from './useTruncationTitles';
 
@@ -686,6 +687,7 @@ export const AppLayout: React.FC = () => {
             {pageCrumb.group && <span className="row" style={{ gap: 6 }}>{pageCrumb.group}<ChevronRight size={14} className="faint" /></span>}
             <b>{pageCrumb.label}</b>
           </nav>
+          <EstateScopeSwitcher />
           <div className="topbar-spacer" />
           <button type="button" className="topbar-search dcos-command-trigger" onClick={() => setPaletteOpen(true)} aria-label="Open command palette" title="Search & jump to anything">
             <Search size={15} /><span className="ellipsis">Search racks, subnets, changes, devices…</span><kbd>⌘K</kbd>

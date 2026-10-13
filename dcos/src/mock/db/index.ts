@@ -2,6 +2,8 @@ import { MockDB } from './store';
 import { buildSnapshot, resolveProfile } from './seed';
 import { resolveEstate, type EstateMode } from '../datasets/estateMode';
 import { loadNeoCloudDatasets } from '../datasets/neocloudData';
+import { resolveEstateScope, type EstateScope } from '../datasets/estateScope';
+import { applyEstateScope, scopeOptions, type ScopeOptions } from './estateScope';
 
 /** In-memory mock DB (RAN chassis), seeded with the DCOS topology. */
 export const db = new MockDB();
@@ -10,9 +12,16 @@ let ready = false;
 let initPromise: Promise<void> | null = null;
 
 /** What start-up loaded and how long each step took (ms). */
-export interface StartupInfo { estate: EstateMode; demoMs: number; importMs: number; hydrateMs: number; totalMs: number; records: number; importError?: string }
+export interface StartupInfo { estate: EstateMode; scope: EstateScope; scopeMs: number; sites: number; demoMs: number; importMs: number; hydrateMs: number; totalMs: number; records: number; importError?: string }
 let startup: StartupInfo | undefined;
 export const getStartupInfo = (): StartupInfo | undefined => startup;
+
+/** The personas and countries that exist in the full estate (before the persona / geography scope is applied). */
+let options: ScopeOptions = { personas: [], geos: [] };
+let activeScope: EstateScope = { persona: 'all', geo: 'all' };
+export const getScopeOptions = (): ScopeOptions => options;
+/** The persona / geography the store was built for. */
+export const getEstateScope = (): EstateScope => activeScope;
 
 export function isMockDbReady(): boolean {
   return ready;
@@ -44,9 +53,20 @@ export function ensureMockDbReady(): Promise<void> {
         }
       }
       const t2 = performance.now();
+      // Persona and geography: remove what is out of scope once, before the store is filled.
+      options = scopeOptions(snap);
+      const wanted = resolveEstateScope();
+      // A value the data does not have (an unknown country, a persona with no site) shows everything rather than nothing.
+      activeScope = {
+        persona: wanted.persona === 'all' || options.personas.some((p) => p.id === wanted.persona) ? wanted.persona : 'all',
+        geo: wanted.geo === 'all' || options.geos.some((g) => g.id === wanted.geo) ? wanted.geo : 'all',
+      };
+      const scoped = applyEstateScope(snap, activeScope);
+      snap = scoped.snapshot;
+      const t2b = performance.now();
       db.hydrate(snap);
       const t3 = performance.now();
-      startup = { estate, demoMs: Math.round(t1 - t0), importMs: Math.round(t2 - t1), hydrateMs: Math.round(t3 - t2), totalMs: Math.round(t3 - t0), records: Object.values(snap).reduce((a, x) => a + x.length, 0), importError };
+      startup = { estate, scope: activeScope, scopeMs: Math.round(t2b - t2), sites: scoped.sites, demoMs: Math.round(t1 - t0), importMs: Math.round(t2 - t1), hydrateMs: Math.round(t3 - t2b), totalMs: Math.round(t3 - t0), records: Object.values(snap).reduce((a, x) => a + x.length, 0), importError };
       ready = true;
     });
   }
@@ -60,4 +80,7 @@ export type { FilterCriteria, QueryOptions, PaginatedResult } from './store';
 export { seedDatabase, buildSnapshot, exportMockDbSnapshot, resolveProfile } from './seed';
 export type { SeedProfile } from './seed';
 export { resolveEstate, setEstate, ESTATE_STORAGE_KEY } from '../datasets/estateMode';
+export { setEstateScope, PERSONAS, geoCodeOf, currencySymbolOf } from '../datasets/estateScope';
+export type { EstateScope, Persona, PersonaId } from '../datasets/estateScope';
+export type { ScopeOptions, ScopeOption } from './estateScope';
 export type { EstateMode } from '../datasets/estateMode';
