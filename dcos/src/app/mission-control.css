@@ -1,0 +1,30 @@
+/* Command Center — page-local helpers on top of the Operate kit (OpsPage, Panel, StatGrid). */
+.mc-hero { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.mc-score { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; min-width: 96px; }
+.mc-score .vw-card-metric-lg { font-size: 40px; line-height: 1.1; }
+.mc-domains { flex: 1; min-width: 0; }
+.mc-scroll { max-height: 340px; overflow-y: auto; min-width: 0; }
+.mc-q { width: 100%; min-width: 0; align-items: center; border: 0; font: inherit; text-align: left; cursor: pointer; transition: filter .12s; }
+.mc-q:hover { filter: brightness(.97); }
+.mc-q:focus-visible { outline: 2px solid var(--primaryColor500); outline-offset: 1px; }
+.mc-q > svg { flex-shrink: 0; }
+.mc-q-txt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc-feed { margin: 0; padding: 0; list-style: none; }
+.mc-feed li { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--vw-color-slate-100); }
+.mc-feed li:first-child { border-top: 0; padding-top: 0; }
+.mc-feed-summary { font-size: 13px; line-height: 20px; color: var(--vw-color-slate-700); }
+.mc-feed .vw-chip { min-width: 0; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-feed time { font-size: 11.5px; white-space: nowrap; flex-shrink: 0; }
+.mc-row { gap: 12px; padding: 8px 0; border-top: 1px solid var(--vw-color-slate-100); font-size: 13px; }
+.mc-fc { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; border: 1px solid var(--vw-color-slate-200); border-left: 3px solid var(--c); border-radius: 10px; padding: 10px 12px; background: var(--surface, #fff); font: inherit; font-size: 13px; text-align: left; color: inherit; }
+.mc-fc.is-click { flex-direction: row; align-items: flex-start; gap: 10px; cursor: pointer; transition: background .12s; }
+.mc-fc.is-click:hover { background: var(--vw-color-slate-50); }
+.mc-fc.is-click:focus-visible { outline: 2px solid var(--primaryColor500); outline-offset: 1px; }
+.mc-fc-detail { font-size: 12px; line-height: 1.5; }
+.mc-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.mc-link { padding: 0; border: 0; background: none; font: inherit; font-weight: 500; color: var(--primaryColor500); cursor: pointer; }
+.mc-link:hover { text-decoration: underline; }
+@media (max-width: 720px) {
+  .mc-hero { flex-direction: column; align-items: stretch; gap: 12px; }
+  .mc-score { flex-direction: row; align-items: baseline; gap: 8px; }
+}

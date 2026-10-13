@@ -1,0 +1,37 @@
+/* Application compatibility aliases. Canonical NST styles are vendored unchanged.
+   Older DCOS components use primaryColor* for brand controls; map those names
+   to the selected theme's accent ramp without redefining canonical primitives. */
+:root {
+  --grayColor10: var(--vw-color-white);
+  --bgColor10: var(--vw-color-white);
+  --buttonBasicPrimaryTextColor: var(--vw-color-gray-900);
+  --buttonBasicPrimaryHoverTextColor: var(--color-primary-hover);
+  --buttonBasicPrimaryFocusTextColor: var(--color-primary-press);
+  --buttonBasicPrimaryHoverBgColor: var(--vw-color-gray-50);
+  --nstPageBackground: var(--bgColor50);
+  --primaryColor50: var(--accentColor50);
+  --primaryColor100: var(--accentColor100);
+  --primaryColor200: var(--accentColor200);
+  --primaryColor300: var(--accentColor300);
+  --primaryColor400: var(--accentColor400);
+  --primaryColor500: var(--accentColor500);
+  --primaryColor600: var(--accentColor600);
+  --primaryColor700: var(--accentColor700);
+  --primaryColor800: var(--accentColor800);
+  --primaryColor900: var(--accentColor900);
+  --vw-shadow-xs: var(--shadow-resting);
+  --vw-shadow-sm: var(--shadow-sm);
+  --vw-shadow-md: var(--shadow-sm);
+}
+.vw-text-secondary { color: var(--vw-color-text-secondary); }
+.vw-text-tertiary { color: var(--vw-color-text-tertiary); }
+.vw-text-disabled { color: var(--vw-color-text-disabled); }
+.vw-text-inverse { color: var(--vw-color-text-inverse); }
+.vw-text-link { color: var(--vw-color-text-link); }
+.vw-text-link-hover:hover { color: var(--vw-color-text-link-hover); }
+.vw-text-success { color: var(--vw-color-success); }
+.vw-text-warning { color: var(--vw-color-warning); }
+.vw-text-danger { color: var(--vw-color-danger); }
+.vw-text-danger-soft { color: var(--vw-color-red-300); }
+.vw-text-info { color: var(--vw-color-info); }
+.vw-text-gray { color: var(--vw-color-gray-500); }

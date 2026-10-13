@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_incident_severity" name="Incident severity" namespace="http://dcos.example.com/dmn" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="incident-severity" name="Incident severity &amp; priority">
+    <description>Maps the technical blast radius (site / hall / rack / device), premium-customer exposure and the facility system involved to a severity (SEV1–SEV4) and a business priority (P1–P4). Hit policy FIRST.</description>
+    <decisionTable id="DecisionTable_incident_severity" hitPolicy="FIRST">
+      <input id="Input_impactLevel" label="Impact level">
+        <inputExpression id="InputExpression_impactLevel" typeRef="string">
+          <text>impactLevel</text>
+        </inputExpression>
+        <inputValues id="InputValues_impactLevel"><text>"site","hall","rack","device"</text></inputValues>
+      </input>
+      <input id="Input_premiumExposed" label="Premium customer exposed">
+        <inputExpression id="InputExpression_premiumExposed" typeRef="boolean">
+          <text>premiumExposed</text>
+        </inputExpression>
+      </input>
+      <input id="Input_facility" label="Facility system">
+        <inputExpression id="InputExpression_facility" typeRef="string">
+          <text>facility</text>
+        </inputExpression>
+        <inputValues id="InputValues_facility"><text>"Power","Cooling","Network","Other"</text></inputValues>
+      </input>
+      <output id="Output_severity" label="Severity" name="severity" typeRef="string" />
+      <output id="Output_priority" label="Priority" name="priority" typeRef="string" />
+      <rule id="Rule_is_1">
+        <description>Whole site affected</description>
+        <inputEntry id="UnaryTests_is_1_1"><text>"site"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_1_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_1_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_1_1"><text>"SEV1"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_1_2"><text>"P1"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_2">
+        <description>Hall-level power or cooling loss</description>
+        <inputEntry id="UnaryTests_is_2_1"><text>"hall"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_2_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_2_3"><text>"Power","Cooling"</text></inputEntry>
+        <outputEntry id="LiteralExpression_is_2_1"><text>"SEV1"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_2_2"><text>"P1"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_3">
+        <description>Hall-level, other system</description>
+        <inputEntry id="UnaryTests_is_3_1"><text>"hall"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_3_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_3_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_3_1"><text>"SEV2"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_3_2"><text>"P2"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_4">
+        <description>Rack with premium customer</description>
+        <inputEntry id="UnaryTests_is_4_1"><text>"rack"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_4_2"><text>true</text></inputEntry>
+        <inputEntry id="UnaryTests_is_4_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_4_1"><text>"SEV2"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_4_2"><text>"P2"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_5">
+        <description>Rack, standard customers</description>
+        <inputEntry id="UnaryTests_is_5_1"><text>"rack"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_5_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_5_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_5_1"><text>"SEV3"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_5_2"><text>"P3"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_6">
+        <description>Single device with premium customer</description>
+        <inputEntry id="UnaryTests_is_6_1"><text>"device"</text></inputEntry>
+        <inputEntry id="UnaryTests_is_6_2"><text>true</text></inputEntry>
+        <inputEntry id="UnaryTests_is_6_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_6_1"><text>"SEV3"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_6_2"><text>"P3"</text></outputEntry>
+      </rule>
+      <rule id="Rule_is_7">
+        <description>Everything else</description>
+        <inputEntry id="UnaryTests_is_7_1"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_7_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_is_7_3"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_is_7_1"><text>"SEV4"</text></outputEntry>
+        <outputEntry id="LiteralExpression_is_7_2"><text>"P4"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_incident_severity">
+      <dmndi:DMNShape id="DMNShape_incident_severity" dmnElementRef="incident-severity">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

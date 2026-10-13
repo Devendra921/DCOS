@@ -1,0 +1,168 @@
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout guardrail — antd's Row/Col grid is flex-based, and a flex item's
+   default min-width is `auto` (its content's min-content size), not 0. A
+   fixed-span Col (e.g. six `span={4}` KPI tiles in one Row) can't actually
+   shrink below what its content wants once the viewport narrows, so instead
+   of wrapping/compressing it pushes the whole Row — and the page — wider
+   than the viewport (measurable as body.scrollWidth > window.innerWidth).
+   Same root cause the design system's own vw-grid-cols-* tracks fix with
+   `minmax(0, 1fr)` instead of bare `1fr` (see vw-utilities.css) — this is
+   the flexbox equivalent for pages still using raw antd Row/Col. */
+.ant-col { min-width: 0; }
+
+body {
+  /* Poppins (--fontFamily, src/styles/capacity/vw-global.css) is loaded via
+     index.html. Falls through to the system stack if the hosted stylesheet
+     is blocked. tnum keeps numerals tabular-width for KPI/table alignment. */
+  font-family: var(--fontFamily), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'tnum';
+  font-size: 14px;
+  color: var(--vw-color-text-primary);
+  background: var(--nstPageBackground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: normal;
+}
+
+/* Headings tightened to match the reference look. */
+h1, h2, h3, h4, h5,
+.ant-typography h1, .ant-typography h2, .ant-typography h3, .ant-typography h4, .ant-typography h5 {
+  letter-spacing: normal;
+  font-feature-settings: 'cv11', 'ss03';
+}
+
+/* Sidebar menu — matches the reference contract-ui-v2 sidebar.
+   14px Inter, 36px item height. Group titles stay much smaller (10px
+   uppercase) so the visual hierarchy reads as "section header → row". */
+.ant-menu .ant-menu-item,
+.ant-menu .ant-menu-submenu-title { font-size: 14px; font-weight: 500; }
+.ant-menu-item-group-title { font-size: var(--vw-font-label-sm) !important; color: var(--vw-color-gray-500) !important; font-weight: 400; }
+.ant-menu-inline .ant-menu-item, .ant-menu-inline .ant-menu-submenu-title { height: 36px; line-height: 36px; }
+.ant-menu .anticon { font-size: 16px !important; }
+
+/* AntD Statistic — calm the inflated 32px default to match dashboard hero.
+   Matches .vw-card-metric-label-sm's exact values (src/styles/capacity/
+   vw-global.css) for bare-string Statistic titles that can't take a
+   className (IpamIntegrationsPage, OnboardingWizard); KPICard applies the
+   real class directly instead of relying on this fallback. */
+.ant-statistic-title { font-size: var(--vw-font-label-sm); font-weight: 400; line-height: 1.2; color: var(--vw-color-gray-500); }
+
+/* Statistic suffix (unit label) — render smaller than the value instead of
+   inheriting the theme's 28px contentFontSize, and never wrap the value +
+   suffix onto two lines. A longer unit like "tCO₂/mo" combined with its
+   value sat right at the card's content width and would wrap while a
+   short one like "%" or "kW" comfortably fit — same component, same CSS,
+   different outcome purely from text length. Forcing one line make every
+   KPI card behave identically regardless of unit length. */
+.ant-statistic-content { white-space: nowrap; }
+.ant-statistic-content-suffix { font-size: 14px; font-weight: 400; color: #7c7c7c; margin-inline-start: 4px; white-space: nowrap; }
+
+/* Tabular numerals everywhere a number is the protagonist. */
+.ant-statistic-content-value,
+.ant-table-cell,
+.ran-kpi-number,
+.ran-kpi-tile,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* Drop antd's own full-width tab-bar divider when Tabs sits inside a
+   .vw-card-section (VwCard's default variant, and the module-nav tab bars) —
+   the card's own border already delineates the section, so the internal
+   line just reads as a redundant floating gray rule. */
+.vw-card-section .ant-tabs-nav::before { border-bottom: none; }
+
+/* ──────────────────────────────────────────────────────────────────
+   List-page filter row — match contract-ui-v2 pattern
+
+   The reference puts every list page on the same recipe: search input
+   (left, fluid) + filter dropdowns (pill-shaped, light bg) + count
+   indicator (right). Touching every individual list page would be
+   risky, so instead align the building blocks via global rules.
+   ────────────────────────────────────────────────────────────── */
+
+/* Control shape and states are owned by themeConfig. Global !important
+   selector/background overrides masked AntD disabled, error and warning states. */
+
+/* Segmented toggles (view switchers, Flat/Tree, Table/Board, etc.) — a
+   visible outline like our buttons, instead of a borderless flat track,
+   so the whole control reads as one clearly-bounded control. */
+.ant-segmented {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  padding: 2px !important;
+}
+.ant-segmented .ant-segmented-item-selected,
+.ant-segmented .ant-segmented-thumb {
+  border-radius: 6px !important;
+}
+
+/* Active page heading hierarchy — left-aligned, generous bottom margin
+   to separate the title block from the filter row beneath it. */
+.ant-page-header-heading-title { font-size: 20px; font-weight: 600; letter-spacing: normal; }
+
+/* Empty-state typography. */
+.ant-empty-description { color: var(--vw-color-gray-600); font-size: 13px; }
+
+/* ──────────────────────────────────────────────────────────────────
+   Sparkline / mini-trend removal — DISABLED.
+
+   This rule used to hide every inline KPI-tile sparkline globally:
+     svg polyline                  { display: none !important; }
+     svg path[fill^="url("]        { display: none !important; }
+     svg defs linearGradient       { display: none !important; }
+   The sparkline removal is now implemented at the React level —
+   `Sparkline` in shared/components/ux/KpiTile.tsx returns `null` —
+   so callers can keep their `sparkline` prop and the inline trend
+   simply doesn't render. Crucially, the old global CSS rule was a
+   shotgun blast: it also nuked the polylines / gradient fills used
+   by real visualisations like the Monthly Spend chart (Financial
+   Command Center), Capex S-Curve, PCI conflict trend, etc., leaving
+   those charts as floating dots with no connecting lines or area
+   fills. Removing the rule restores them.
+   ────────────────────────────────────────────────────────────── */
+
+#root {
+  display: block;
+  text-align: left;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Geo command map — custom site markers are pure HTML discs/badges; strip
+   Leaflet's default white box + border so only our styling shows. */
+.dcos-site-marker { background: transparent; border: none; }
+
+/* Shared toolbar children must shrink before their controls wrap. */
+.dcos-list-actions,
+.dcos-list-actions > .ant-space-item { min-width: 0; max-width: 100%; }
+
+button, input, select, textarea { font-family: inherit; }
+button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible {
+  outline: 2px solid var(--primaryColor500, #000);
+  outline-offset: 3px;
+}
+
+.dcos-app-header { gap: 12px; }
+@media (max-width: 640px) {
+  .dcos-app-header.ant-layout-header { padding-inline: 12px; flex-wrap: wrap; height: auto; min-height: 64px; padding-block: 12px; }
+  .dcos-app-header .dcos-header-actions { gap: 8px !important; }
+  .dcos-app-header .dcos-command-trigger { width: 100% !important; max-width: none !important; }
+  .dcos-app-header .dcos-header-actions { width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 1000px) {
+  .wf-responsive-columns { grid-template-columns: minmax(0, 1fr) !important; }
+  .wf-responsive-columns > * { min-width: 0; }
+}

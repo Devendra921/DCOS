@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_change_risk" name="Change risk" namespace="http://dcos.example.com/dmn" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="change-risk" name="Change risk &amp; approval path">
+    <description>Classifies a change request by blast radius and context, and routes it to the approval path the governance policy requires. Hit policy FIRST: rules are ordered most to least severe.</description>
+    <decisionTable id="DecisionTable_change_risk" hitPolicy="FIRST">
+      <input id="Input_scopeSize" label="Scope size (affected resources)">
+        <inputExpression id="InputExpression_scopeSize" typeRef="number">
+          <text>scopeSize</text>
+        </inputExpression>
+      </input>
+      <input id="Input_premiumCustomers" label="Premium customers exposed">
+        <inputExpression id="InputExpression_premiumCustomers" typeRef="number">
+          <text>premiumCustomers</text>
+        </inputExpression>
+      </input>
+      <input id="Input_conflicts" label="Window conflicts">
+        <inputExpression id="InputExpression_conflicts" typeRef="boolean">
+          <text>conflicts</text>
+        </inputExpression>
+      </input>
+      <input id="Input_openIncidents" label="Open incidents at site">
+        <inputExpression id="InputExpression_openIncidents" typeRef="number">
+          <text>openIncidents</text>
+        </inputExpression>
+      </input>
+      <output id="Output_risk" label="Risk" name="risk" typeRef="string" />
+      <output id="Output_approvalPath" label="Approval path" name="approvalPath" typeRef="string" />
+      <rule id="Rule_cr_1">
+        <description>Conflicting window with another change</description>
+        <inputEntry id="UnaryTests_cr_1_1"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_1_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_1_3"><text>true</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_1_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_1_1"><text>"High"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_1_2"><text>"CAB + Facilities Director"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_2">
+        <description>Site already has an open incident</description>
+        <inputEntry id="UnaryTests_cr_2_1"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_2_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_2_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_2_4"><text>&gt; 0</text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_2_1"><text>"High"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_2_2"><text>"CAB + NOC Lead"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_3">
+        <description>Large scope touching premium customers</description>
+        <inputEntry id="UnaryTests_cr_3_1"><text>&gt; 10</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_3_2"><text>&gt; 0</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_3_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_3_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_3_1"><text>"High"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_3_2"><text>"CAB"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_4">
+        <description>Premium customers exposed</description>
+        <inputEntry id="UnaryTests_cr_4_1"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_4_2"><text>&gt; 0</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_4_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_4_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_4_1"><text>"Medium"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_4_2"><text>"Change manager + account manager"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_5">
+        <description>Large scope</description>
+        <inputEntry id="UnaryTests_cr_5_1"><text>&gt; 10</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_5_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_5_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_5_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_5_1"><text>"Medium"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_5_2"><text>"Change manager"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_6">
+        <description>Several resources, no exposure</description>
+        <inputEntry id="UnaryTests_cr_6_1"><text>&gt; 3</text></inputEntry>
+        <inputEntry id="UnaryTests_cr_6_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_6_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_6_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_6_1"><text>"Low"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_6_2"><text>"Peer review"</text></outputEntry>
+      </rule>
+      <rule id="Rule_cr_7">
+        <description>Standard change</description>
+        <inputEntry id="UnaryTests_cr_7_1"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_7_2"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_7_3"><text></text></inputEntry>
+        <inputEntry id="UnaryTests_cr_7_4"><text></text></inputEntry>
+        <outputEntry id="LiteralExpression_cr_7_1"><text>"Low"</text></outputEntry>
+        <outputEntry id="LiteralExpression_cr_7_2"><text>"Auto-approve"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_change_risk">
+      <dmndi:DMNShape id="DMNShape_change_risk" dmnElementRef="change-risk">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

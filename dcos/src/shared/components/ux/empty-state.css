@@ -1,0 +1,79 @@
+/* Missing records fill the actual available page area, below breadcrumbs.
+   Only explicit page empty states opt in; populated pages keep their layout. */
+.vw-page-container:has(> .dcos-empty-page),
+.vw-page-container:has(> .ops-root > .dcos-empty-page),
+.vw-page-container > .ops-root:has(> .dcos-empty-page) {
+  display: flex;
+  flex-direction: column;
+}
+.vw-page-container > .ops-root:has(> .dcos-empty-page) { flex: 1; }
+.vw-page-container:has(.dcos-empty-page) > .dcos-crumbs,
+.ops-root:has(> .dcos-empty-page) > .page:not(.dcos-empty-page) { flex: 0 0 auto; }
+.dcos-empty-page,
+.ops-root > .page.dcos-empty-page {
+  flex: 1 0 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.dcos-empty-page > :is(.ant-empty, .empty) {
+  width: 100%;
+  max-width: 480px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.dcos-empty-copy { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.dcos-empty-copy h1 { margin: 0; }
+.dcos-empty-copy .vw-card-description { line-height: 1.6; }
+.dcos-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--vw-space-sm); margin-top: var(--vw-space-xxs); }
+.vw-empty { min-width: 0; min-height: 180px; overflow-wrap: anywhere; }
+
+/* A sole empty state owns the card body, including stretched grid cards.
+   Table placeholders remain within their own table rather than filling a page. */
+:is(.panel, .vw-card-section, .vw-card-child):has(> :is(.panel-body, .vw-card-body) > :is(.empty, .ant-empty, .vw-empty):only-child) {
+  display: flex;
+  flex-direction: column;
+}
+:is(.panel-body, .vw-card-body):has(> :is(.empty, .ant-empty, .vw-empty):only-child) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  min-height: 180px;
+}
+:is(.panel-body, .vw-card-body) > :is(.empty, .ant-empty, .vw-empty):only-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  text-align: center;
+}
+.widget-body:has(> :is(.empty, .ant-empty, .vw-empty):only-child) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.widget-body > :is(.empty, .ant-empty, .vw-empty):only-child { margin: auto 0; }
+/* Auto margins on the shared page container should not shrink breadcrumbs
+   after a missing-record page switches the container to a flex column. */
+.vw-page-container:has(> .dcos-empty-page) > .dcos-crumbs { width: 100%; }
+
+.ops-root .dt-scroll:has(> .empty) { display: flex; flex-direction: column; }
+.ops-root .dt-scroll > .empty { flex: 1; }
+/* Fixed-height table cards (such as Power panels/feeds) retain their viewport
+   when filtered to zero rows, with the placeholder centered inside it. */
+.ant-table-body:has(.ant-table-placeholder) > table { height: 100%; }
+.ant-table-placeholder > td { vertical-align: middle; }
+.ant-table-body:has(.ant-table-placeholder) .ant-table-measure-row { height: 0; }
+.ant-table-body .ant-table-placeholder { height: 100%; }
+/* Match Ant’s expanded placeholder inset; first/last data-cell padding must
+   not offset the sticky placeholder within a horizontally scrollable table. */
+.ant-table-wrapper .ant-table-body .ant-table-tbody > .ant-table-placeholder > td { padding-inline: 12px !important; }

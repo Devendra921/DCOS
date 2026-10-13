@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "chase-up",
+  "type": "default",
+  "components": [
+    { "id": "Text_cu_intro", "type": "text", "text": "### Chase up\nRecord who you contacted, what they told you and the new expected date. The date is kept with the record so the plan can be updated." },
+    { "id": "Field_contact", "type": "textfield", "key": "contact", "label": "Who you contacted", "validate": {"required": true}, "layout": {"row": "Row_cu_1", "columns": 8} },
+    { "id": "Field_contactedOn", "type": "datetime", "key": "contactedOn", "subtype": "date", "dateLabel": "Contacted on", "validate": {"required": true}, "layout": {"row": "Row_cu_1", "columns": 8} },
+    { "id": "Field_expectedDate", "type": "datetime", "key": "expectedDate", "subtype": "date", "dateLabel": "New expected date", "description": "Leave empty if they could not give a date.", "layout": {"row": "Row_cu_2", "columns": 8} },
+    { "id": "Field_delayReason", "type": "select", "key": "delayReason", "label": "Reason given (optional)", "values": [{"label": "Manufacturing or supply delay", "value": "supply"}, {"label": "Shipping or customs", "value": "shipping"}, {"label": "Waiting on our information or payment", "value": "us"}, {"label": "Authority or third-party backlog", "value": "backlog"}, {"label": "Other", "value": "other"}], "layout": {"row": "Row_cu_2", "columns": 8} },
+    { "id": "Field_note", "type": "textarea", "key": "note", "label": "What they said", "validate": {"required": true} },
+    { "id": "Field_escalated", "type": "checkbox", "key": "escalated", "label": "Escalated to a manager or account lead" },
+    { "id": "Field_correspondence", "type": "filepicker", "key": "correspondence", "label": "Emails or letters (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" }
+  ]
+}

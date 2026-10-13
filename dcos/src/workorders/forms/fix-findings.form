@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "fix-findings",
+  "type": "default",
+  "components": [
+    { "id": "Text_ff_intro", "type": "text", "text": "### Fix findings\nRecord what was fixed and how, and attach evidence. Anything you could not fix stays on the list. The step then goes back to be tested or inspected again." },
+    { "id": "List_fixes", "type": "dynamiclist", "path": "fixes", "label": "What was fixed", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_f_finding", "type": "textfield", "key": "finding", "label": "Finding, defect or snag", "validate": {"required": true}, "layout": {"row": "Row_f", "columns": 8} },
+      { "id": "Field_f_fix", "type": "textfield", "key": "fix", "label": "What was done", "validate": {"required": true}, "layout": {"row": "Row_f", "columns": 8} }
+    ] },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Evidence of the fix", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "description": "Photos, readings or a retest sheet.", "validate": {"required": true} },
+    { "id": "List_openItemsList", "type": "dynamiclist", "path": "openItemsList", "label": "Still open", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_oi_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_oi", "columns": 8} },
+      { "id": "Field_oi_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_oi", "columns": 4} },
+      { "id": "Field_oi_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_oi", "columns": 4} }
+    ] },
+    { "id": "Field_readyForRetest", "type": "checkbox", "key": "readyForRetest", "label": "Ready to be tested or inspected again", "validate": {"required": true} },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" }
+  ]
+}

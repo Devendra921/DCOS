@@ -1,0 +1,1859 @@
+$gray: (
+  10: #ffffff,
+  50: #f7f7f7,
+  100: #ebebeb,
+  200: #d1d1d1,
+  300: #b6b6b6,
+  400: #9c9c9c,
+  500: #828282,
+  600: #686868,
+  700: #4d4d4d,
+  800: #333333,
+  900: #000000,
+  contrast: (50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #ffffff,
+    A200: #ffffff,
+    A400: #ffffff,
+    A700: #ffffff,
+  ),
+);
+
+$rex-font-display: (
+  'display-1': 3.54em,
+  'display-2': 3.08em,
+  'display-3': 2.77em,
+  'display-4': 2.46em,
+  'display-5': 2.15em,
+);
+
+$rex-font-header: (
+  'header-1': 1.85em,
+  'header-2': 1.54em,
+  'header-3': 1.23em,
+  'header-4': 1.08em,
+  'header-5': 0.92em,
+);
+
+$rex-font-body: (
+  'lead-body': 1.54em,
+  'body-1': 1.23em,
+  'body-2': 1.08em,
+  'caption': 0.92em,
+  'overline': 0.77em,
+);
+
+$rex-buttons-size: (
+  'button-xl': 10em,
+  'button-l': 9em,
+  'button-m': 7em,
+  'button-s': 5em,
+  'button-xl-font-size': 1.08em,
+);
+
+
+$lineheight-x: normal;
+
+
+/* Spacing */
+$sizeUnit: em;
+$marginKey: 'm';
+$paddingKey: 'p';
+$allKey: 'all';
+$separator: '-';
+$sizes: (
+  ('none', 0),
+  ('xxs', 0.125),
+  ('xs', 0.25),
+  ('sm', 0.5),
+  ('md', 1),
+  ('lg', 2),
+  ('xl', 4),
+  ('xxl', 8)
+);
+$positions: (
+  ('t', 'top'),
+  ('r', 'inline-end'),
+  ('b', 'bottom'),
+  ('l', 'inline-start')
+);
+
+/* divider */
+$dividerUnit: px;
+$dividerThickness: 'bt';
+$dividerType: 'dt';
+$separator: '-';
+
+$diviThickness: (
+  ('none', 0),
+  ('xs', 0.5),
+  ('sm', 1),
+  ('md', 2),
+  ('lg', 3),
+  ('xl', 4),
+  ('xxl', 5)
+);
+
+$diviType: (
+  ('dashed', 'dashed'),
+  ('dotted', 'dotted'),
+  ('solid', 'solid')
+);
+
+
+/* disable */
+$rex-opacity: (
+  'op-value': 0.5,
+);
+
+$rex-pointer-none: (
+  'p-n': none,
+);
+
+
+$box-shadow: 0em 0em 0.3em rgba(0, 0, 0, 0.1);
+
+
+.level4-style {
+  /* -------------------- App Container -------------------- */
+  --appContainerGap: 2em;
+  --appContainerRadius: 1em;
+
+  /* Side space margin */
+  --sideSpaceMargin : 1200px;
+
+  /* Outer Focus Border Border */
+  --focusOuterOutline: none !important;
+  
+  /* -------------------- Radius Styles -------------------- */
+  --dialogRadius: 1rem;
+  --chipRadius: 999px;
+  --queryBuilderRadius: .75rem;
+  --iconSelectBoxRadius: var(--fieldRadius);
+  --cardRadius: 1.6em;
+
+  /* -------------------- Chip Variant Colors -------------------- */
+  /* Success Chip */
+  --chipSuccessBgColor: #d7f7d9;
+  --chipSuccessTextColor: #0a4d00;
+  
+  /* Error Chip */
+  --chipErrorBgColor: #ffe8e8;
+  --chipErrorTextColor: #ba0000;
+  
+  /* Warning Chip */
+  --chipWarningBgColor: #fff5c2;
+  --chipWarningTextColor: #7a5900;
+  
+  /* Info Chip */
+  --chipInfoBgColor: #e6f1ff;
+  --chipInfoTextColor: #004085;
+  
+  /* Purple Chip */
+  --chipPurpleBgColor: #efdffa;
+  --chipPurpleTextColor: #552684;
+  
+  /* Orange Chip */
+  --chipOrangeBgColor: #ffecd8;
+  --chipOrangeTextColor: #824313;
+  
+  /* Pink Chip */
+  --chipPinkBgColor: #ffebf4;
+  --chipPinkTextColor: #750f3d;
+  
+  /* Cyan Chip */
+  --chipCyanBgColor: #d9f7fa;
+  --chipCyanTextColor: #00555e;
+
+  /* Neutral Chip */
+  --chipNeutralBgColor: transparent;
+  --chipNeutralTextColor: var(--grayColor700);
+
+  /* -------------------- Builder Config -------------------- */
+  --configCardRadius: 1rem;
+  --configHeaderMargin:  0em 0em 1.34em 0em;
+  --configHeaderBgColor: var(--bgColor10);
+  --configHeaderBorderWidth: 1px;
+
+  /* --------------------------------------
+   * Field Variables
+   * -------------------------------------- */
+   --fieldRadius: 8px;
+   --fieldHeight: 2.9em;
+   --fieldLabelGap: 0.25rem;
+   --fieldBorderWidth: 1px;
+   --fieldHoverBorderWidth: 1px;
+   --fieldFocusBorderWidth: 2px; /* 2px is the default focus border width */
+
+   /* Field Colors */
+   --fieldPlaceholderColor: var(--grayColor400);
+   --fieldLabelColor: var(--vw-color-gray-700);
+   --fieldHoverLabelColor: var(--vw-color-gray-900);
+   --fieldTextColor: var(--vw-color-gray-900);
+   --fieldHoverBorderColor: var(--accentColor500);
+   --fieldFocusBorderColor: var(--accentColor500);
+   --fieldMatHintColor: var(--vw-color-gray-500);
+   --fieldBorderColor: var(--vw-color-gray-300);
+
+   /* Disabled Field Styles */
+   --fieldDisabledBgColor: var(--bgColor50);
+   --fieldDisabledActiveBgColor: var(--bgColor100);
+   --fieldDisabledLabelColor: var(--grayColor400);
+   --fieldDisabledTextColor: var(--grayColor500);
+   --fieldDisabledBorderColor: var(--grayColor100);
+   --fieldDisabledBorderWidth: 0em;
+
+  /* General Field Styling */
+  --fieldLabelFontWeight: 500;
+  --fieldTextFontWeight: 500;
+  --fieldPlaceholderFontWeight: 500;
+  --fieldMatHintFontWeight: 400;
+  --fieldAffixIconBorderWidth: 0em;
+  --fieldCurrencyInputBorderWidth: 0.084em;
+
+  /* --------------------------------------
+   * Dropdown Variables
+   * -------------------------------------- */
+   --dropdownBorderColor: var(--fieldBorderColor);
+   --dropdownItemHoverTextColor: var(--accentColor800);
+   --dropdownItemHoverBgColor: var(--accentColor50);
+   --dropdownSelectedCheckMarkColor : transparent;
+   --dropdownSelectedTextColor: var(--accentColor500);
+   --dropdownSelectedCheckMarkVisibility: none;
+   --dropdownSelectedBgColor: var(--accentColor50);
+   --dropdownSelectedBgColor: var(--bgColor50);
+   --dropdownItemTextColor: var(--grayColor600);
+   --dropDownArrowColor: var(--grayColor400);
+
+  /* Field Error States */
+  --fieldErrorBorderColor: var(--vw-color-gray-300);
+  --fieldErrorHoverBorderColor: var(--accentColor500);
+  --fieldErrorFocusBorderColor: var(--accentColor500);
+  --fieldHintErrorColor: var(--warnColor600);
+  --fieldErrorLtrMsgAlignment: right;
+  --fieldErrorRtlMsgAlignment: left;
+
+  /* Field Affix Text */
+  --fieldAffixTextBorderWidth: 0em;
+
+  /* --------------------------------------
+   * Button Variables
+   * -------------------------------------- */
+
+     /* -------------------- Button Styles -------------------- */
+
+   /* General Button Styling */
+  --buttonRadius: var(--fieldRadius);
+  --buttonHeight: 2.67em;
+  --buttonIconWidth: 2.67em;
+  --buttonIconHeight: 2.67em;
+  --buttonPadding: 0.5em 0.67em;
+
+  /* --------------------------------------
+ * Filled Button Variables
+ * -------------------------------------- */
+
+  /* Disabled Filled Button Styles */
+  --buttonFilledDisabledBgColor: var(--grayColor50);
+  --buttonFilledDisabledTextColor: var(--grayColor400);
+  --buttonFilledDisabledBorderColor: var(--grayColor50);
+
+  /* Primary */
+  --buttonFilledPrimaryBgColor: var(--primaryColor500);
+  --buttonFilledPrimaryTextColor: var(--grayColor10);
+  --buttonFilledPrimaryBorderColor: var(--primaryColor500);
+  --buttonFilledPrimaryBorderWidth: 0.084em;
+  --buttonFilledPrimaryHoverBgColor: var(--primaryColor600);
+  --buttonFilledPrimaryHoverBorderColor: var(--primaryColor600);
+  --buttonFilledPrimaryHoverTextColor: var(--grayColor10);
+  --buttonFilledPrimaryFocusBgColor: var(--primaryColor700);
+  --buttonFilledPrimaryFocusBorderColor: var(--primaryColor700);
+  --buttonFilledPrimaryFocusTextColor: var(--grayColor10);
+
+  /* Accent */
+  --buttonFilledAccentBgColor: var(--accentColor500);
+  --buttonFilledAccentTextColor: var(--grayColor10);
+  --buttonFilledAccentBorderColor: var(--accentColor500);
+  --buttonFilledAccentBorderWidth: 0.084em;
+  --buttonFilledAccentHoverBgColor: var(--accentColor600);
+  --buttonFilledAccentHoverBorderColor: var(--accentColor600);
+  --buttonFilledAccentHoverTextColor: var(--grayColor10);
+  --buttonFilledAccentFocusBgColor: var(--accentColor700);
+  --buttonFilledAccentFocusBorderColor: var(--accentColor700);
+  --buttonFilledAccentFocusTextColor: var(--grayColor10);
+
+  /* Warn */
+  --buttonFilledWarnBgColor: var(--warnColor600);
+  --buttonFilledWarnTextColor: var(--grayColor10);
+  --buttonFilledWarnBorderColor: var(--warnColor600);
+  --buttonFilledWarnBorderWidth: 0.084em;
+  --buttonFilledWarnHoverBgColor: var(--warnColor600);
+  --buttonFilledWarnHoverBorderColor: var(--warnColor600);
+  --buttonFilledWarnHoverTextColor: var(--grayColor10);
+  --buttonFilledWarnFocusBgColor: var(--warnColor600);
+  --buttonFilledWarnFocusBorderColor: var(--warnColor600);
+  --buttonFilledWarnFocusTextColor: var(--grayColor10);
+
+
+  /* --------------------------------------
+ * Stroked Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonStrokedDisabledBgColor: transparent;
+  --buttonStrokedDisabledTextColor: var(--grayColor400);
+  --buttonStrokedDisabledBorderColor: var(--grayColor200);
+
+  /* Primary */
+  --buttonStrokedPrimaryBgColor: transparent;
+  --buttonStrokedPrimaryTextColor: var(--grayColor800);
+  --buttonStrokedPrimaryBorderColor: var(--grayColor300);
+  --buttonStrokedPrimaryBorderWidth: 0.084em;
+  --buttonStrokedPrimaryHoverBgColor: transparent;
+  --buttonStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonStrokedPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonStrokedPrimaryFocusBgColor: transparent;
+  --buttonStrokedPrimaryFocusBorderColor: var(--primaryColor600);
+  --buttonStrokedPrimaryFocusTextColor: var(--primaryColor600);
+
+  /* Accent */
+  --buttonStrokedAccentBgColor: transparent;
+  --buttonStrokedAccentTextColor: var(--grayColor800);
+  --buttonStrokedAccentBorderColor: var(--grayColor300);
+  --buttonStrokedAccentBorderWidth: 0.084em;
+  --buttonStrokedAccentHoverBgColor: transparent;
+  --buttonStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonStrokedAccentHoverTextColor: var(--accentColor500);
+  --buttonStrokedAccentFocusBgColor: transparent;
+  --buttonStrokedAccentFocusBorderColor: var(--accentColor500);
+  --buttonStrokedAccentFocusTextColor: var(--accentColor500);
+
+  /* Warn */
+  --buttonStrokedWarnBgColor: transparent;
+  --buttonStrokedWarnTextColor: var(--grayColor800);
+  --buttonStrokedWarnBorderColor: var(--grayColor300);
+  --buttonStrokedWarnBorderWidth: 0.084em;
+  --buttonStrokedWarnHoverBgColor: transparent;
+  --buttonStrokedWarnHoverBorderColor: var(--warnColor500);
+  --buttonStrokedWarnHoverTextColor: var(--warnColor500);
+  --buttonStrokedWarnFocusBgColor: transparent;
+  --buttonStrokedWarnFocusBorderColor: var(--warnColor600);
+  --buttonStrokedWarnFocusTextColor: var(--warnColor600);
+
+
+   /* --------------------------------------
+ * Flat Stroked Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonflatStrokedDisabledBgColor: transparent;
+  --buttonflatStrokedDisabledTextColor: var(--grayColor400);
+  --buttonflatStrokedDisabledBorderColor: var(--grayColor200);
+
+  /* Primary */
+  --buttonflatStrokedPrimaryBgColor: transparent;
+  --buttonflatStrokedPrimaryTextColor: var(--grayColor800);
+  --buttonflatStrokedPrimaryBorderColor: var(--grayColor300);
+  --buttonflatStrokedPrimaryBorderWidth: 0.084em;
+  --buttonflatStrokedPrimaryHoverBgColor: var(--primaryColor500);
+  --buttonflatStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonflatStrokedPrimaryHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedPrimaryFocusBgColor: var(--primaryColor600);
+  --buttonflatStrokedPrimaryFocusBorderColor: var(--primaryColor600);
+  --buttonflatStrokedPrimaryFocusTextColor: var(--grayColor10);
+
+  /* Accent */
+  --buttonflatStrokedAccentBgColor: transparent;
+  --buttonflatStrokedAccentTextColor: var(--grayColor800);
+  --buttonflatStrokedAccentBorderColor: var(--grayColor300);
+  --buttonflatStrokedAccentBorderWidth: 0.084em;
+  --buttonflatStrokedAccentHoverBgColor: var(--accentColor500);
+  --buttonflatStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonflatStrokedAccentHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedAccentFocusBgColor: var(--accentColor600);
+  --buttonflatStrokedAccentFocusBorderColor: var(--accentColor600);
+  --buttonflatStrokedAccentFocusTextColor: var(--grayColor10);
+
+  /* Warn */
+  --buttonflatStrokedWarnBgColor: transparent;
+  --buttonflatStrokedWarnTextColor: var(--grayColor800);
+  --buttonflatStrokedWarnBorderColor: var(--grayColor300);
+  --buttonflatStrokedWarnBorderWidth: 0.084em;
+  --buttonflatStrokedWarnHoverBgColor: var(--warnColor600);
+  --buttonflatStrokedWarnHoverBorderColor: var(--warnColor600);
+  --buttonflatStrokedWarnHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedWarnFocusBgColor: var(--warnColor700);
+  --buttonflatStrokedWarnFocusBorderColor: var(--warnColor700);
+  --buttonflatStrokedWarnFocusTextColor: var(--grayColor10);
+
+  /* --------------------------------------
+ * Icon Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonIconDisabledBgColor: transparent;
+  --buttonIconDisabledTextColor: var(--grayColor400);
+  --buttonIconDisabledBorderColor: var(--grayColor10);
+
+  /* Primary */
+  --buttonIconPrimaryBgColor: transparent;
+  --buttonIconPrimaryTextColor: var(--primaryColor500);
+  --buttonIconPrimaryBorderColor: var(--primaryColor500);
+  --buttonIconPrimaryBorderWidth: 0em;
+  --buttonIconPrimaryHoverBgColor: transparent;
+  --buttonIconPrimaryHoverBorderColor: transparent;
+  --buttonIconPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonIconPrimaryFocusBgColor: transparent;
+  --buttonIconPrimaryFocusBorderColor: transparent;
+  --buttonIconPrimaryFocusTextColor: var(--primaryColor500);
+
+  /* Accent */
+  --buttonIconAccentBgColor: transparent;
+  --buttonIconAccentTextColor: var(--accentColor500);
+  --buttonIconAccentBorderColor: var(--accentColor500);
+  --buttonIconAccentBorderWidth: 0em;
+  --buttonIconAccentHoverBgColor: transparent;
+  --buttonIconAccentHoverBorderColor: transparent;
+  --buttonIconAccentHoverTextColor: var(--accentColor500);
+  --buttonIconAccentFocusBgColor: transparent;
+  --buttonIconAccentFocusBorderColor: transparent;
+  --buttonIconAccentFocusTextColor: var(--accentColor500);
+
+  /* Warn */
+  --buttonIconWarnBgColor: transparent;
+  --buttonIconWarnTextColor: var(--warnColor600);
+  --buttonIconWarnBorderColor: var(--warnColor600);
+  --buttonIconWarnBorderWidth: 0em;
+  --buttonIconWarnHoverBgColor: transparent;
+  --buttonIconWarnHoverBorderColor: transparent;
+  --buttonIconWarnHoverTextColor: var(--warnColor600);
+  --buttonIconWarnFocusBgColor: transparent;
+  --buttonIconWarnFocusBorderColor: transparent;
+  --buttonIconWarnFocusTextColor: var(--warnColor600);
+
+  /* --------------------------------------
+ * Icon Stroked Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonIconStrokedDisabledBgColor: var(--grayColor50);
+  --buttonIconStrokedDisabledTextColor: var(--grayColor400);
+  --buttonIconStrokedDisabledBorderColor: var(--grayColor50);
+
+  /* Primary */
+  --buttonIconStrokedPrimaryBgColor: var(--grayColor50);
+  --buttonIconStrokedPrimaryTextColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryBorderColor: var(--grayColor50);
+  --buttonIconStrokedPrimaryBorderWidth: 0.084em;
+  --buttonIconStrokedPrimaryHoverBgColor: var(--grayColor50);
+  --buttonIconStrokedPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryFocusBgColor: var(--primaryColor50);
+  --buttonIconStrokedPrimaryFocusTextColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryFocusBorderColor: var(--primaryColor500);
+
+  /* Accent */
+  --buttonIconStrokedAccentBgColor: var(--grayColor50);
+  --buttonIconStrokedAccentTextColor: var(--accentColor500);
+  --buttonIconStrokedAccentBorderColor: var(--grayColor50);
+  --buttonIconStrokedAccentBorderWidth: 0.084em;
+  --buttonIconStrokedAccentHoverBgColor: var(--grayColor50);
+  --buttonIconStrokedAccentHoverTextColor: var(--accentColor500);
+  --buttonIconStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonIconStrokedAccentFocusBgColor: var(--grayColor50);
+  --buttonIconStrokedAccentFocusTextColor: var(--accentColor500);
+  --buttonIconStrokedAccentFocusBorderColor: var(--accentColor500);
+
+  /* Warn */
+  --buttonIconStrokedWarnBgColor: var(--grayColor50);
+  --buttonIconStrokedWarnTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnBorderColor: var(--grayColor50);
+  --buttonIconStrokedWarnBorderWidth: 0.084em;
+  --buttonIconStrokedWarnHoverBgColor: var(--grayColor50);
+  --buttonIconStrokedWarnHoverTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnHoverBorderColor: var(--warnColor600);
+  --buttonIconStrokedWarnFocusBgColor: var(--grayColor50);
+  --buttonIconStrokedWarnFocusTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnFocusBorderColor: var(--warnColor600);
+
+    /* --------------------------------------
+ * Toggle Variables
+ * -------------------------------------- */
+
+  /* Button Toggle */
+  --toggleButtonPadding: 0.2em;
+  --toggleButtonBgColor: var(--bgColor10);
+  --toggleButtonUncheckedTextColor: var(--grayColor700);
+  --toggleBorderRadius: 1.5em;
+  --toggleButtonOuterBorderWidth: var(--fieldBorderWidth);
+  --toggleButtonOuterBorder: var(--fieldBorderColor);
+  --toggleButtonCheckedDisabledBgColor: var(--bgColor10);
+  --toggleButtonHeight: 2.3em;
+
+
+  /* Slide Toggle */
+  --toggleBorderColor : var(--grayColor200);
+  --toggleBorderRadius: 1.5em;
+  --toggleSelectedBgColor: var(--accentColor500);
+  --toggleSelectedHoverBgColor: var(--accentColor600);
+  --toggleUnselectedBgColor: var(--bgColor200); 
+  --toggleInnerBgColor: var(--bgColor10); 
+  --toggleInnerBorderColor: var(--grayColor300);
+
+
+  /* --------------------------------------
+   * Checkbox Variables
+   * -------------------------------------- */
+  --checkboxBorderColor: var(--grayColor600);
+  --checkboxDisabledCheckmarkColor: var(--grayColor300);
+  --checkboxBgColor: var(--accentColor500);
+  --checkboxOuterBorderRadius: 0em;
+  --checkboxBorderWidth: 0.084em;
+  --checkboxBorderRadius: 0.37em;
+
+  /* --------------------------------------
+ * Slider Variables
+ * -------------------------------------- */
+ --sliderActiveTrackBgColor: var(--accentColor500);
+ --sliderThumbBgColor: var(--bgColor10);
+ --sliderTrackBgColor: var(--accentColor50);
+ --sliderThumbBorderWidth: 0.084em;
+ --sliderTrackHeight: 0.64em;
+ --sliderThumbBoxShadow: 0em 0.22em 0.3em 0em var(--grayColor200);
+ --sliderThumbBorderColor: var(--grayColor100);
+ --sliderTopLabelTextColor: var(--grayColor10);
+ --sliderTopLabelBgColor: var(--accentColor500);
+ --sliderTopLabelBorderWidth: 0.084em;
+ --sliderTopLabelBoxShadow: 0.17em 0.33em 0.92em 0em rgba(0, 0, 0, 0.1);
+ --sliderDisabledInactiveBgColor: var(--bgColor100);
+ --sliderDisabledActiveBgColor: var(--bgColor200);
+
+
+ /* --------------------------------------
+* Range Slider Variables
+* -------------------------------------- */
+ --rangeSliderActiveTrackBgColor: var(--accentColor500);
+ --rangeSliderThumbBgColor: var(--bgColor10);
+ --rangeSliderTrackBgColor: var(--accentColor50);
+ --rangeSliderThumbBorderColor: var(--grayColor100);
+ --rangeSliderThumbBoxShadow: 0em 0.22em 0.3em 0em var(--grayColor200);
+ --rangeSliderTopLabelTextColor: var(--grayColor1000);
+ --rangeSliderTopLabelBgColor: var(--bgColor200);
+ --rangeSliderTopLabelBorderWidth:0;
+ --rangeSliderTopLabelBoxShadow:none;
+
+  /* --------------------------------------
+   * Radio Button Variables
+   * -------------------------------------- */
+  --radioBorderColor: var(--grayColor600);
+  --radioOuterBgColor: var(--bgColor10);
+  --radioInnerBgColor: var(--accentColor500);
+  --radioTabsBorderColor: var(--grayColor100);
+
+  /* --------------------------------------
+   * Upload Variables
+   * -------------------------------------- */
+  --uploadBoxRadius: 1em;
+  --uploadBorderStyle: solid;
+  --uploadBorderWidth: 0.084em;
+  --uploadBorderRadius: 0.67em;
+  --uploadBorderColor: var(--grayColor100);
+  --uploadIconPadding: 0.5em;
+  --uploadIconBorderRadius: 0.67em;
+  --uploadDisabledBorderColor: var(--grayColor50);
+  --uploadDisabledBgColor: var(--bgColor50);
+  --uploadBoxTitleTextColor: var(--grayColor500);
+  --uploadBoxSubTitleTextColor: var(--grayColor500);
+  --uploadBoxTitleDisabledTextColor: var(--grayColor400);
+  --uploadIconBorderColor: var(--grayColor300);
+  --uploadHoverBorderColor: var(--accentColor500);
+  --uploadIconBorderStyle: solid;
+  --uploadBoxActionTextColor : var(--accentColor500);
+
+ 
+  /* -------------------- Snackbar Styles -------------------- */
+  --snackbarBorderWidth: 0.11em;
+  --snackbarBorderRadius: 1em;
+
+  /* Error Snackbar */
+  --errorBgColor: var(--bgColor10);
+  --errorBorderColor: var(--warnColor500);
+  --errorIconColor: var(--warnColor500);
+  --errorTitleColor: var(--warnColor500);
+  --errorTextColor: var(--grayColor1000);
+
+  /* Success Snackbar */
+  --successBgColor: var(--bgColor10);
+  --successBorderColor: #2ab915;
+  --successIconColor: #2ab915;
+  --successTitleColor: #2ab915;
+  --successTextColor: var(--grayColor1000);
+
+  /* Warning Snackbar */
+  --warnBgColor: var(--bgColor10);
+  --warnBorderColor: #f79008;
+  --warnIconColor: #f79008;
+  --warnTitleColor: #f79008;
+  --warnTextColor: var(--grayColor1000);
+
+  /* Info Snackbar */
+  --infoBgColor: var(--bgColor10);
+  --infoBorderColor: #1b81ef;
+  --infoIconColor: #1b81ef; 
+  --infoTitleColor: #1b81ef;  
+  --infoTextColor: var(--grayColor1000);
+
+  /* -------------------- Snackbar Solid Type Styles -------------------- */
+  
+  /* Error Snackbar Solid */
+  --errorSolidBgColor: #dc3545;
+  --errorSolidBorderColor: #dc3545;
+  --errorSolidIconColor: #ffffff;
+  --errorSolidTitleColor: #ffffff;
+  --errorSolidTextColor: #ffffff;
+
+  /* Success Snackbar Solid */
+  --successSolidBgColor: #2ab915;
+  --successSolidBorderColor: #2ab915;
+  --successSolidIconColor: #ffffff;
+  --successSolidTitleColor: #ffffff;
+  --successSolidTextColor: #ffffff;
+
+  /* Warning Snackbar Solid */
+  --warnSolidBgColor: #f79008;
+  --warnSolidBorderColor: #f79008;
+  --warnSolidIconColor: #ffffff;
+  --warnSolidTitleColor: #ffffff;
+  --warnSolidTextColor: #ffffff;
+
+  /* Info Snackbar Solid */
+  --infoSolidBgColor: #1b81ef;
+  --infoSolidBorderColor: #1b81ef;
+  --infoSolidIconColor: #ffffff;
+  --infoSolidTitleColor: #ffffff;
+  --infoSolidTextColor: #ffffff;
+
+  /* -------------------- Tooltip Styles -------------------- */
+  --tooltipColor: rgb(255, 247, 247);
+  --tooltipTextColor: #ffffff;
+  --tooltipFontSize: 0.89em;
+  --tooltipBgColor: #515151;
+  --tooltipArrowBgColor: transparent;
+  --tooltipBorderRadius: 0.6em;
+
+  /* -------------------- ag-Grid Styles -------------------- */
+  --agGridPinnedBorder: 0em;
+  --agGridHeaderBg: var(--bgColor10);
+  --agGridHeaderFontSize: 1.08em;
+  --agGridHeaderLabelFontWeight: 500;
+  --agGridHeaderToolBg: var(--grayColor50);
+  --agGridHeaderPadding:0em 1.15em;
+  --agGridHeaderBorderBottomColor: var(--grayColor50);
+  --agGridHeaderBorderTopColor: transparent;
+  --agGridBorderBottomColor: var(--grayColor50);
+  --agGridHeaderColumnColor: var(--grayColor700);
+  --agGridHeaderToolHeight: 4em;
+  --agGridHeaderToolPadding: 0.8em;
+  --agGridHeaderSearchTools: 0.3em;
+  --agGridMenuIconColor: var(--grayColor600);
+  --agGridRowHoverColor: var(--bgColor50);
+
+  /* -------------------- Tab Styles -------------------- */
+  --tabHeight: 4.31em;
+  --tabWidth: 12.39em;
+  --tabBottomBorderWidth: 0.084em;
+  --tabTitleMargin: 0em;
+  --tabBgColor: var(--bgColor10);
+
+  /* -------------------- Radio Tabs -------------------- */
+  --radioTabsTextColor: var(--accentColor500);
+  --radioOuterBorderColor: var(--accentColor500);
+
+  /* --------------------------------------
+  * Stepper Variables
+  * -------------------------------------- */
+  --stepperLabelFontWeight: 400;
+  --stepperConnectorLineWidth: var(--fieldBorderWidth);
+  --stepperConnectorLineColor: var(--grayColor400);
+  --stepperPreviousConnectorLineColor: var(--accentColor500);
+
+  --stepperNextStepBgColor: var(--bgColor10);
+  --stepperNextStepBorderColor: var(--grayColor400);
+  --stepperNextStepTextColor: var(--grayColor600);
+  --stepperNextLabelColor: var(--grayColor700);
+  --stepperNextDescriptionColor: var(--grayColor700);
+
+  --stepperCurrentStepBgColor: var(--accentColor500);
+  --stepperCurrentStepBorderColor:var(--accentColor500);
+  --stepperCurrentStepTextColor: var(--grayColor10);
+  --stepperCurrentLabelColor: var(--accentColor500);
+  --stepperCurrentDescriptionColor: var(--accentColor500);
+
+  --stepperPreviousStepBgColor: var(--accentColor500);
+  --stepperPreviousStepBorderColor:var(--accentColor500);
+  --stepperPreviousStepTextColor: var(--grayColor10);
+  --stepperPreviousLabelColor: var(--accentColor500);
+  --stepperPreviousDescriptionColor: var(--accentColor500);
+
+  /* -------------------- Date Picker  -------------------- */
+  --datePickerBorderColor: var(--grayColor100);
+  --datePickerHeaderDateBorderColor: var(--grayColor100);
+  --datePickerSelectedCellBorderRadius: 2em; 
+  --datePickerCellInRangeBgColor: var(--bgColor50);
+  --datePickerCellInRangeHoverBgColor: var(--bgColor100);
+  --datePickerSelectedCellColor:black;
+  --datePickerSelectedCellBgColor:var(--accentColor50);
+  --datePickerTodayCellBgColor: var(--accentColor50);
+  --datePickerSelectedRangeCellBgColor:var(--accentColor500);
+  --datePickerSelectedRangeCellColor:var(--grayColor10);
+  --datePickerCellRangeFromBorderRadius: 2em;
+  --datePickerCellSpacing: 0em 0.3em;
+  --datePickerCalendarHeight: 27em;
+
+  /* -------------------- Splitview  -------------------- */
+  --splitviewSelectedCardBorderColor: var(--accentColor600);
+  --splitviewSelectedCardBoxShadow: none;
+
+  /* -------------------- Breadcrumbs -------------------- */
+  --breadCrumbBreadColor: var(--grayColor500);
+  --breadCrumbRecentBreadColor: var(--grayColor1000);
+  --breadCrumbIconColor: var(--grayColor500);
+  --breadCrumbRecentIconColor: var(--grayColor1000);
+
+
+  
+}
+
+.template13-style {
+  /* -------------------- App Container -------------------- */
+  --appContainerGap: 2em;
+  --appContainerRadius: 1em;
+
+  /* Side space margin */
+  --sideSpaceMargin : 1200px;
+
+  /* Outer Focus Border Border */
+  --focusOuterOutline:0px 0px 0px 2px var(--grayColor10),   0px 0px 0px 4px var(--grayColor300);
+
+  /* -------------------- Radius Styles -------------------- */
+  --dialogRadius: 1em;
+  --chipRadius: 1em;
+  --queryBuilderRadius: 1em;
+  --iconSelectBoxRadius: 1em;
+  --cardRadius: 1.6em;
+
+  /* -------------------- Chip Variant Colors -------------------- */
+  /* Success Chip */
+  --chipSuccessBgColor: #d7f7d9;
+  --chipSuccessTextColor: #0a4d00;
+  
+  /* Error Chip */
+  --chipErrorBgColor: #ffe8e8;
+  --chipErrorTextColor: #ba0000;
+  
+  /* Warning Chip */
+  --chipWarningBgColor: #fff5c2;
+  --chipWarningTextColor: #7a5900;
+  
+  /* Info Chip */
+  --chipInfoBgColor: #e6f1ff;
+  --chipInfoTextColor: #004085;
+  
+  /* Purple Chip */
+  --chipPurpleBgColor: #efdffa;
+  --chipPurpleTextColor: #552684;
+  
+  /* Orange Chip */
+  --chipOrangeBgColor: #ffecd8;
+  --chipOrangeTextColor: #824313;
+  
+  /* Pink Chip */
+  --chipPinkBgColor: #ffebf4;
+  --chipPinkTextColor: #750f3d;
+  
+  /* Cyan Chip */
+  --chipCyanBgColor: #d9f7fa;
+  --chipCyanTextColor: #00555e;
+
+  /* Neutral Chip */
+  --chipNeutralBgColor: transparent;
+  --chipNeutralTextColor: var(--grayColor700);
+
+  /* -------------------- Builder Config -------------------- */
+  --configCardRadius: 1em;
+  --configHeaderMargin:  0em 0em 1.34em 0em;
+  --configHeaderBgColor: var(--bgColor10);
+  --configHeaderBorderWidth: 0.084em;
+
+  /* --------------------------------------
+ * Field Variables
+ 
+ * -------------------------------------- */
+ --fieldRadius: 0.5em;
+ --fieldHeight: 2.9em;
+ --fieldLabelGap: 0.7em;
+ --fieldBorderWidth: 0.084em;
+ --fieldHoverBorderWidth: 0.084em;
+ --fieldFocusBorderWidth: 0.165em;
+
+ /* Field Colors */
+ --fieldPlaceholderColor: var(--grayColor400);
+ --fieldLabelColor: #364153;
+ --fieldHoverLabelColor: var(--grayColor700);
+ --fieldTextColor: var(--grayColor900);
+ --fieldHoverBorderColor: var(--accentColor500);
+ --fieldFocusBorderColor: var(--accentColor500);
+ --fieldMatHintColor: #6a7282;
+ --fieldBorderColor: var(--grayColor300);
+
+ /* Disabled Field Styles */
+ --fieldDisabledBgColor: var(--bgColor50);
+ --fieldDisabledActiveBgColor: var(--bgColor300);
+ --fieldDisabledLabelColor: var(--grayColor700);
+ --fieldDisabledTextColor: var(--grayColor400);
+ --fieldDisabledBorderColor: var(--grayColor300);
+ --fieldDisabledBorderWidth: var(--fieldBorderWidth);
+
+  /* General Field Styling */
+  --fieldLabelFontWeight: 500;
+  --fieldTextFontWeight: 400;
+  --fieldPlaceholderFontWeight: 400;
+  --fieldMatHintFontWeight: 400;
+  --fieldAffixIconBorderWidth: 0em;
+  --fieldCurrencyInputBorderWidth: 0.084em;
+
+  /* Field Error States */
+  --fieldErrorBorderColor: var(--warnColor300);
+  --fieldErrorHoverBorderColor: var(--warnColor500);
+  --fieldErrorFocusBorderColor: var(--warnColor500);
+  --fieldHintErrorColor: var(--warnColor600);
+  --fieldErrorLtrMsgAlignment: left;
+  --fieldErrorRtlMsgAlignment: right;
+
+  /* Field Affix Text */
+  --fieldAffixTextBorderWidth: 0.084em;
+  
+  /* --------------------------------------
+ * Dropdown Variables
+ * -------------------------------------- */
+ --dropdownBorderColor: var(--grayColor200);
+ --dropdownItemHoverTextColor: var(--grayColor900);
+ --dropdownItemHoverBgColor: var(--bgColor50);
+ --dropdownSelectedCheckMarkColor : var(--accentColor500);
+ --dropdownSelectedTextColor: var(--grayColor900);
+ --dropdownSelectedCheckMarkVisibility: block;
+ --dropdownSelectedBgColor: var(--bgColor100);
+ --dropdownItemTextColor: var(--grayColor900);
+ --dropDownArrowColor: var(--grayColor500);
+
+  /* --------------------------------------
+* Button Variables
+* -------------------------------------- */
+ 
+   /* -------------------- Button Styles -------------------- */
+
+  /* General Button Styling */
+  --buttonRadius: 2em;
+  --buttonHeight: 2.75em;
+  --buttonIconWidth: 2.75em;
+  --buttonIconHeight: 2.75em;
+  --buttonPadding: 0.63em 1em;
+ 
+  /* --------------------------------------
+* Filled Button Variables
+* -------------------------------------- */
+ 
+  /* Disabled */
+  --buttonFilledDisabledBgColor: var(--bgColor100);
+  --buttonFilledDisabledTextColor: var(--grayColor400);
+  --buttonFilledDisabledBorderColor: var(--grayColor200);
+ 
+  /* Primary */
+  --buttonFilledPrimaryBgColor: var(--primaryColor500);
+  --buttonFilledPrimaryTextColor: var(--grayColor10);
+  --buttonFilledPrimaryBorderColor: var(--primaryColor500);
+  --buttonFilledPrimaryBorderWidth: 0.084em;
+  --buttonFilledPrimaryHoverBgColor: var(--primaryColor600);
+  --buttonFilledPrimaryHoverTextColor: var(--grayColor10);
+  --buttonFilledPrimaryHoverBorderColor: var(--primaryColor600);
+  --buttonFilledPrimaryFocusBgColor: var(--primaryColor700);
+  --buttonFilledPrimaryFocusTextColor: var(--grayColor10);
+  --buttonFilledPrimaryFocusBorderColor: var(--primaryColor700);
+ 
+  /* Accent */
+  --buttonFilledAccentBgColor: var(--accentColor500);
+  --buttonFilledAccentTextColor: var(--grayColor10);
+  --buttonFilledAccentBorderColor: var(--accentColor500);
+  --buttonFilledAccentBorderWidth: 0.084em;
+  --buttonFilledAccentHoverBgColor: var(--accentColor600);
+  --buttonFilledAccentHoverTextColor: var(--grayColor10);
+  --buttonFilledAccentHoverBorderColor: var(--accentColor600);
+  --buttonFilledAccentFocusBgColor: var(--accentColor500);
+  --buttonFilledAccentFocusTextColor: var(--grayColor10);
+  --buttonFilledAccentFocusBorderColor: var(--accentColor500);
+ 
+  /* Warn */
+  --buttonFilledWarnBgColor: var(--warnColor600);
+  --buttonFilledWarnTextColor: var(--grayColor10);
+  --buttonFilledWarnBorderColor: var(--warnColor600);
+  --buttonFilledWarnBorderWidth: 0.084em;
+  --buttonFilledWarnHoverBgColor: var(--warnColor700);
+  --buttonFilledWarnHoverTextColor: var(--grayColor10);
+  --buttonFilledWarnHoverBorderColor: var(--warnColor700);
+  --buttonFilledWarnFocusBgColor: var(--warnColor600);
+  --buttonFilledWarnFocusTextColor: var(--grayColor10);
+  --buttonFilledWarnFocusBorderColor: var(--warnColor600);
+ 
+
+
+  /* --------------------------------------
+ * Stroked Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonStrokedDisabledBgColor: transparent;
+  --buttonStrokedDisabledTextColor: var(--grayColor400);
+  --buttonStrokedDisabledBorderColor: var(--grayColor200);
+
+  /* Primary */
+  --buttonStrokedPrimaryBgColor: transparent;
+  --buttonStrokedPrimaryTextColor: var(--grayColor800);
+  --buttonStrokedPrimaryBorderColor: var(--grayColor300);
+  --buttonStrokedPrimaryBorderWidth: 0.084em;
+  --buttonStrokedPrimaryHoverBgColor: transparent;
+  --buttonStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonStrokedPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonStrokedPrimaryFocusBgColor: transparent;
+  --buttonStrokedPrimaryFocusBorderColor: var(--primaryColor600);
+  --buttonStrokedPrimaryFocusTextColor: var(--primaryColor600);
+
+  /* Accent */
+  --buttonStrokedAccentBgColor: transparent;
+  --buttonStrokedAccentTextColor: var(--grayColor800);
+  --buttonStrokedAccentBorderColor: var(--grayColor300);
+  --buttonStrokedAccentBorderWidth: 0.084em;
+  --buttonStrokedAccentHoverBgColor: transparent;
+  --buttonStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonStrokedAccentHoverTextColor: var(--accentColor500);
+  --buttonStrokedAccentFocusBgColor: transparent;
+  --buttonStrokedAccentFocusBorderColor: var(--accentColor500);
+  --buttonStrokedAccentFocusTextColor: var(--accentColor500);
+
+  /* Warn */
+  --buttonStrokedWarnBgColor: transparent;
+  --buttonStrokedWarnTextColor: var(--grayColor800);
+  --buttonStrokedWarnBorderColor: var(--grayColor300);
+  --buttonStrokedWarnBorderWidth: 0.084em;
+  --buttonStrokedWarnHoverBgColor: transparent;
+  --buttonStrokedWarnHoverBorderColor: var(--warnColor500);
+  --buttonStrokedWarnHoverTextColor: var(--warnColor500);
+  --buttonStrokedWarnFocusBgColor: transparent;
+  --buttonStrokedWarnFocusBorderColor: var(--warnColor600);
+  --buttonStrokedWarnFocusTextColor: var(--warnColor600);
+
+
+   /* --------------------------------------
+ * Flat Stroked Button Variables
+ * -------------------------------------- */
+
+  /* Disabled */
+  --buttonflatStrokedDisabledBgColor: transparent;
+  --buttonflatStrokedDisabledTextColor: var(--grayColor400);
+  --buttonflatStrokedDisabledBorderColor: var(--grayColor200);
+
+  /* Primary */
+  --buttonflatStrokedPrimaryBgColor: transparent;
+  --buttonflatStrokedPrimaryTextColor: var(--grayColor800);
+  --buttonflatStrokedPrimaryBorderColor: var(--grayColor300);
+  --buttonflatStrokedPrimaryBorderWidth: 0.084em;
+  --buttonflatStrokedPrimaryHoverBgColor: var(--primaryColor500);
+  --buttonflatStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonflatStrokedPrimaryHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedPrimaryFocusBgColor: var(--primaryColor600);
+  --buttonflatStrokedPrimaryFocusBorderColor: var(--primaryColor600);
+  --buttonflatStrokedPrimaryFocusTextColor: var(--grayColor10);
+
+  /* Accent */
+  --buttonflatStrokedAccentBgColor: transparent;
+  --buttonflatStrokedAccentTextColor: var(--grayColor800);
+  --buttonflatStrokedAccentBorderColor: var(--grayColor300);
+  --buttonflatStrokedAccentBorderWidth: 0.084em;
+  --buttonflatStrokedAccentHoverBgColor: var(--accentColor500);
+  --buttonflatStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonflatStrokedAccentHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedAccentFocusBgColor: var(--accentColor600);
+  --buttonflatStrokedAccentFocusBorderColor: var(--accentColor600);
+  --buttonflatStrokedAccentFocusTextColor: var(--grayColor10);
+
+  /* Warn */
+  --buttonflatStrokedWarnBgColor: transparent;
+  --buttonflatStrokedWarnTextColor: var(--grayColor800);
+  --buttonflatStrokedWarnBorderColor: var(--grayColor300);
+  --buttonflatStrokedWarnBorderWidth: 0.084em;
+  --buttonflatStrokedWarnHoverBgColor: var(--warnColor600);
+  --buttonflatStrokedWarnHoverBorderColor: var(--warnColor600);
+  --buttonflatStrokedWarnHoverTextColor: var(--grayColor10);
+  --buttonflatStrokedWarnFocusBgColor: var(--warnColor700);
+  --buttonflatStrokedWarnFocusBorderColor: var(--warnColor700);
+  --buttonflatStrokedWarnFocusTextColor: var(--grayColor10);
+ 
+  /* --------------------------------------
+* Stroked Button Variables
+* -------------------------------------- */
+ 
+  /* Disabled */
+  --buttonStrokedDisabledBgColor: var(--grayColor10);
+  --buttonStrokedDisabledTextColor: var(--grayColor400);
+  --buttonStrokedDisabledBorderColor: var(--grayColor200);
+ 
+  /* Primary */
+  --buttonStrokedPrimaryBgColor: transparent;
+  --buttonStrokedPrimaryTextColor: var(--grayColor700);
+  --buttonStrokedPrimaryBorderColor: var(--grayColor400);
+  --buttonStrokedPrimaryBorderWidth: 0.084em;
+  --buttonStrokedPrimaryHoverBgColor: transparent;
+  --buttonStrokedPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonStrokedPrimaryFocusBgColor: transparent;
+  --buttonStrokedPrimaryFocusTextColor: var(--primaryColor600);
+  --buttonStrokedPrimaryFocusBorderColor: var(--primaryColor600);
+ 
+  /* Accent */
+  --buttonStrokedAccentBgColor: transparent;
+  --buttonStrokedAccentTextColor: var(--grayColor700);
+  --buttonStrokedAccentBorderColor: var(--grayColor400);
+  --buttonStrokedAccentBorderWidth: 0.084em;
+  --buttonStrokedAccentHoverBgColor: transparent;
+  --buttonStrokedAccentHoverTextColor: var(--accentColor500);
+  --buttonStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonStrokedAccentFocusBgColor: transparent;
+  --buttonStrokedAccentFocusTextColor: var(--accentColor600);
+  --buttonStrokedAccentFocusBorderColor: var(--accentColor600);
+ 
+  /* Warn */
+  --buttonStrokedWarnBgColor: transparent;
+  --buttonStrokedWarnTextColor: var(--grayColor700);
+  --buttonStrokedWarnBorderColor: var(--grayColor400);
+  --buttonStrokedWarnBorderWidth: 0.084em;
+  --buttonStrokedWarnHoverBgColor: transparent;
+  --buttonStrokedWarnHoverTextColor: var(--warnColor500);
+  --buttonStrokedWarnHoverBorderColor: var(--warnColor500);
+  --buttonStrokedWarnFocusBgColor: transparent;
+  --buttonStrokedWarnFocusTextColor: var(--warnColor600);
+  --buttonStrokedWarnFocusBorderColor: var(--warnColor600);
+ 
+  /* --------------------------------------
+* Icon Button Variables
+* -------------------------------------- */
+ 
+  /* Disabled */
+  --buttonIconDisabledBgColor: transparent;
+  --buttonIconDisabledTextColor: var(--grayColor400);
+  --buttonIconDisabledBorderColor: var(--grayColor10);
+ 
+  /* Primary */
+  --buttonIconPrimaryBgColor: transparent;
+  --buttonIconPrimaryTextColor: var(--primaryColor500);
+  --buttonIconPrimaryBorderColor: var(--primaryColor500);
+  --buttonIconPrimaryBorderWidth: 0em;
+  --buttonIconPrimaryHoverBgColor: transparent;
+  --buttonIconPrimaryHoverBorderColor: transparent;
+  --buttonIconPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonIconPrimaryFocusBgColor: transparent;
+  --buttonIconPrimaryFocusBorderColor: transparent;
+  --buttonIconPrimaryFocusTextColor: var(--primaryColor500);
+ 
+  /* Accent */
+  --buttonIconAccentBgColor: transparent;
+  --buttonIconAccentTextColor: var(--accentColor500);
+  --buttonIconAccentBorderColor: transparent;
+  --buttonIconAccentBorderWidth: 0;
+  --buttonIconAccentHoverBgColor: transparent;
+  --buttonIconAccentHoverBorderColor: transparent;
+  --buttonIconAccentHoverTextColor: var(--accentColor500);
+  --buttonIconAccentFocusBgColor: transparent;
+  --buttonIconAccentFocusBorderColor: transparent;
+  --buttonIconAccentFocusTextColor: var(--accentColor500);
+ 
+  /* Warn */
+  --buttonIconWarnBgColor: transparent;
+  --buttonIconWarnTextColor: var(--warnColor600);
+  --buttonIconWarnBorderColor: var(--warnColor600);
+  --buttonIconWarnBorderWidth: 0em;
+  --buttonIconWarnHoverBgColor: transparent;
+  --buttonIconWarnHoverBorderColor: transparent;
+  --buttonIconWarnHoverTextColor: var(--warnColor600);
+  --buttonIconWarnFocusBgColor: transparent;
+  --buttonIconWarnFocusBorderColor: transparent;
+  --buttonIconWarnFocusTextColor: var(--warnColor600);
+ 
+  /* --------------------------------------
+* Icon Stroked Button Variables
+* -------------------------------------- */
+ 
+  /* Disabled */
+  --buttonIconStrokedDisabledBgColor: var(--grayColor50);
+  --buttonIconStrokedDisabledTextColor: var(--grayColor400);
+  --buttonIconStrokedDisabledBorderColor: var(--grayColor100);
+ 
+  /* Primary */
+  --buttonIconStrokedPrimaryBgColor: transparent;
+  --buttonIconStrokedPrimaryTextColor: var(--grayColor800);
+  --buttonIconStrokedPrimaryBorderColor: var(--grayColor50);
+  --buttonIconStrokedPrimaryBorderWidth: 0.084em;
+  --buttonIconStrokedPrimaryHoverBgColor: var(--grayColor50);
+  --buttonIconStrokedPrimaryHoverTextColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryHoverBorderColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryFocusBgColor: var(--primaryColor50);
+  --buttonIconStrokedPrimaryFocusTextColor: var(--primaryColor500);
+  --buttonIconStrokedPrimaryFocusBorderColor: var(--primaryColor500);
+ 
+  /* Accent */
+  --buttonIconStrokedAccentBgColor: var(--bgColor50);
+  --buttonIconStrokedAccentTextColor: var(--accentColor500);
+  --buttonIconStrokedAccentBorderColor: transparent;
+  --buttonIconStrokedAccentBorderWidth: 0.084em;
+  --buttonIconStrokedAccentHoverBgColor: var(--bgColor50);
+  --buttonIconStrokedAccentHoverBorderColor: var(--accentColor500);
+  --buttonIconStrokedAccentHoverTextColor: var(--accentColor500);
+  --buttonIconStrokedAccentFocusBgColor: var(--bgColor50);
+  --buttonIconStrokedAccentFocusBorderColor: var(--accentColor500);
+  --buttonIconStrokedAccentFocusTextColor: var(--accentColor500);
+ 
+  /* Warn */
+  --buttonIconStrokedWarnBgColor: transparent;
+  --buttonIconStrokedWarnTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnBorderColor: var(--grayColor50);
+  --buttonIconStrokedWarnBorderWidth: 0.084em;
+  --buttonIconStrokedWarnHoverBgColor: var(--grayColor50);
+  --buttonIconStrokedWarnHoverBorderColor: var(--warnColor600);
+  --buttonIconStrokedWarnHoverTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnFocusBgColor: var(--grayColor50);
+  --buttonIconStrokedWarnFocusTextColor: var(--warnColor600);
+  --buttonIconStrokedWarnFocusBorderColor: var(--warnColor600);
+  
+  /* --------------------------------------
+ * Toggle Variables
+ * -------------------------------------- */
+
+  /* Button Toggle */
+  --toggleButtonPadding: 0.28em;
+  --toggleButtonBgColor: var(--bgColor200);
+  --toggleButtonUncheckedTextColor: var(--grayColor700);
+  --toggleButtonOuterBorderWidth: 0px;
+  --toggleButtonOuterBorder: var(--fieldBorderColor);
+  --toggleButtonCheckedDisabledBgColor: var(--bgColor10);
+  --toggleButtonHeight: 2.3em;
+
+
+  /* Slide Toggle */
+  --toggleBorderColor : var(--grayColor200);
+  --toggleBorderRadius: 1.5em;
+  --toggleSelectedBgColor: var(--accentColor500);
+  --toggleSelectedHoverBgColor: var(--accentColor600);
+  --toggleUnselectedBgColor: var(--bgColor200); 
+  --toggleInnerBgColor: var(--bgColor10); 
+  --toggleInnerBorderColor: var(--fieldDisabledBorderColor);
+
+  /* --------------------------------------
+ * Checkbox Variables
+ * -------------------------------------- */
+  --checkboxBorderColor: var(--grayColor300);
+  --checkboxDisabledCheckmarkColor: var(--grayColor300);
+  --checkboxOuterBorderRadius:0.2em;
+  --checkboxBorderWidth: 0.084em;
+  --checkboxBorderRadius: 0.37em;
+  --checkboxBgColor: var(--accentColor500);
+
+  /* --------------------------------------
+ * Slider Variables
+ * -------------------------------------- */
+  --sliderActiveTrackBgColor: var(--accentColor400);
+  --sliderThumbBgColor: var(--bgColor10);
+  --sliderTrackBgColor:var(--bgColor200);
+  --sliderThumbBorderWidth: 0.084em;
+  --sliderTrackHeight: 0.64em;
+  --sliderThumbBoxShadow:0em 0.22em 0.3em 0em var(--grayColor200);
+  --sliderThumbBorderColor: var(--bgColor300);
+  --sliderTopLabelTextColor: var(--grayColor900);
+  --sliderTopLabelBgColor: var(--bgColor200);
+  --sliderTopLabelBorderWidth: 0.084em;
+  --sliderTopLabelBoxShadow: 0.17em 0.33em 0.92em 0em rgba(0, 0, 0, 0.1);
+  --sliderDisabledInactiveBgColor: var(--bgColor100);
+  --sliderDisabledActiveBgColor: var(--bgColor200);
+
+  /* --------------------------------------
+ * Range Slider Variables
+ * -------------------------------------- */
+  --rangeSliderActiveTrackBgColor: var(--accentColor400);
+  --rangeSliderThumbBgColor: var(--bgColor10);
+  --rangeSliderTrackBgColor: var(--bgColor200);
+  --rangeSliderThumbBorderColor: var(--grayColor300);
+  --rangeSliderThumbBoxShadow:0em 0.22em 0.3em 0em var(--grayColor200);
+  --rangeSliderTopLabelTextColor:var(--grayColor900);
+  --rangeSliderTopLabelBgColor: var(--bgColor200);
+  --rangeSliderTopLabelBorderWidth:0;
+  --rangeSliderTopLabelBoxShadow:none;
+
+  /* --------------------------------------
+ * Radio Button Variables
+ * -------------------------------------- */
+  --radioBorderColor: var(--grayColor300);
+  --radioOuterBgColor: var(--accentColor500);
+  --radioInnerBgColor: var(--bgColor10);
+  --radioTabsBorderColor: var(--grayColor200);
+
+
+  /* --------------------------------------
+ * Upload Variables
+ * -------------------------------------- */
+  --uploadBoxRadius: 1em;
+  --uploadBorderStyle: solid;
+  --uploadBorderWidth: 0.084em;
+  --uploadBorderRadius: 0.8em;
+  --uploadBorderColor: var(--grayColor200);
+  --uploadIconPadding: 0.8em;
+  --uploadIconBorderRadius: 0.8em;
+  --uploadIconBorderColor: var(--grayColor200);
+  --uploadBoxActionTextColor : var(--grayColor700);
+  --uploadBoxTitleTextColor: var(--grayColor600);
+  --uploadBoxSubTitleTextColor: var(--grayColor600);
+  --uploadHoverBorderColor: var(--accentColor500);
+  --uploadDisabledBorderColor: var(--grayColor200);
+  --uploadDisabledBgColor: var(--bgColor50);
+  --uploadBoxTitleDisabledTextColor: var(--grayColor400);
+  --uploadIconBorderStyle: solid;
+
+  /* -------------------- Snackbar Styles -------------------- */
+  --snackbarBorderWidth: 0.11em;
+  --snackbarBorderRadius: 1em;
+
+  /* Error Snackbar */
+  --errorBgColor: var(--bgColor10);
+  --errorBorderColor: var(--warnColor500);
+  --errorIconColor: var(--warnColor500);
+  --errorTitleColor: var(--warnColor500);
+  --errorTextColor: #252525;
+
+  /* Success Snackbar */
+  --successBgColor: var(--bgColor10);
+  --successBorderColor: #2ab915;
+  --successIconColor: #2ab915;
+  --successTitleColor: #2ab915;
+  --successTextColor: #252525;
+
+  /* Warning Snackbar */
+  --warnBgColor: var(--bgColor10);
+  --warnBorderColor: #f79008;
+  --warnIconColor: #f79008;
+  --warnTitleColor: #f79008;
+  --warnTextColor: #252525;
+
+  /* Info Snackbar */
+  --infoBgColor: var(--bgColor10);
+  --infoBorderColor: #1b81ef;
+  --infoIconColor: #1b81ef; 
+  --infoTitleColor: #1b81ef;  
+  --infoTextColor: #252525;
+
+  /* -------------------- Snackbar Solid Type Styles -------------------- */
+  
+  /* Error Snackbar Solid */
+  --errorSolidBgColor: #dc3545;
+  --errorSolidBorderColor: #dc3545;
+  --errorSolidIconColor: #ffffff;
+  --errorSolidTitleColor: #ffffff;
+  --errorSolidTextColor: #ffffff;
+
+  /* Success Snackbar Solid */
+  --successSolidBgColor: #2ab915;
+  --successSolidBorderColor: #2ab915;
+  --successSolidIconColor: #ffffff;
+  --successSolidTitleColor: #ffffff;
+  --successSolidTextColor: #ffffff;
+
+  /* Warning Snackbar Solid */
+  --warnSolidBgColor: #f79008;
+  --warnSolidBorderColor: #f79008;
+  --warnSolidIconColor: #ffffff;
+  --warnSolidTitleColor: #ffffff;
+  --warnSolidTextColor: #ffffff;
+
+  /* Info Snackbar Solid */
+  --infoSolidBgColor: #1b81ef;
+  --infoSolidBorderColor: #1b81ef;
+  --infoSolidIconColor: #ffffff;
+  --infoSolidTitleColor: #ffffff;
+  --infoSolidTextColor: #ffffff;
+
+  /* -------------------- Tooltip Styles -------------------- */
+  --tooltipColor: #D7D3D0;
+  --tooltipTextColor: #ffffff;
+  --tooltipFontSize: 0.89em;
+  --tooltipBgColor: #171412;
+  --tooltipArrowBgColor: #171412;
+  --tooltipBorderRadius: 0.6em;
+
+  /* -------------------- ag-Grid Styles -------------------- */
+  --agGridPinnedBorder: 0em;
+  --agGridHeaderBg: var(--bgColor50);
+  --agGridHeaderFontSize: 1em;
+  --agGridHeaderLabelFontWeight: 600;
+  --agGridHeaderToolBg: var(--bgColor10);
+  --agGridHeaderPadding:0em 1.15em 0em 0.2em;
+  --agGridHeaderBorderBottomColor: var(--grayColor200);
+  --agGridHeaderBorderTopColor: var(--grayColor200);
+  --agGridBorderBottomColor: var(--grayColor200);
+  --agGridHeaderToolHeight: 4em;
+  --agGridHeaderToolPadding: 0.8em;
+  --agGridHeaderColumnColor: var(--grayColor500);
+  --agGridHeaderSearchTools: 0.3em;
+  --agGridMenuIconColor: var(--grayColor400);
+  --agGridRowHoverColor: var(--grayColor50);
+
+  /* -------------------- Tab Styles -------------------- */
+  --tabHeight: 4.31em;
+  --tabWidth: 12.39em;
+  --tabBottomBorderWidth: 0.084em;
+  --tabTitleMargin: 0em;
+  --tabBgColor: var(--bgColor10);
+
+  /* -------------------- Radio Tabs -------------------- */
+  --radioTabsTextColor: var(--accentColor500);
+  --radioOuterBorderColor: var(--accentColor500);
+
+  /* --------------------------------------
+ * Stepper Variables
+ * -------------------------------------- */
+  --stepperLabelFontWeight: 500;
+  --stepperConnectorLineWidth: 0.16em;
+  --stepperConnectorLineColor:var(--grayColor200);
+  --stepperPreviousConnectorLineColor: var(--accentColor500);
+
+  --stepperNextStepBgColor:var(--bgColor50);
+  --stepperNextStepBorderColor:var(--grayColor300);
+  --stepperNextStepTextColor:var(--grayColor300);
+  --stepperNextLabelColor:var(--grayColor700);
+  --stepperNextDescriptionColor: var(--grayColor600);
+
+  --stepperCurrentStepBgColor:var(--accentColor500);
+  --stepperCurrentStepBorderColor:var(--accentColor500);
+  --stepperCurrentStepTextColor:var(--grayColor10);
+  --stepperCurrentLabelColor:var(--accentColor600);
+  --stepperCurrentDescriptionColor: var(--accentColor500);
+
+  --stepperPreviousStepBgColor:var(--accentColor500);
+  --stepperPreviousStepBorderColor:var(--accentColor500);
+  --stepperPreviousStepTextColor:var(--grayColor10);
+  --stepperPreviousLabelColor:var(--grayColor700);
+  --stepperPreviousDescriptionColor: var(--grayColor600);
+
+
+  /* -------------------- Date Picker  -------------------- */
+  --datePickerBorderColor: var(--grayColor200);
+  --datePickerHeaderDateBorderColor: var(--grayColor300);
+  --datePickerSelectedCellBorderRadius: 2em;
+  --datePickerCellInRangeBgColor: var(--bgColor100);
+  --datePickerCellInRangeHoverBgColor: var(--bgColor50);
+  --datePickerSelectedCellColor:black;
+  --datePickerSelectedCellBgColor:var(--accentColor50);
+  --datePickerTodayCellBgColor: var(--accentColor50);
+  --datePickerSelectedRangeCellBgColor:var(--accentColor500);
+  --datePickerSelectedRangeCellColor:var(--grayColor10);
+  --datePickerCellRangeFromBorderRadius: 2em;
+  --datePickerCellSpacing: 0em 0.3em;
+  --datePickerCalendarHeight: 27em;
+
+  /* -------------------- Splitview -------------------- */
+  --splitviewSelectedCardBorderColor: var(--accentColor600); //green
+  --splitviewSelectedCardBoxShadow: none; //rgb(30 246 136 / 18%) 0em 0.25em 0.67em
+
+  /* -------------------- Breadcrumbs -------------------- */
+  --breadCrumbBreadColor: var(--grayColor600);
+  --breadCrumbRecentBreadColor: var(--grayColor700);
+  --breadCrumbIconColor: var(--grayColor300);
+  --breadCrumbRecentIconColor: var(--grayColor300);
+}
+
+
+$border-radius: var(--fieldRadius);
+
+:root {
+  --direction: ltr;
+  --fontFamily: 'Poppins';
+
+  --vw-page-gap: 0.75rem;
+  // Pure values
+  --vw-space-none: 0;
+  --vw-space-xxs: 0.125rem;
+  --vw-space-xs:  0.25rem;
+  --vw-space-sm:  0.5rem;
+  --vw-space-md:  0.75rem;
+  --vw-space-lg:  0.875rem;
+  --vw-space-xl:  1rem;
+  --vw-space-2xl: 1.25rem;
+  --vw-space-3xl: 1.5rem;
+  --vw-space-4xl: 2rem;
+
+  /* Radius */
+  --vw-radius-none: 0;
+  --vw-radius-xs:   4px;
+  --vw-radius-sm:   8px;
+  --vw-radius-md:   12px;
+  --vw-radius-lg:   12px;
+  --vw-radius-xl:   20px;
+  --vw-radius-full: 9999px;
+
+  /* Typography — font sizes (rem) and line-heights (unitless) for font consistency */
+  /* Heading */
+  --vw-font-heading-xs: 0.75rem;
+  --vw-line-heading-xs: 1.25;
+  --vw-font-heading-sm: 0.875rem;
+  --vw-line-heading-sm: 1.5;
+  --vw-font-heading-md: 1rem;
+  --vw-line-heading-md: 1.75;
+  --vw-font-heading-lg: 1.125rem;
+  --vw-line-heading-lg: 1.5;
+  --vw-font-heading-xl: 1.25rem;
+  --vw-line-heading-xl: 1.75;
+  --vw-font-heading-2xl: 1.5rem;
+  --vw-line-heading-2xl: 2; 
+    /* Label */
+  --vw-font-label-xs: 0.6875rem;
+  --vw-font-label-sm: 0.75rem;
+  --vw-font-label-md: 0.875rem;
+  --vw-font-label-lg: 1rem;
+  /* Value (metric/numeral) */
+  --vw-font-value-xs: 0.5rem;
+  --vw-font-value-sm: 0.75rem;
+  --vw-font-value-md: 0.875rem;
+  --vw-font-value-lg: 1rem;
+  --vw-font-value-xl: 1.25rem;
+  --vw-font-value-xxl: 1.5rem; /* 24px — v1.2 primary metric */
+  --vw-font-value-xxxl: 1.75rem;
+  /* Description & legend */
+  --vw-font-description: 0.875rem;
+  --vw-line-description: 1.25;
+  --vw-font-legend: 0.75rem;
+  --vw-line-legend: 1.2;
+  // ─────────────────────────────────────────────────────────────────────────
+  // SEMANTIC COLORS
+  // Use these in components - they map to primitives
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Primary - Main brand/action color
+  --vw-color-info: var(--vw-color-blue-600);
+  --vw-color-info-hover: var(--vw-color-blue-700);
+  --vw-color-info-active: var(--vw-color-blue-800);
+  --vw-color-info-light: var(--vw-color-blue-50);
+  --vw-color-info-contrast: var(--grayColor10);
+
+  // Success - Positive feedback
+  --vw-color-success: var(--vw-color-green-500);
+  --vw-color-success-hover: var(--vw-color-green-600);
+  --vw-color-success-active: var(--vw-color-green-700);
+  --vw-color-success-light: var(--vw-color-green-50);
+  --vw-color-success-contrast: var(--grayColor10);
+
+  // Warning - Caution feedback
+  --vw-color-warning: var(--vw-color-amber-500);
+  --vw-color-warning-hover: var(--vw-color-amber-600);
+  --vw-color-warning-active: var(--vw-color-amber-700);
+  --vw-color-warning-light: var(--vw-color-amber-50);
+  --vw-color-warning-contrast: var(--grayColor900);
+
+  // Danger/Error - Negative feedback
+  --vw-color-danger: var(--vw-color-red-500);
+  --vw-color-danger-hover: var(--vw-color-red-600);
+  --vw-color-danger-active: var(--vw-color-red-700);
+  --vw-color-danger-light: var(--vw-color-red-50);
+  --vw-color-danger-contrast: var(--grayColor10);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SURFACE & BACKGROUND COLORS
+  // ─────────────────────────────────────────────────────────────────────────
+
+  --vw-color-background: var(--bgColor50);
+  --vw-color-surface: var(--grayColor10);
+  --vw-color-surface-hover: var(--bgColor100);
+  --vw-color-surface-active: var(--bgColor200);
+  --vw-color-surface-selected: var(--bgColor50);
+  --vw-color-surface-disabled: var(--bgColor100);
+  --vw-color-surface-elevated: var(--grayColor10);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEXT COLORS
+  // ─────────────────────────────────────────────────────────────────────────
+
+  --vw-color-text-primary: var(--grayColor900);
+  --vw-color-text-secondary: var(--grayColor600);
+  --vw-color-text-tertiary: var(--grayColor500);
+  --vw-color-text-disabled: var(--grayColor400);
+  --vw-color-text-inverse: var(--grayColor10);
+  --vw-color-text-link: var(--primaryColor500);
+  --vw-color-text-link-hover: var(--primaryColor600);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BORDER COLORS
+  // ─────────────────────────────────────────────────────────────────────────
+
+  --vw-color-border: var(--grayColor300);
+  --vw-color-border-hover: var(--grayColor400);
+  --vw-color-border-focus: var(--primaryColor500);
+  --vw-color-border-error: var(--vw-color-danger);
+  --vw-color-border-success: var(--vw-color-success);
+  --vw-color-border-disabled: var(--grayColor200);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // FOCUS & INTERACTIVE STATES
+  // ─────────────────────────────────────────────────────────────────────────
+
+  --vw-color-focus-ring: rgba(33, 150, 243, 0.4);
+  --vw-color-focus-ring-danger: rgba(244, 67, 54, 0.4);
+  --vw-color-overlay: rgba(0, 0, 0, 0.5);
+  --vw-color-overlay-light: rgba(0, 0, 0, 0.3);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ICON COLORS
+  // ─────────────────────────────────────────────────────────────────────────
+
+  --vw-color-icon-primary: var(--grayColor700);
+  --vw-color-icon-secondary: var(--grayColor500);
+  --vw-color-icon-disabled: var(--grayColor400);
+  --vw-color-icon-inverse: var(--grayColor10);
+  --vw-color-icon-interactive: var(--primaryColor500);
+
+ /* Pure */
+ --vw-color-white: #ffffff;
+ --vw-color-black: #000000;
+
+ /* Gray (also used as base for --grayColor* mapping) */
+ --vw-color-gray-10: #ffffff;
+ --vw-color-gray-50: #f9fafb;
+ --vw-color-gray-100: #f3f4f6;
+ --vw-color-gray-200: #e5e7eb;
+ --vw-color-gray-300: #d1d5db;
+ --vw-color-gray-400: #9ca3af;
+ --vw-color-gray-500: #6b7280;
+ --vw-color-gray-600: #4b5563;
+ --vw-color-gray-700: #374151;
+ --vw-color-gray-800: #1f2937;
+ --vw-color-gray-900: #111827;
+ --vw-color-gray-950: #030712;
+ --vw-color-gray-1000: #000000;
+
+ /* Blue */
+ --vw-color-blue-25: #f8fcff;
+ --vw-color-blue-50: #eff6ff;
+ --vw-color-blue-100: #dbeafe;
+ --vw-color-blue-200: #bfdbfe;
+ --vw-color-blue-300: #93c5fd;
+ --vw-color-blue-400: #60a5fa;
+ --vw-color-blue-500: #3b82f6;
+ --vw-color-blue-600: #2563eb;
+ --vw-color-blue-700: #1d4ed8;
+ --vw-color-blue-800: #1e40af;
+ --vw-color-blue-900: #1e3a8a;
+ --vw-color-blue-950: #172554;
+
+ /* Teal */
+ --vw-color-teal-25: #f7fffe;
+ --vw-color-teal-50: #f0fdfa;
+ --vw-color-teal-100: #ccfbf1;
+ --vw-color-teal-200: #99f6e4;
+ --vw-color-teal-300: #5eead4;
+ --vw-color-teal-400: #2dd4bf;
+ --vw-color-teal-500: #14b8a6;
+ --vw-color-teal-600: #0d9488;
+ --vw-color-teal-700: #0f766e;
+ --vw-color-teal-800: #115e59;
+ --vw-color-teal-900: #134e4a;
+ --vw-color-teal-950: #042f2e;
+
+ /* Green */
+ --vw-color-green-25: #f7fff9;
+ --vw-color-green-50: #f0fdf4;
+ --vw-color-green-100: #dcfce7;
+ --vw-color-green-200: #bbf7d0;
+ --vw-color-green-300: #86efac;
+ --vw-color-green-400: #4ade80;
+ --vw-color-green-500: #22c55e;
+ --vw-color-green-600: #16a34a;
+ --vw-color-green-700: #15803d;
+ --vw-color-green-800: #166534;
+ --vw-color-green-900: #14532d;
+ --vw-color-green-950: #052e16;
+
+ /* Amber */
+ --vw-color-amber-25: #fffef7;
+ --vw-color-amber-50: #fffbeb;
+ --vw-color-amber-100: #fef3c7;
+ --vw-color-amber-200: #fde68a;
+ --vw-color-amber-300: #fcd34d;
+ --vw-color-amber-400: #fbbf24;
+ --vw-color-amber-500: #f59e0b;
+ --vw-color-amber-600: #d97706;
+ --vw-color-amber-700: #b45309;
+ --vw-color-amber-800: #92400e;
+ --vw-color-amber-900: #78350f;
+ --vw-color-amber-950: #451a03;
+
+ /* Red */
+ --vw-color-red-25: #fffcfc;
+ --vw-color-red-50: #fef2f2;
+ --vw-color-red-100: #fee2e2;
+ --vw-color-red-200: #fecaca;
+ --vw-color-red-300: #fca5a5;
+ --vw-color-red-400: #f87171;
+ --vw-color-red-500: #ef4444;
+ --vw-color-red-600: #dc2626;
+ --vw-color-red-700: #b91c1c;
+ --vw-color-red-800: #991b1b;
+ --vw-color-red-900: #7f1d1d;
+ --vw-color-red-950: #450a0a;
+
+ /* Indigo */
+ --vw-color-indigo-25: #F6F6FF;
+ --vw-color-indigo-50: #eef2ff;
+ --vw-color-indigo-100: #e0e7ff;
+ --vw-color-indigo-200: #c7d2fe;
+ --vw-color-indigo-300: #a5b4fc;
+ --vw-color-indigo-400: #818cf8;
+ --vw-color-indigo-500: #6366f1;
+ --vw-color-indigo-600: #4f46e5;
+ --vw-color-indigo-700: #4338ca;
+ --vw-color-indigo-800: #3730a3;
+ --vw-color-indigo-900: #312e81;
+ --vw-color-indigo-950: #1e1b4b;
+
+ /* Orange */
+ --vw-color-orange-25: #FFF8EE;
+ --vw-color-orange-50: #fff7ed;
+ --vw-color-orange-100: #ffedd5;
+ --vw-color-orange-200: #fed7aa;
+ --vw-color-orange-300: #fdba74;
+ --vw-color-orange-400: #fb923c;
+ --vw-color-orange-500: #f97316;
+ --vw-color-orange-600: #ea580c;
+ --vw-color-orange-700: #c2410c;
+ --vw-color-orange-800: #9a3412;
+ --vw-color-orange-900: #7c2d12;
+ --vw-color-orange-950: #431407;
+
+ /* Stone */
+ --vw-color-stone-25: #fcfcfb;
+ --vw-color-stone-50: #fafaf9;
+ --vw-color-stone-100: #f5f5f4;
+ --vw-color-stone-200: #e7e5e4;
+ --vw-color-stone-300: #d6d3d1;
+ --vw-color-stone-400: #a8a29e;
+ --vw-color-stone-500: #78716c;
+ --vw-color-stone-600: #57534e;
+ --vw-color-stone-700: #44403c;
+ --vw-color-stone-800: #292524;
+ --vw-color-stone-900: #1c1917;
+ --vw-color-stone-950: #0c0a09;
+
+ /* Neutral */
+ --vw-color-neutral-25: #fcfcfc;
+ --vw-color-neutral-50: #fafafa;
+ --vw-color-neutral-100: #f5f5f5;
+ --vw-color-neutral-200: #e5e5e5;
+ --vw-color-neutral-300: #d4d4d4;
+ --vw-color-neutral-400: #a3a3a3;
+ --vw-color-neutral-500: #737373;
+ --vw-color-neutral-600: #525252;
+ --vw-color-neutral-700: #404040;
+ --vw-color-neutral-800: #262626;
+ --vw-color-neutral-900: #171717;
+ --vw-color-neutral-950: #0a0a0a;
+
+ /* Zinc */
+ --vw-color-zinc-25: #fcfcfc;
+ --vw-color-zinc-50: #fafafa;
+ --vw-color-zinc-100: #f4f4f5;
+ --vw-color-zinc-200: #e4e4e7;
+ --vw-color-zinc-300: #d4d4d8;
+ --vw-color-zinc-400: #a1a1aa;
+ --vw-color-zinc-500: #71717a;
+ --vw-color-zinc-600: #52525b;
+ --vw-color-zinc-700: #3f3f46;
+ --vw-color-zinc-800: #27272a;
+ --vw-color-zinc-900: #18181b;
+ --vw-color-zinc-950: #09090b;
+
+ /* Slate */
+ --vw-color-slate-25: #fbfcfe;
+ --vw-color-slate-50: #f8fafc;
+ --vw-color-slate-100: #f1f5f9;
+ --vw-color-slate-200: #e2e8f0;
+ --vw-color-slate-300: #cbd5e1;
+ --vw-color-slate-400: #94a3b8;
+ --vw-color-slate-500: #64748b;
+ --vw-color-slate-600: #475569;
+ --vw-color-slate-700: #334155;
+ --vw-color-slate-800: #1e293b;
+ --vw-color-slate-900: #0f172a;
+ --vw-color-slate-950: #020617;
+
+ /* Rose */
+ --vw-color-rose-25: #fff8f9;
+ --vw-color-rose-50: #fff1f2;
+ --vw-color-rose-100: #ffe4e6;
+ --vw-color-rose-200: #fecdd3;
+ --vw-color-rose-300: #fda4af;
+ --vw-color-rose-400: #fb7185;
+ --vw-color-rose-500: #f43f5e;
+ --vw-color-rose-600: #e11d48;
+ --vw-color-rose-700: #be123c;
+ --vw-color-rose-800: #9f1239;
+ --vw-color-rose-900: #881337;
+ --vw-color-rose-950: #4c0519;
+
+ /* Pink */
+ --vw-color-pink-25: #fef7fb;
+ --vw-color-pink-50: #fdf2f8;
+ --vw-color-pink-100: #fce7f3;
+ --vw-color-pink-200: #fbcfe8;
+ --vw-color-pink-300: #f9a8d4;
+ --vw-color-pink-400: #f472b6;
+ --vw-color-pink-500: #ec4899;
+ --vw-color-pink-600: #db2777;
+ --vw-color-pink-700: #be185d;
+ --vw-color-pink-800: #9d174d;
+ --vw-color-pink-900: #831843;
+ --vw-color-pink-950: #500724;
+
+ /* Fuchsia */
+ --vw-color-fuchsia-25: #fef9ff;
+ --vw-color-fuchsia-50: #fdf4ff;
+ --vw-color-fuchsia-100: #fae8ff;
+ --vw-color-fuchsia-200: #f5d0fe;
+ --vw-color-fuchsia-300: #f0abfc;
+ --vw-color-fuchsia-400: #e879f9;
+ --vw-color-fuchsia-500: #d946ef;
+ --vw-color-fuchsia-600: #c026d3;
+ --vw-color-fuchsia-700: #a21caf;
+ --vw-color-fuchsia-800: #86198f;
+ --vw-color-fuchsia-900: #701a75;
+ --vw-color-fuchsia-950: #4a044e;
+
+ /* Purple */
+ --vw-color-purple-25: #fdfaff;
+ --vw-color-purple-50: #faf5ff;
+ --vw-color-purple-100: #f3e8ff;
+ --vw-color-purple-200: #e9d5ff;
+ --vw-color-purple-300: #d8b4fe;
+ --vw-color-purple-400: #c084fc;
+ --vw-color-purple-500: #a855f7;
+ --vw-color-purple-600: #9333ea;
+ --vw-color-purple-700: #7e22ce;
+ --vw-color-purple-800: #6b21a8;
+ --vw-color-purple-900: #581c87;
+ --vw-color-purple-950: #3b0764;
+
+ /* Violet */
+ --vw-color-violet-25: #faf9ff;
+ --vw-color-violet-50: #f5f3ff;
+ --vw-color-violet-100: #ede9fe;
+ --vw-color-violet-200: #ddd6fe;
+ --vw-color-violet-300: #c4b5fd;
+ --vw-color-violet-400: #a78bfa;
+ --vw-color-violet-500: #8b5cf6;
+ --vw-color-violet-600: #7c3aed;
+ --vw-color-violet-700: #6d28d9;
+ --vw-color-violet-800: #5b21b6;
+ --vw-color-violet-900: #4c1d95;
+ --vw-color-violet-950: #2e1065;
+
+ /* Sky */
+ --vw-color-sky-25: #f8fcff;
+ --vw-color-sky-50: #f0f9ff;
+ --vw-color-sky-100: #e0f2fe;
+ --vw-color-sky-200: #bae6fd;
+ --vw-color-sky-300: #7dd3fc;
+ --vw-color-sky-400: #38bdf8;
+ --vw-color-sky-500: #0ea5e9;
+ --vw-color-sky-600: #0284c7;
+ --vw-color-sky-700: #0369a1;
+ --vw-color-sky-800: #075985;
+ --vw-color-sky-900: #0c4a6e;
+ --vw-color-sky-950: #082f49;
+
+ /* Cyan */
+ --vw-color-cyan-25: #f5feff;
+ --vw-color-cyan-50: #ecfeff;
+ --vw-color-cyan-100: #cffafe;
+ --vw-color-cyan-200: #a5f3fc;
+ --vw-color-cyan-300: #67e8f9;
+ --vw-color-cyan-400: #22d3ee;
+ --vw-color-cyan-500: #06b6d4;
+ --vw-color-cyan-600: #0891b2;
+ --vw-color-cyan-700: #0e7490;
+ --vw-color-cyan-800: #155e75;
+ --vw-color-cyan-900: #164e63;
+ --vw-color-cyan-950: #083344;
+
+ /* Yellow */
+ --vw-color-yellow-25: #fffef5;
+ --vw-color-yellow-50: #fefce8;
+ --vw-color-yellow-100: #fef9c3;
+ --vw-color-yellow-200: #fef08a;
+ --vw-color-yellow-300: #fde047;
+ --vw-color-yellow-400: #facc15;
+ --vw-color-yellow-500: #eab308;
+ --vw-color-yellow-600: #ca8a04;
+ --vw-color-yellow-700: #a16207;
+ --vw-color-yellow-800: #854d0e;
+ --vw-color-yellow-900: #713f12;
+ --vw-color-yellow-950: #422006;
+
+ /* Lime */
+ --vw-color-lime-25: #fbfff3;
+ --vw-color-lime-50: #f7fee7;
+ --vw-color-lime-100: #ecfccb;
+ --vw-color-lime-200: #d9f99d;
+ --vw-color-lime-300: #bef264;
+ --vw-color-lime-400: #a3e635;
+ --vw-color-lime-500: #84cc16;
+ --vw-color-lime-600: #65a30d;
+ --vw-color-lime-700: #4d7c0f;
+ --vw-color-lime-800: #3f6212;
+ --vw-color-lime-900: #365314;
+ --vw-color-lime-950: #1a2e05;
+
+ /* Emerald */
+ --vw-color-emerald-25: #f7fffb;
+ --vw-color-emerald-50: #ecfdf5;
+ --vw-color-emerald-100: #d1fae5;
+ --vw-color-emerald-200: #a7f3d0;
+ --vw-color-emerald-300: #6ee7b7;
+ --vw-color-emerald-400: #34d399;
+ --vw-color-emerald-500: #10b981;
+ --vw-color-emerald-600: #059669;
+ --vw-color-emerald-700: #047857;
+ --vw-color-emerald-800: #065f46;
+ --vw-color-emerald-900: #064e3b;
+ --vw-color-emerald-950: #022c22;
+
+
+ /* accent — base: #1290e0 (blue) */
+ --vw-color-accent-50:  #e8f4fd;
+ --vw-color-accent-100: #c5e2f9;
+ --vw-color-accent-200: #9fcef5;
+ --vw-color-accent-300: #72b8f0;
+ --vw-color-accent-400: #3da6e8;
+ --vw-color-accent-500: #1290e0;
+ --vw-color-accent-600: #0d75be;
+ --vw-color-accent-700: #095c98;
+ --vw-color-accent-800: #064473;
+ --vw-color-accent-900: #032d4f;
+}

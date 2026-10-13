@@ -1,0 +1,117 @@
+/* Detail routes share the modern module rhythm. Diagram canvases and tables
+   retain their own scrolling rather than widening the page. */
+.dcos-detail-page { container: detail-page / inline-size; }
+.dcos-detail-page > * { min-width: 0; }
+.record-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px 24px; flex-wrap: wrap; margin-bottom: 18px; }
+.record-header-identity { flex: 1 1 280px; min-width: 0; }
+.record-header .vw-page-title { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.record-header-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; min-width: 0; }
+.record-header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; max-width: 100%; }
+.record-header-meta .vw-chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.dcos-detail-page .ant-col { min-width: 0; }
+.dcos-detail-page :is(.vw-card-section, .vw-card-child) { min-width: 0; }
+.dcos-detail-page .vw-card-header { align-items: flex-start; gap: 10px 16px; }
+.dcos-detail-page .vw-card-header > .vw-card-title { font-size: 14px; font-weight: 500; line-height: 1.5; }
+.dcos-detail-page .vw-card-extra { display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; min-width: 0; }
+.dcos-detail-page .ant-descriptions .ant-descriptions-item-label { font-size: 13px; font-weight: 400; color: var(--vw-color-slate-500); line-height: 1.5; white-space: normal; }
+.dcos-detail-page .ant-descriptions .ant-descriptions-item-content { font-size: 13px; line-height: 1.5; color: var(--vw-color-slate-800); overflow-wrap: anywhere; min-width: 0; }
+.dcos-detail-page .ant-descriptions:not(.ant-descriptions-bordered):not(.ant-descriptions-vertical) .ant-descriptions-item-container { display: grid; grid-template-columns: minmax(100px, 35%) minmax(0, 1fr); gap: 8px; }
+.dcos-detail-page .ant-descriptions:not(.ant-descriptions-bordered) .ant-descriptions-item-label::after { margin-inline-start: 2px; }
+.dcos-detail-page .ant-statistic-content { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; line-height: 1.35 !important; }
+.dcos-detail-page .ant-statistic-content-suffix { margin-inline-start: 0; white-space: normal; line-height: 1.5; }
+.dcos-detail-page .ant-tabs, .dcos-detail-page .ant-tabs-content-holder { min-width: 0; }
+.dcos-detail-page .ant-table-wrapper { max-width: 100%; }
+.dcos-detail-page .ant-table-content { overflow-x: auto; }
+.dcos-detail-page :is(.ant-table-cell, .nst-table td).ant-table-cell-align-right { text-align: right; }
+.dcos-detail-page .dcos-crumbs li :is(a, span) { overflow-wrap: anywhere; }
+.detail-context-header { min-width: 0; }
+.detail-context-header .detail-property { max-width: 100%; }
+.detail-context-header .detail-property-value { white-space: normal !important; overflow: visible !important; overflow-wrap: anywhere; }
+.detail-rack-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; align-items: start; }
+.detail-rack-layout > * { min-width: 0; }
+.circuit-utilisation { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.circuit-utilisation svg { max-width: 100%; }
+.circuit-utilisation-value { font-size: 26px; font-weight: 600; line-height: 1.3; }
+.circuit-percentile-value { font-size: 22px; font-weight: 500; line-height: 1.3; }
+@container detail-page (max-width: 1000px) {
+  .dcos-detail-page .vw-grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .detail-rack-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@container detail-page (max-width: 600px) {
+  .dcos-detail-page :is(.vw-grid-cols-2, .vw-grid-cols-3, .vw-grid-cols-4, .vw-grid-cols-auto-320) { grid-template-columns: minmax(0, 1fr); }
+  .record-header-actions { justify-content: flex-start; width: 100%; }
+  .detail-context-header { position: static !important; }
+}
+@media (max-width: 640px) {
+  .vw-page-container.dcos-detail-page { padding: 20px 16px 40px !important; }
+}
+
+/* Portal surfaces: title, actions and close control remain reachable on phones. */
+.ant-drawer-left > .ant-drawer-content-wrapper,
+.ant-drawer-right > .ant-drawer-content-wrapper { max-width: calc(100vw - 16px); }
+.ant-drawer .ant-drawer-body { min-width: 0; }
+.ant-drawer .ant-drawer-title { overflow-wrap: anywhere; }
+.ant-drawer .ant-drawer-extra .ant-space { flex-wrap: wrap; }
+.ant-modal .ant-modal-title { padding-inline-end: 28px; overflow-wrap: anywhere; }
+.ant-modal .ant-modal-footer { flex-wrap: wrap; }
+.ant-modal .ant-space:has(> .ant-space-item > .ant-form-item) { display: flex; flex-wrap: wrap; width: 100%; align-items: flex-end; }
+.ant-modal .ant-space:has(> .ant-space-item > .ant-form-item) > .ant-space-item { flex: 1 1 160px; min-width: 0; max-width: 100%; }
+.ant-modal .ant-space-item > .ant-form-item :is(.ant-select, .ant-input-number, .ant-input) { width: 100% !important; }
+.drawer { max-width: calc(100vw - 16px); }
+@media (max-width: 600px) {
+  .ant-drawer .ant-drawer-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 14px 16px; gap: 12px; }
+  .ant-drawer .ant-drawer-title { grid-column: 1; grid-row: 1; }
+  .ant-drawer .ant-drawer-close { grid-column: 2; grid-row: 1; }
+  .ant-drawer .ant-drawer-extra { grid-column: 1 / -1; grid-row: 2; }
+  .ant-drawer .ant-drawer-body, .drawer .drawer-body { padding: 16px; }
+  .ant-drawer .ant-drawer-footer { padding: 12px 16px; }
+  .ant-modal .ant-modal-body { padding: 16px; }
+}
+
+.dcos-detail-page .vw-chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.dcos-detail-page .vw-card-extra > .ant-space { flex-wrap: wrap; }
+
+/* Legacy operational and delivery details use the same available-width rules. */
+.vw-page-container.dcos-detail-page { padding: 28px 28px 48px !important; }
+.dcos-detail-page > .ops-root > .page { padding-inline: 0; }
+.dcos-detail-page :is(.nst-table-wrap, .dt-scroll) { max-width: 100%; overflow-x: auto; }
+.dcos-detail-page .panel-body:has(> table) { overflow-x: auto; }
+.dcos-detail-page .detail-summary-grid > div > div { white-space: normal !important; overflow: visible !important; overflow-wrap: anywhere; }
+.dcos-detail-page .detail-summary-grid .vw-card-metric-label-sub { font-size: 13px; line-height: 1.4; }
+.dcos-detail-page .ne-name { font-size: 20px; line-height: 1.4; overflow-wrap: anywhere; }
+.dcos-detail-page .ne-head-top { flex-wrap: wrap; }
+.dcos-detail-page .ne-id { flex: 1 1 220px; }
+.dcos-detail-page .ne-sub > span { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.dcos-detail-page .kpi-basis { white-space: normal; overflow-wrap: anywhere; }
+.dcos-detail-page :is(.dch-bar, .dch-bar-actions, .dch-sub) { flex-wrap: wrap; }
+.dcos-detail-page .dch-bar-name { white-space: normal; overflow-wrap: anywhere; }
+@container detail-page (max-width: 1000px) {
+  .dcos-detail-page .detail-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 16px; }
+  .dcos-detail-page .detail-summary-grid > div { border-left: 0 !important; padding: 0 !important; }
+  .dcos-detail-page :is(.detail-columns, .ne-impact, .ne-al-grid, .ne-fc-body, .cust-grid, .inc-grid) { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@container detail-page (max-width: 600px) {
+  .dcos-detail-page :is(.detail-summary-grid, .dch-kpis, .ne-attrs, .mx-vitals, .mx-stats, .asset-tiles, .asset-fac, .site-gap-cards, .att-cats) { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .dcos-detail-page .detail-kv-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .dcos-detail-page .dch-id { flex-basis: 100%; }
+  .dcos-detail-page .dch-health { margin-left: 0; }
+  .dcos-detail-page .dch-kpi-note, .dcos-detail-page .dch-kpi-h .vw-card-metric-label { white-space: normal; overflow: visible; }
+}
+@media (max-width: 640px) {
+  .vw-page-container.dcos-detail-page { padding: 20px 16px 40px !important; }
+  .ant-drawer .detail-form-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+.dcos-detail-page .kpi-main { flex-wrap: wrap; }
+.dcos-detail-page .kpi-value { overflow-wrap: anywhere; }
+@container detail-page (max-width: 1000px) {
+  .dcos-detail-page .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container detail-page (max-width: 600px) {
+  .dcos-detail-page .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dcos-detail-page :is(.g-2, .g-2-1, .g-1-2, .g-3, .g-4, .g-main-side, .g-side-main) { grid-template-columns: minmax(0, 1fr); }
+}
+
+.dcos-detail-page .seg { flex-wrap: wrap; max-width: 100%; }
+.dcos-detail-page .vw-card-extra > .vw-flex { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.dcos-detail-page .vw-card-extra .ant-select { max-width: 100%; }

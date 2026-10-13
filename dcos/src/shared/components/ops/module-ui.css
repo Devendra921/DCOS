@@ -1,0 +1,148 @@
+.vw-page-container:has(.module-ui) {
+  padding: 28px 28px 48px !important;
+}
+.vw-page-container:has(.module-ui) > * { max-width: 1640px; margin-inline: auto; }
+@media (max-width: 640px) {
+  .vw-page-container:has(.module-ui) { padding: 20px 16px 40px !important; }
+}
+/* Module views use the Estate / Work orders card anatomy. Scoped so the
+   reference screens and specialized diagram renderers keep their own layout. */
+.module-ui {
+  --module-gap: 16px;
+  --module-radius: 16px;
+  --module-ink: var(--vw-color-slate-900);
+  --module-muted: var(--vw-color-slate-500);
+  container: module-view / inline-size;
+  font-family: var(--fontFamily);
+  color: var(--vw-color-slate-700);
+  font-size: 14px;
+  line-height: 1.5;
+  min-width: 0;
+}
+.module-screen { min-width: 0; }
+.module-ui.ops-embed > .page { gap: var(--module-gap); max-width: none; }
+.module-ui .ops-page-head { align-items: flex-start; gap: 12px 20px; }
+.module-ui .ops-page-head .vw-page-title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -.01em;
+  color: var(--module-ink);
+}
+.module-ui .ops-page-head.is-module-view .vw-page-title { font-size: 16px; }
+.module-ui .ops-page-head .vw-page-description { font-size: 14px; line-height: 1.5; }
+.module-ui .ops-page-head.is-toolbar { justify-content: flex-end; }
+.module-ui .page-actions { max-width: 100%; }
+
+/* KPI strip = the ideation StatGrid: ONE card, tiles split by hairlines, a fixed
+   label · value · sub · detail rhythm so every tile lines up (src/ops/styles/base.css).
+   Only the column counts adapt to the available width. */
+.module-ui .dco-card.dco-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.module-ui .dco-card.dco-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.module-ui .dco-tile > .dco-detail:empty { display: none; }
+.module-ui .dco-v small { font-size: 13px; font-weight: 400; color: var(--vw-color-slate-500); margin-left: 4px; letter-spacing: 0; }
+
+/* The same gutters, titles and neutral borders for charts and registers. */
+.module-ui :is(.panel.vw-card-section, .vw-card-section.dcl-table, .card, .doc-card) {
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: var(--module-radius);
+  background: var(--surface, #fff);
+  box-shadow: none;
+  min-width: 0;
+}
+.module-ui .panel-head { padding: 16px 18px 12px; }
+.module-ui .panel-head h3 { font-size: 14px; font-weight: 500; line-height: 1.5; }
+.module-ui .panel-head h3 svg { flex-shrink: 0; color: var(--module-muted); }
+.module-ui .panel-head .sub { font-size: 12px; line-height: 1.5; }
+.module-ui .panel-body { padding: 0 18px 18px; }
+.module-ui .panel-body.is-flush { padding: 0; }
+.module-ui .dcl-table { overflow: hidden; }
+.module-ui .dt-scroll { overflow: auto; max-width: 100%; }
+.module-ui .dt-table { font-size: 13px; }
+.module-ui .dt-table th { font-size: 12px; font-weight: 500; background: var(--vw-color-slate-50); }
+.module-ui .dt-table td { padding-block: 12px; }
+.module-ui .cell-2 { gap: 3px; }
+.module-ui .cell-2 small { font-size: 12px; line-height: 1.5; }
+.module-ui .lt { flex-wrap: wrap; gap: 10px; }
+.module-ui .lt-search { flex: 1 1 220px; max-width: 340px; min-width: 0; }
+.module-ui .dt-pager { flex-wrap: wrap; gap: 10px; }
+.module-ui .doc-card { padding: 16px; }
+.module-ui .doc-name { font-size: 14px; line-height: 1.5; }
+.module-ui .doc-sum { font-size: 13px; }
+.module-ui .doc-foot { font-size: 12px; color: var(--module-muted); }
+.module-ui :is(button, a, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--primaryColor500);
+  outline-offset: 3px;
+}
+
+/* Respond to usable content width, including the expanded navigation/help
+   rail, rather than forcing a desktop grid into a narrow page. */
+@container module-view (max-width: 1100px) {
+  .module-ui .dco-card.vw-card-section { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .module-ui .dco-card > .dco-tile:nth-child(3n+1) { border-left: 0; }
+  .module-ui .dco-card > .dco-tile:nth-child(n+4) { border-top: 1px solid var(--vw-color-slate-200); }
+  .module-ui :is(.g-4, .g-3) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .module-ui :is(.g-main-side, .g-side-main) { grid-template-columns: minmax(0, 1fr); }
+}
+@container module-view (max-width: 760px) {
+  .module-ui .dco-card.vw-card-section { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .module-ui .dco-card > .dco-tile { border-left: 0; }
+  .module-ui .dco-card > .dco-tile:nth-child(2n) { border-left: 1px solid var(--vw-color-slate-200); }
+  .module-ui .dco-card > .dco-tile:nth-child(n+3) { border-top: 1px solid var(--vw-color-slate-200); }
+  .module-ui :is(.g-2-1, .g-1-2, .g-2, .g-3, .g-4, .kc-layout) { grid-template-columns: minmax(0, 1fr); }
+  .module-ui .lt-search { max-width: none; }
+  .module-ui .kc-cats { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .module-ui .kc-cat { width: auto; border-color: var(--vw-color-slate-200); }
+  .module-ui .topo-canvas { min-height: 340px; }
+}
+@container module-view (max-width: 420px) {
+  .module-ui .dco-card.vw-card-section { grid-template-columns: minmax(0, 1fr); }
+  .module-ui .dco-card > .dco-tile { border-left: 0 !important; }
+  .module-ui .dco-card > .dco-tile:nth-child(n+2) { border-top: 1px solid var(--vw-color-slate-200); }
+  .module-ui .page-actions { width: 100%; }
+  .module-ui .ops-page-head.is-toolbar { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .module-ui .doc-card { transition: none; transform: none; }
+}
+
+/* Keep quantities aligned across rows, including stacked values and meters. */
+.module-ui .dt-table :is(th, td).is-right { text-align: right; font-variant-numeric: tabular-nums; }
+.module-ui .dt-table th.is-right .dt-sort { justify-content: flex-end; }
+.module-ui .dt-table td.is-right > :is(.row, .meter) { justify-content: flex-end; }
+.module-ui .dt-table td.is-right .cell-2 { align-items: flex-end !important; }
+.module-ui .dt-table tr.is-click:focus-visible { outline: 2px solid var(--primaryColor500); outline-offset: -2px; }
+.module-ui .dt-table tr.is-click:focus-visible td { background: var(--primaryColor50); }
+.module-ui .kc-filter-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 10px 12px; margin-bottom: 14px; border-radius: 10px; background: var(--primaryColor50); color: var(--primaryColor700); font-size: 13px; }
+.module-ui .kc-filter-summary button { flex-shrink: 0; }
+.module-ui .kc-docs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+.module-ui .kc-docs .doc-card-top { flex-wrap: wrap; }
+.module-ui .kc-docs .doc-name { flex-basis: calc(100% - 44px); }
+.module-ui .kc-docs .doc-card-top > .vw-chip { margin-left: 40px; }
+
+/* Keep chart controls and wrapped legends legible at the same density as registers. */
+.module-ui .dn { justify-content: center; gap: 16px; }
+.module-ui .dn-legend td:first-child { white-space: normal; }
+.module-ui .dn-legend button { display: inline-flex; align-items: center; gap: 8px; width: 100%; border: 0; border-radius: 6px; padding: 4px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.module-ui .dn-legend button i { flex-shrink: 0; margin: 0; }
+.module-ui .dn-legend button:hover, .module-ui .dn-legend button[aria-pressed="true"] { background: var(--primaryColor50); color: var(--primaryColor700); }
+.module-ui .bl-row[aria-pressed="true"] { background: var(--primaryColor50); box-shadow: inset 3px 0 var(--primaryColor500); }
+.module-ui .bl-row[aria-pressed="true"] .bl-name { color: var(--primaryColor700); }
+.module-ui .dt-table td.is-wrap .ent-link { white-space: normal; overflow-wrap: anywhere; }
+
+/* Legacy inner views now use the same module frame and responsive cards. */
+.module-ui .ant-col, .module-ui .vw-card-extra { min-width: 0; }
+.module-ui .ant-statistic-content { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; }
+.module-ui .ant-statistic-content-suffix { margin-inline-start: 0; }
+.module-ui .vw-card-header { gap: 10px 16px; }
+.module-ui .vw-card-header > .vw-card-title { font-size: 14px; font-weight: 500; line-height: 1.5; }
+.module-ui .vw-card-extra { max-width: 100%; }
+.module-ui .vw-card-extra .ant-space { flex-wrap: wrap; }
+@container module-view (max-width: 760px) {
+  .module-ui .vw-grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* No reserved empty space: the detail area takes only the height its content needs,
+   so a tile without a chart doesn't leave a blank block under its sub-line. */
+.module-ui .dco-tile > .dco-detail { height: auto; min-height: 0; overflow: visible; }
+.module-ui .dco-tile > .dco-detail .dco-legend { gap: 4px; }

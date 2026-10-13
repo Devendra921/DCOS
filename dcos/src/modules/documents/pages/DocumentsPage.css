@@ -1,0 +1,11 @@
+/* Knowledge Center: category rail + document library (Operate kit layout) */
+.ops-root .kc-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; align-items: start; min-width: 0; }
+.ops-root .kc-cats { display: flex; flex-direction: column; gap: 2px; }
+.ops-root .kc-cat { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 1px solid transparent; border-radius: var(--vw-radius-sm); background: transparent; font: inherit; font-size: var(--vw-font-label-md); color: var(--vw-color-slate-700); text-align: left; cursor: pointer; }
+.ops-root .kc-cat:hover { background: var(--vw-color-slate-50); }
+.ops-root .kc-cat.is-on { background: var(--vw-color-blue-50); border-color: var(--vw-color-blue-200); color: var(--vw-color-slate-900); }
+.ops-root .kc-cat-ico { display: inline-flex; width: 16px; justify-content: center; }
+.ops-root .kc-cat-l { flex: 1; min-width: 0; }
+.ops-root .kc-cat-n { color: var(--vw-color-slate-500); font-size: var(--vw-font-label-xs); }
+.ops-root .kc-docs .doc-card .vw-chip { flex-shrink: 0; }
+@media (max-width: 1100px) { .ops-root .kc-layout { grid-template-columns: minmax(0, 1fr); } }

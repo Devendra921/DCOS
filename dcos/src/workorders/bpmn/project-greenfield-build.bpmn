@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_greenfield_build" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_greenfield_build">
+    <bpmn:participant id="Participant_project_greenfield_build" name="PRJ-01 · Greenfield DC build" processRef="project-greenfield-build" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-greenfield-build" name="Greenfield DC build" isExecutable="true">
+    <bpmn:documentation>Runs a new data centre from approved build to ready for service: the site design is signed, permits and consents are checked (a permit nearing expiry triggers a renewal), construction contracts are awarded, construction work orders run under change, long-lead plant is received and installed, acceptance tests L1–L5 must pass, the network backbone is built, operations takes the site over once snags are closed and capacity is released.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_greenfield_build">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>check_permits</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_permit_expiry</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>renew_permit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_permit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>chase_permits</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>award</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>receive_plant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_delayed_expedite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>expedite</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Contractor" name="Contractor">
+        <bpmn:flowNodeRef>raise_construction</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_construction</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_plant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_plant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_tests</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_backbone</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_backbone</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>close_snags</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Commissioning" name="Commissioning">
+        <bpmn:flowNodeRef>acceptance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_atp</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>handover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_snags</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>release</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Build approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Sign off site design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P10D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_check_permits</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="check_permits" name="Check permits and consents">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="permit-check" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_design_check_permits</bpmn:incoming>
+      <bpmn:incoming>Flow_renew_permit_check_permits</bpmn:incoming>
+      <bpmn:incoming>Flow_chase_permits_check_permits</bpmn:incoming>
+      <bpmn:outgoing>Flow_check_permits_g_permit</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_permit_expiry" name="Permit nearing expiry" attachedToRef="check_permits" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_permit_expiry_renew_permit</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_b_permit_expiry">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P30D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="renew_permit" name="Renew permit">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_permit_expiry_renew_permit</bpmn:incoming>
+      <bpmn:outgoing>Flow_renew_permit_check_permits</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_permit" name="Permits approved?" default="Flow_g_permit_award">
+      <bpmn:incoming>Flow_check_permits_g_permit</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_permit_award</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_permit_chase_permits</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="chase_permits" name="Chase the authority">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_permit_chase_permits</bpmn:incoming>
+      <bpmn:outgoing>Flow_chase_permits_check_permits</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="award" name="Award construction contracts">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="commercial-approval" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P5D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_permit_award</bpmn:incoming>
+      <bpmn:outgoing>Flow_award_raise_construction</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_construction" name="Raise construction work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_award_raise_construction</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_construction_wait_construction</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_construction" name="Construction work closed">
+      <bpmn:incoming>Flow_raise_construction_wait_construction</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_construction_receive_plant</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_construction" messageRef="Message_wait_construction" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="receive_plant" name="Receive long-lead plant">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="receive-delivery" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT400H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_construction_receive_plant</bpmn:incoming>
+      <bpmn:incoming>Flow_expedite_receive_plant</bpmn:incoming>
+      <bpmn:outgoing>Flow_receive_plant_raise_plant</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_delayed_expedite" name="Delivery delayed" attachedToRef="receive_plant" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_delayed_expedite_expedite</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_delayed_expedite" messageRef="Message_b_delayed_expedite" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="expedite" name="Expedite with the vendor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_delayed_expedite_expedite</bpmn:incoming>
+      <bpmn:outgoing>Flow_expedite_receive_plant</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_plant" name="Raise plant installation work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_receive_plant_raise_plant</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_plant_wait_plant</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_plant" name="Plant installation work closed">
+      <bpmn:incoming>Flow_raise_plant_wait_plant</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_plant_acceptance</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_plant" messageRef="Message_wait_plant" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="acceptance" name="Witness acceptance tests L1–L5">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acceptance-tests" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P10D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_plant_acceptance</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_tests_acceptance</bpmn:incoming>
+      <bpmn:outgoing>Flow_acceptance_g_atp</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_atp" name="ATP passed?" default="Flow_g_atp_raise_backbone">
+      <bpmn:incoming>Flow_acceptance_g_atp</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_atp_raise_backbone</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_atp_fix_tests</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_tests" name="Fix failed tests">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="fix-findings" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_atp_fix_tests</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_tests_acceptance</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_backbone" name="Raise network backbone work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_atp_raise_backbone</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_backbone_wait_backbone</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_backbone" name="Network backbone work closed">
+      <bpmn:incoming>Flow_raise_backbone_wait_backbone</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_backbone_handover</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_backbone" messageRef="Message_wait_backbone" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="handover" name="Hand over to operations">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="handover" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_backbone_handover</bpmn:incoming>
+      <bpmn:incoming>Flow_close_snags_handover</bpmn:incoming>
+      <bpmn:outgoing>Flow_handover_g_snags</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_snags" name="Snags closed?" default="Flow_g_snags_release">
+      <bpmn:incoming>Flow_handover_g_snags</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_snags_release</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_snags_close_snags</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="close_snags" name="Close snags">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="fix-findings" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_snags_close_snags</bpmn:incoming>
+      <bpmn:outgoing>Flow_close_snags_handover</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="release" name="Release capacity">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.release-capacity" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_snags_release</bpmn:incoming>
+      <bpmn:outgoing>Flow_release_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="Site ready for service">
+      <bpmn:incoming>Flow_release_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_check_permits" sourceRef="design" targetRef="check_permits" />
+    <bpmn:sequenceFlow id="Flow_check_permits_g_permit" sourceRef="check_permits" targetRef="g_permit" />
+    <bpmn:sequenceFlow id="Flow_renew_permit_check_permits" sourceRef="renew_permit" targetRef="check_permits" />
+    <bpmn:sequenceFlow id="Flow_g_permit_award" name="approved" sourceRef="g_permit" targetRef="award">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_permit_chase_permits" name="not yet" sourceRef="g_permit" targetRef="chase_permits">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_chase_permits_check_permits" sourceRef="chase_permits" targetRef="check_permits" />
+    <bpmn:sequenceFlow id="Flow_award_raise_construction" sourceRef="award" targetRef="raise_construction" />
+    <bpmn:sequenceFlow id="Flow_raise_construction_wait_construction" sourceRef="raise_construction" targetRef="wait_construction" />
+    <bpmn:sequenceFlow id="Flow_wait_construction_receive_plant" sourceRef="wait_construction" targetRef="receive_plant" />
+    <bpmn:sequenceFlow id="Flow_expedite_receive_plant" sourceRef="expedite" targetRef="receive_plant" />
+    <bpmn:sequenceFlow id="Flow_receive_plant_raise_plant" sourceRef="receive_plant" targetRef="raise_plant" />
+    <bpmn:sequenceFlow id="Flow_raise_plant_wait_plant" sourceRef="raise_plant" targetRef="wait_plant" />
+    <bpmn:sequenceFlow id="Flow_wait_plant_acceptance" sourceRef="wait_plant" targetRef="acceptance" />
+    <bpmn:sequenceFlow id="Flow_acceptance_g_atp" sourceRef="acceptance" targetRef="g_atp" />
+    <bpmn:sequenceFlow id="Flow_g_atp_raise_backbone" name="passed" sourceRef="g_atp" targetRef="raise_backbone">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_atp_fix_tests" name="failed tests" sourceRef="g_atp" targetRef="fix_tests">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_tests_acceptance" sourceRef="fix_tests" targetRef="acceptance" />
+    <bpmn:sequenceFlow id="Flow_raise_backbone_wait_backbone" sourceRef="raise_backbone" targetRef="wait_backbone" />
+    <bpmn:sequenceFlow id="Flow_wait_backbone_handover" sourceRef="wait_backbone" targetRef="handover" />
+    <bpmn:sequenceFlow id="Flow_handover_g_snags" sourceRef="handover" targetRef="g_snags" />
+    <bpmn:sequenceFlow id="Flow_g_snags_release" name="closed" sourceRef="g_snags" targetRef="release">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=snags = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_snags_close_snags" name="open snags" sourceRef="g_snags" targetRef="close_snags">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=snags &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_close_snags_handover" sourceRef="close_snags" targetRef="handover" />
+    <bpmn:sequenceFlow id="Flow_release_end" sourceRef="release" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_permit_expiry_renew_permit" sourceRef="b_permit_expiry" targetRef="renew_permit" />
+    <bpmn:sequenceFlow id="Flow_b_delayed_expedite_expedite" sourceRef="b_delayed_expedite" targetRef="expedite" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_construction" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_construction&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_b_delayed_expedite" name="delivery-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_plant" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_plant&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_backbone" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_backbone&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_greenfield_build">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_greenfield_build" bpmnElement="Collaboration_project_greenfield_build">
+      <bpmndi:BPMNShape id="Participant_project_greenfield_build_di" bpmnElement="Participant_project_greenfield_build" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3150" height="1215" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="3120" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="3120" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="3120" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Contractor_di" bpmnElement="Lane_Contractor" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="3120" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Commissioning_di" bpmnElement="Lane_Commissioning" isHorizontal="true">
+        <dc:Bounds x="190" y="995" width="3120" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="1145" width="3120" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="check_permits_di" bpmnElement="check_permits">
+        <dc:Bounds x="570" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_permit_expiry_di" bpmnElement="b_permit_expiry">
+        <dc:Bounds x="642" y="177" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="renew_permit_di" bpmnElement="renew_permit">
+        <dc:Bounds x="740" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_permit_di" bpmnElement="g_permit">
+        <dc:Bounds x="775" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="chase_permits_di" bpmnElement="chase_permits">
+        <dc:Bounds x="910" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="award_di" bpmnElement="award">
+        <dc:Bounds x="910" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_construction_di" bpmnElement="raise_construction">
+        <dc:Bounds x="1080" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_construction_di" bpmnElement="wait_construction">
+        <dc:Bounds x="1292" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receive_plant_di" bpmnElement="receive_plant">
+        <dc:Bounds x="1420" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_delayed_expedite_di" bpmnElement="b_delayed_expedite">
+        <dc:Bounds x="1492" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="expedite_di" bpmnElement="expedite">
+        <dc:Bounds x="1590" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_plant_di" bpmnElement="raise_plant">
+        <dc:Bounds x="1590" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_plant_di" bpmnElement="wait_plant">
+        <dc:Bounds x="1802" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="acceptance_di" bpmnElement="acceptance">
+        <dc:Bounds x="1930" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_atp_di" bpmnElement="g_atp">
+        <dc:Bounds x="2135" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_tests_di" bpmnElement="fix_tests">
+        <dc:Bounds x="2270" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_backbone_di" bpmnElement="raise_backbone">
+        <dc:Bounds x="2270" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_backbone_di" bpmnElement="wait_backbone">
+        <dc:Bounds x="2482" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handover_di" bpmnElement="handover">
+        <dc:Bounds x="2610" y="1180" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_snags_di" bpmnElement="g_snags">
+        <dc:Bounds x="2815" y="1195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="close_snags_di" bpmnElement="close_snags">
+        <dc:Bounds x="2950" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="release_di" bpmnElement="release">
+        <dc:Bounds x="2950" y="1180" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="3162" y="1202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="410" />
+        <di:waypoint x="400" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_check_permits_di" bpmnElement="Flow_design_check_permits">
+        <di:waypoint x="520" y="410" />
+        <di:waypoint x="545" y="410" />
+        <di:waypoint x="545" y="155" />
+        <di:waypoint x="570" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_check_permits_g_permit_di" bpmnElement="Flow_check_permits_g_permit">
+        <di:waypoint x="690" y="155" />
+        <di:waypoint x="775" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_renew_permit_check_permits_di" bpmnElement="Flow_renew_permit_check_permits">
+        <di:waypoint x="800" y="300" />
+        <di:waypoint x="800" y="212" />
+        <di:waypoint x="630" y="212" />
+        <di:waypoint x="630" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_permit_award_di" bpmnElement="Flow_g_permit_award">
+        <di:waypoint x="825" y="155" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="885" y="560" />
+        <di:waypoint x="910" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_permit_chase_permits_di" bpmnElement="Flow_g_permit_chase_permits">
+        <di:waypoint x="825" y="155" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="885" y="260" />
+        <di:waypoint x="910" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_chase_permits_check_permits_di" bpmnElement="Flow_chase_permits_check_permits">
+        <di:waypoint x="970" y="300" />
+        <di:waypoint x="970" y="212" />
+        <di:waypoint x="630" y="212" />
+        <di:waypoint x="630" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_award_raise_construction_di" bpmnElement="Flow_award_raise_construction">
+        <di:waypoint x="1030" y="560" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1055" y="815" />
+        <di:waypoint x="1080" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_construction_wait_construction_di" bpmnElement="Flow_raise_construction_wait_construction">
+        <di:waypoint x="1200" y="815" />
+        <di:waypoint x="1292" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_construction_receive_plant_di" bpmnElement="Flow_wait_construction_receive_plant">
+        <di:waypoint x="1328" y="815" />
+        <di:waypoint x="1395" y="815" />
+        <di:waypoint x="1395" y="560" />
+        <di:waypoint x="1420" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_expedite_receive_plant_di" bpmnElement="Flow_expedite_receive_plant">
+        <di:waypoint x="1650" y="705" />
+        <di:waypoint x="1650" y="617" />
+        <di:waypoint x="1480" y="617" />
+        <di:waypoint x="1480" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_receive_plant_raise_plant_di" bpmnElement="Flow_receive_plant_raise_plant">
+        <di:waypoint x="1540" y="560" />
+        <di:waypoint x="1565" y="560" />
+        <di:waypoint x="1565" y="815" />
+        <di:waypoint x="1590" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_plant_wait_plant_di" bpmnElement="Flow_raise_plant_wait_plant">
+        <di:waypoint x="1710" y="815" />
+        <di:waypoint x="1802" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_plant_acceptance_di" bpmnElement="Flow_wait_plant_acceptance">
+        <di:waypoint x="1838" y="815" />
+        <di:waypoint x="1905" y="815" />
+        <di:waypoint x="1905" y="1070" />
+        <di:waypoint x="1930" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_acceptance_g_atp_di" bpmnElement="Flow_acceptance_g_atp">
+        <di:waypoint x="2050" y="1070" />
+        <di:waypoint x="2135" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_atp_raise_backbone_di" bpmnElement="Flow_g_atp_raise_backbone">
+        <di:waypoint x="2185" y="1070" />
+        <di:waypoint x="2245" y="1070" />
+        <di:waypoint x="2245" y="815" />
+        <di:waypoint x="2270" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_atp_fix_tests_di" bpmnElement="Flow_g_atp_fix_tests">
+        <di:waypoint x="2185" y="1070" />
+        <di:waypoint x="2245" y="1070" />
+        <di:waypoint x="2245" y="920" />
+        <di:waypoint x="2270" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_tests_acceptance_di" bpmnElement="Flow_fix_tests_acceptance">
+        <di:waypoint x="2330" y="960" />
+        <di:waypoint x="2330" y="1127" />
+        <di:waypoint x="1990" y="1127" />
+        <di:waypoint x="1990" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_backbone_wait_backbone_di" bpmnElement="Flow_raise_backbone_wait_backbone">
+        <di:waypoint x="2390" y="815" />
+        <di:waypoint x="2482" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_backbone_handover_di" bpmnElement="Flow_wait_backbone_handover">
+        <di:waypoint x="2518" y="815" />
+        <di:waypoint x="2585" y="815" />
+        <di:waypoint x="2585" y="1220" />
+        <di:waypoint x="2610" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_handover_g_snags_di" bpmnElement="Flow_handover_g_snags">
+        <di:waypoint x="2730" y="1220" />
+        <di:waypoint x="2815" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_snags_release_di" bpmnElement="Flow_g_snags_release">
+        <di:waypoint x="2865" y="1220" />
+        <di:waypoint x="2950" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_snags_close_snags_di" bpmnElement="Flow_g_snags_close_snags">
+        <di:waypoint x="2865" y="1220" />
+        <di:waypoint x="2925" y="1220" />
+        <di:waypoint x="2925" y="920" />
+        <di:waypoint x="2950" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_close_snags_handover_di" bpmnElement="Flow_close_snags_handover">
+        <di:waypoint x="3010" y="960" />
+        <di:waypoint x="3010" y="1277" />
+        <di:waypoint x="2670" y="1277" />
+        <di:waypoint x="2670" y="1260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_release_end_di" bpmnElement="Flow_release_end">
+        <di:waypoint x="3070" y="1220" />
+        <di:waypoint x="3162" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_permit_expiry_renew_permit_di" bpmnElement="Flow_b_permit_expiry_renew_permit">
+        <di:waypoint x="660" y="213" />
+        <di:waypoint x="660" y="223" />
+        <di:waypoint x="715" y="223" />
+        <di:waypoint x="715" y="260" />
+        <di:waypoint x="740" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_delayed_expedite_expedite_di" bpmnElement="Flow_b_delayed_expedite_expedite">
+        <di:waypoint x="1510" y="618" />
+        <di:waypoint x="1510" y="628" />
+        <di:waypoint x="1565" y="628" />
+        <di:waypoint x="1565" y="665" />
+        <di:waypoint x="1590" y="665" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

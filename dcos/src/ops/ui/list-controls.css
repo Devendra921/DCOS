@@ -1,0 +1,43 @@
+/* Shared register filters use the same modal surface as record forms.
+   Portals keep options visible even inside a clipped or empty table card. */
+.list-filter-modal .ant-modal-body { padding: 0; }
+.list-filter-modal .lt-panel-b { grid-template-columns: 180px minmax(0, 1fr); min-height: 240px; }
+.list-filter-modal .lt-cats { padding: 12px; gap: 4px; }
+.list-filter-modal .lt-cats button { border-radius: 10px; font-size: 13px; }
+.list-filter-modal .lt-cats button.is-on { color: var(--primaryColor700); background: var(--primaryColor50); }
+.list-filter-modal .lt-cats button.is-on::before { display: none; }
+.list-filter-modal .lt-field { min-width: 0; padding: 20px; }
+.list-filter-modal .lt-field-l { font-size: 13px; font-weight: 500; }
+.list-filter-modal .ant-modal-footer { flex-wrap: wrap; }
+.list-quick-popover .ant-popover-inner { padding: 0; border-radius: 12px; overflow: hidden; }
+.list-quick-popover .qs-pop {
+  position: static;
+  width: min(280px, calc(100vw - 32px));
+  min-width: 0;
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.list-quick-popover .qs-list { max-height: min(280px, 45vh); overflow-y: auto; }
+.list-quick-popover .qs-list button { white-space: normal; font-size: 13px; padding: 10px 12px; }
+.list-quick-popover .qs-list button.is-on { background: var(--primaryColor50); color: var(--primaryColor700); }
+.list-quick-popover :is(button, input):focus-visible,
+.list-filter-modal button:focus-visible { outline: 2px solid var(--primaryColor500); outline-offset: -2px; }
+@media (max-width: 600px) {
+  .list-filter-modal .lt-panel-b { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .list-filter-modal .lt-cats { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--vw-color-slate-200); }
+  .list-filter-modal .lt-cats button { border: 1px solid var(--vw-color-slate-200); gap: 8px; }
+  .list-filter-modal .lt-field { padding: 16px; }
+}
+
+/* Applied filters stay visible even when they are not one of the quick controls. */
+.lt-applied { display: flex; flex: 1 0 100%; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 2px; min-width: 0; }
+.lt-filter-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 9px; border: 1px solid var(--primaryColor100); border-radius: 8px; background: var(--primaryColor50); color: var(--primaryColor700); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; text-align: left; }
+.lt-filter-chip strong { font-weight: 500; }
+.lt-filter-chip span { overflow-wrap: anywhere; }
+.lt-filter-chip svg { flex-shrink: 0; }
+.lt-filter-chip:hover { border-color: var(--primaryColor300); }
+.lt-clear-filters { padding: 5px 8px; border: 0; background: transparent; color: var(--primaryColor700); font: inherit; font-size: 12px; cursor: pointer; }
+.lt-clear-filters:hover { text-decoration: underline; }
+
+.lt:has(.lt-applied) { flex-wrap: wrap; }

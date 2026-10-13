@@ -1,0 +1,4 @@
+/* Facility device detail — port and bay rows inside kit Panels. */
+.ddp-row { flex-wrap: wrap; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--vw-color-slate-100); }
+.ddp-row:last-child { border-bottom: 0; }
+.ddp-wrap { flex-wrap: wrap; gap: 6px; }

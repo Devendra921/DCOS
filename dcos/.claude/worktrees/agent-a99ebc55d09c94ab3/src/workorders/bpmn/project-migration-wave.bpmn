@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_migration_wave" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_migration_wave">
+    <bpmn:participant id="Participant_project_migration_wave" name="PRJ-06 · Migration wave" processRef="project-migration-wave" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-migration-wave" name="Migration wave" isExecutable="true">
+    <bpmn:documentation>Moves workloads or equipment in one wave: discovery and dependencies are confirmed, the wave plan is approved, pre-migration checks must pass, the moves run as work orders under change, service owners confirm their services (a failed wave is rolled back and re-planned) and the source is decommissioned.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_migration_wave">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>plan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_plan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>discovery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>replan</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_move</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_move</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>rollback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_source</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_source</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>prechecks</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_ready</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_prechecks</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>confirm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_confirmed</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Wave approved">
+      <bpmn:outgoing>Flow_start_discovery</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="discovery" name="Confirm discovery and dependencies">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Capacity Planner" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT64H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_discovery</bpmn:incoming>
+      <bpmn:outgoing>Flow_discovery_plan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="plan" name="Approve the wave plan">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_discovery_plan</bpmn:incoming>
+      <bpmn:incoming>Flow_replan_plan</bpmn:incoming>
+      <bpmn:incoming>Flow_rollback_plan</bpmn:incoming>
+      <bpmn:outgoing>Flow_plan_g_plan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_plan" name="Plan approved?" default="Flow_g_plan_prechecks">
+      <bpmn:incoming>Flow_plan_g_plan</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_plan_prechecks</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_plan_replan</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="replan" name="Re-plan the wave">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Capacity Planner" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_plan_replan</bpmn:incoming>
+      <bpmn:outgoing>Flow_replan_plan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="prechecks" name="Run pre-migration checks">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_plan_prechecks</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_prechecks_prechecks</bpmn:incoming>
+      <bpmn:outgoing>Flow_prechecks_g_ready</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_ready" name="Ready to move?" default="Flow_g_ready_raise_move">
+      <bpmn:incoming>Flow_prechecks_g_ready</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_ready_raise_move</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_ready_fix_prechecks</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_prechecks" name="Clear failed checks">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ready_fix_prechecks</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_prechecks_prechecks</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_move" name="Raise migration work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ready_raise_move</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_move_wait_move</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_move" name="Migration work closed">
+      <bpmn:incoming>Flow_raise_move_wait_move</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_move_confirm</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_move" messageRef="Message_wait_move" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="confirm" name="Service owners confirm">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_move_confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_confirm_g_confirmed</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_confirmed" name="Services confirmed?" default="Flow_g_confirmed_raise_source">
+      <bpmn:incoming>Flow_confirm_g_confirmed</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_confirmed_raise_source</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_confirmed_rollback</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="rollback" name="Roll back the wave">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Field Technician" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_confirmed_rollback</bpmn:incoming>
+      <bpmn:outgoing>Flow_rollback_plan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_source" name="Raise source decommission work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_confirmed_raise_source</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_source_wait_source</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_source" name="Source decommission work closed">
+      <bpmn:incoming>Flow_raise_source_wait_source</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_source_end</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_source" messageRef="Message_wait_source" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="end" name="Wave closed">
+      <bpmn:incoming>Flow_wait_source_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_discovery" sourceRef="start" targetRef="discovery" />
+    <bpmn:sequenceFlow id="Flow_discovery_plan" sourceRef="discovery" targetRef="plan" />
+    <bpmn:sequenceFlow id="Flow_plan_g_plan" sourceRef="plan" targetRef="g_plan" />
+    <bpmn:sequenceFlow id="Flow_g_plan_prechecks" name="approved" sourceRef="g_plan" targetRef="prechecks">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_plan_replan" name="rejected" sourceRef="g_plan" targetRef="replan">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_replan_plan" sourceRef="replan" targetRef="plan" />
+    <bpmn:sequenceFlow id="Flow_prechecks_g_ready" sourceRef="prechecks" targetRef="g_ready" />
+    <bpmn:sequenceFlow id="Flow_g_ready_raise_move" name="ready" sourceRef="g_ready" targetRef="raise_move">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_ready_fix_prechecks" name="checks failed" sourceRef="g_ready" targetRef="fix_prechecks">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_prechecks_prechecks" sourceRef="fix_prechecks" targetRef="prechecks" />
+    <bpmn:sequenceFlow id="Flow_raise_move_wait_move" sourceRef="raise_move" targetRef="wait_move" />
+    <bpmn:sequenceFlow id="Flow_wait_move_confirm" sourceRef="wait_move" targetRef="confirm" />
+    <bpmn:sequenceFlow id="Flow_confirm_g_confirmed" sourceRef="confirm" targetRef="g_confirmed" />
+    <bpmn:sequenceFlow id="Flow_g_confirmed_raise_source" name="confirmed" sourceRef="g_confirmed" targetRef="raise_source">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_confirmed_rollback" name="not confirmed" sourceRef="g_confirmed" targetRef="rollback">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_rollback_plan" sourceRef="rollback" targetRef="plan" />
+    <bpmn:sequenceFlow id="Flow_raise_source_wait_source" sourceRef="raise_source" targetRef="wait_source" />
+    <bpmn:sequenceFlow id="Flow_wait_source_end" sourceRef="wait_source" targetRef="end" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_move" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_move&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_source" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_source&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_migration_wave">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_migration_wave" bpmnElement="Collaboration_project_migration_wave">
+      <bpmndi:BPMNShape id="Participant_project_migration_wave_di" bpmnElement="Participant_project_migration_wave" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2300" height="915" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="discovery_di" bpmnElement="discovery">
+        <dc:Bounds x="400" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="plan_di" bpmnElement="plan">
+        <dc:Bounds x="570" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_plan_di" bpmnElement="g_plan">
+        <dc:Bounds x="775" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="replan_di" bpmnElement="replan">
+        <dc:Bounds x="910" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="prechecks_di" bpmnElement="prechecks">
+        <dc:Bounds x="910" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ready_di" bpmnElement="g_ready">
+        <dc:Bounds x="1115" y="790" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_prechecks_di" bpmnElement="fix_prechecks">
+        <dc:Bounds x="1250" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_move_di" bpmnElement="raise_move">
+        <dc:Bounds x="1250" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_move_di" bpmnElement="wait_move">
+        <dc:Bounds x="1462" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="confirm_di" bpmnElement="confirm">
+        <dc:Bounds x="1590" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_confirmed_di" bpmnElement="g_confirmed">
+        <dc:Bounds x="1795" y="790" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rollback_di" bpmnElement="rollback">
+        <dc:Bounds x="1930" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_source_di" bpmnElement="raise_source">
+        <dc:Bounds x="1930" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_source_di" bpmnElement="wait_source">
+        <dc:Bounds x="2142" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2312" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_discovery_di" bpmnElement="Flow_start_discovery">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="305" />
+        <di:waypoint x="400" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_discovery_plan_di" bpmnElement="Flow_discovery_plan">
+        <di:waypoint x="520" y="305" />
+        <di:waypoint x="545" y="305" />
+        <di:waypoint x="545" y="155" />
+        <di:waypoint x="570" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_plan_g_plan_di" bpmnElement="Flow_plan_g_plan">
+        <di:waypoint x="690" y="155" />
+        <di:waypoint x="775" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_plan_prechecks_di" bpmnElement="Flow_g_plan_prechecks">
+        <di:waypoint x="825" y="155" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="885" y="815" />
+        <di:waypoint x="910" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_plan_replan_di" bpmnElement="Flow_g_plan_replan">
+        <di:waypoint x="825" y="155" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="885" y="410" />
+        <di:waypoint x="910" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_replan_plan_di" bpmnElement="Flow_replan_plan">
+        <di:waypoint x="970" y="370" />
+        <di:waypoint x="970" y="95" />
+        <di:waypoint x="630" y="95" />
+        <di:waypoint x="630" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_prechecks_g_ready_di" bpmnElement="Flow_prechecks_g_ready">
+        <di:waypoint x="1030" y="815" />
+        <di:waypoint x="1115" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ready_raise_move_di" bpmnElement="Flow_g_ready_raise_move">
+        <di:waypoint x="1165" y="815" />
+        <di:waypoint x="1225" y="815" />
+        <di:waypoint x="1225" y="560" />
+        <di:waypoint x="1250" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ready_fix_prechecks_di" bpmnElement="Flow_g_ready_fix_prechecks">
+        <di:waypoint x="1165" y="815" />
+        <di:waypoint x="1225" y="815" />
+        <di:waypoint x="1225" y="920" />
+        <di:waypoint x="1250" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_prechecks_prechecks_di" bpmnElement="Flow_fix_prechecks_prechecks">
+        <di:waypoint x="1310" y="960" />
+        <di:waypoint x="1310" y="872" />
+        <di:waypoint x="970" y="872" />
+        <di:waypoint x="970" y="855" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_move_wait_move_di" bpmnElement="Flow_raise_move_wait_move">
+        <di:waypoint x="1370" y="560" />
+        <di:waypoint x="1462" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_move_confirm_di" bpmnElement="Flow_wait_move_confirm">
+        <di:waypoint x="1498" y="560" />
+        <di:waypoint x="1565" y="560" />
+        <di:waypoint x="1565" y="815" />
+        <di:waypoint x="1590" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_confirm_g_confirmed_di" bpmnElement="Flow_confirm_g_confirmed">
+        <di:waypoint x="1710" y="815" />
+        <di:waypoint x="1795" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_confirmed_raise_source_di" bpmnElement="Flow_g_confirmed_raise_source">
+        <di:waypoint x="1845" y="815" />
+        <di:waypoint x="1905" y="815" />
+        <di:waypoint x="1905" y="560" />
+        <di:waypoint x="1930" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_confirmed_rollback_di" bpmnElement="Flow_g_confirmed_rollback">
+        <di:waypoint x="1845" y="815" />
+        <di:waypoint x="1905" y="815" />
+        <di:waypoint x="1905" y="665" />
+        <di:waypoint x="1930" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_rollback_plan_di" bpmnElement="Flow_rollback_plan">
+        <di:waypoint x="1990" y="625" />
+        <di:waypoint x="1990" y="95" />
+        <di:waypoint x="630" y="95" />
+        <di:waypoint x="630" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_source_wait_source_di" bpmnElement="Flow_raise_source_wait_source">
+        <di:waypoint x="2050" y="560" />
+        <di:waypoint x="2142" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_source_end_di" bpmnElement="Flow_wait_source_end">
+        <di:waypoint x="2178" y="560" />
+        <di:waypoint x="2245" y="560" />
+        <di:waypoint x="2245" y="155" />
+        <di:waypoint x="2312" y="155" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

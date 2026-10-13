@@ -1,0 +1,172 @@
+/* NST → Ant Design adapter.
+   Reference: vendored NST components.css semantic .nst-table and VW specimens.
+   Keep rc-table's real tables/colgroups: never turn th/td/tr into flex or grid,
+   and never add overflow to the card shell (it would break sticky headers). */
+.ant-table-wrapper { min-width: 0; }
+.ant-table-wrapper .ant-table-thead > tr > th,
+.ant-table-wrapper .ant-table-thead > tr > td {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--vw-color-gray-700);
+  white-space: nowrap;
+}
+.ant-table-wrapper .ant-table-tbody > tr > td { vertical-align: middle; }
+.ant-table-wrapper .ant-table-sticky-holder,
+.ant-table-wrapper .ant-table-header { background: var(--vw-color-surface-elevated); }
+.ant-table-wrapper .ant-table-sticky-holder { isolation: isolate; }
+.ant-table-wrapper .ant-table-tbody > tr > td .ant-typography-secondary {
+  font-size: var(--vw-font-label-sm);
+  color: var(--vw-color-text-tertiary);
+}
+
+/* Shared list surface: identity → controls → tabs → column header → rows.
+   Inline padding is identical across all bands and both sides of the grid. */
+.vw-table-heading,
+.vw-table-toolbar,
+.vw-table-subheader { padding: var(--vw-space-lg); min-width: 0; }
+.vw-table-toolbar { border-top: 1px solid var(--vw-color-gray-200); border-bottom: 1px solid var(--vw-color-gray-200); }
+.vw-table-tabs { padding-inline: var(--vw-space-lg); }
+.vw-table-tabs > .ant-tabs-nav { margin: 0; }
+.vw-data-grid .ant-table { border-radius: 0 0 var(--vw-radius-lg) var(--vw-radius-lg); }
+.vw-data-grid .ant-table-container { border-start-start-radius: 0; border-start-end-radius: 0; }
+.vw-data-grid .ant-table-tbody > tr > td { white-space: nowrap; }
+.vw-data-grid .ant-table-thead > tr > th { border-radius: 0; }
+.vw-data-grid .ant-table-tbody > tr:last-child > td { border-bottom: 0; }
+
+/* Mirror the reference form grid without changing AntD validation or values. */
+.vw-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--vw-space-xl);
+  align-items: start;
+  padding-block: var(--vw-space-md);
+}
+.vw-form-grid > .is-full { grid-column: 1 / -1; }
+.vw-form-grid > .ant-form-item { min-width: 0; margin-bottom: 0; }
+.ant-form-item-label > label { font-weight: 500; }
+
+/* Match the registry rather than overriding the theme with a second scale. */
+.ant-card-head-title { font-size: var(--vw-font-heading-md); font-weight: 500; color: var(--vw-color-gray-800); }
+.ant-tabs-tab-btn { font-size: var(--vw-font-label-md); font-weight: 500; }
+.ant-typography:is(h1, h2, h3, h4, h5) { font-weight: 500; }
+.dc-scope-select { max-width: 100%; }
+
+/* Allow nested grids and table cards to shrink inside their allocated track. */
+.vw-grid > * { min-width: 0; }
+@media (max-width: 480px) {
+  .vw-table-toolbar > .ant-space { width: 100%; }
+}
+
+.vw-hub-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--vw-page-gap);
+}
+.tabbed-hub-tabs { min-width: 0; }
+.tabbed-hub-tabs > .ant-tabs-nav { margin: 0; }
+.vw-hub-actions { min-width: 0; max-width: 100%; }
+@media (max-width: 1024px) {
+  .vw-hub-header { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Canonical semantic table specimen, adapted to rc-table's native colgroups.
+   Header and body use identical insets; fixed columns keep rc-table positioning. */
+.ant-table-wrapper .ant-table-thead > tr > th,
+.ant-table-wrapper .ant-table-thead > tr > td {
+  padding: 10px var(--vw-space-sm);
+  background: var(--vw-color-neutral-50);
+  color: var(--vw-color-neutral-500);
+  font-weight: 500;
+  line-height: 20px;
+  border-bottom-color: var(--vw-color-neutral-200);
+}
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  padding: 10px var(--vw-space-sm);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--vw-color-neutral-600);
+  border-bottom-color: var(--vw-color-neutral-100);
+}
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td { background: var(--vw-color-neutral-50); }
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected > td { background: var(--vw-color-accent-50); }
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected:hover > td { background: var(--vw-color-accent-100); }
+.ant-table-wrapper .ant-table-content { overflow-x: auto; }
+.ant-table-wrapper .ant-table-thead > tr > th::before { display: none; }
+.vw-data-grid { border-radius: var(--vw-radius-md); border-color: var(--vw-color-neutral-200); }
+.vw-table-toolbar { padding: 10px var(--vw-space-md); }
+
+/* Card, tab and form typography mirror the registered specimens. */
+.ant-card { box-shadow: var(--shadow-resting); }
+.ant-statistic-title { font-size: var(--vw-font-heading-md); font-weight: 500; line-height: 1.5; color: var(--vw-color-gray-800); }
+.ant-statistic-content { font-weight: 300; line-height: 1; }
+.ant-statistic-content-suffix { color: var(--vw-color-gray-500); }
+.ant-tabs-tab { padding-block: var(--vw-space-sm); }
+.ant-tabs-tab-btn { font-weight: 400; }
+.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600; }
+.ant-form-item-label > label { color: var(--vw-color-gray-500); line-height: 18px; }
+.ant-btn { box-shadow: none; }
+.ant-modal-content, .ant-popover-inner, .ant-dropdown-menu, .ant-select-dropdown { box-shadow: var(--shadow-sm); }
+
+/* Official Phosphor SVG icons inherit the surrounding component size/color. */
+.vw-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 1; vertical-align: -.125em; flex-shrink: 0; }
+.vw-icon > svg { display: block; width: 1em; height: 1em; flex-shrink: 0; }
+.ant-menu .vw-icon { font-size: 16px; }
+.vw-icon-spin { animation: vw-icon-spin 1s linear infinite; }
+@keyframes vw-icon-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .vw-icon-spin { animation: none; } }
+
+/* Fixed-count dashboard grids collapse without altering page/data composition. */
+.vw-grid { min-width: 0; }
+@media (max-width: 1100px) {
+  .vw-grid-cols-4, .vw-grid-cols-5, .vw-grid-cols-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .vw-grid-cols-2, .vw-grid-cols-3, .vw-grid-cols-4, .vw-grid-cols-5, .vw-grid-cols-6 { grid-template-columns: minmax(0, 1fr); }
+  .vw-grid-cols-auto-320 { grid-template-columns: minmax(0, 1fr); }
+  .ant-descriptions-view { overflow-x: auto; }
+}
+
+/* Auto-fit supports the five-metric IPAM summary without an orphaned fifth card. */
+.vw-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+
+/* Keep metric baselines aligned and constrain labels to one line. */
+.vw-kpi-card > div { display: flex; flex-direction: column; height: 100%; }
+.vw-kpi-card .ant-statistic { display: flex; flex: 1; flex-direction: column; justify-content: space-between; gap: var(--vw-space-sm); }
+
+/* App-shell navigation specimen: preserve the existing collapse/menu behavior. */
+.vw-app-navigation .ant-menu-item,
+.vw-app-navigation .ant-menu-submenu-title { height: 44px; line-height: 44px; border-radius: var(--vw-radius-full); font-weight: 400; }
+.vw-app-navigation .ant-menu-item-selected { font-weight: 500; }
+.vw-app-navigation .vw-icon { font-size: 20px; }
+.vw-app-navigation.ant-layout-sider { border-right-color: var(--vw-color-gray-200); }
+
+.vw-kpi-card .ant-statistic-title { min-width: 0; }
+.vw-kpi-card .vw-kpi-label {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Match incident worklog to the details row; keep the composer visible. */
+.vw-incident-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas: "details worklog" "linked linked";
+  gap: var(--vw-space-lg);
+  margin-bottom: var(--vw-space-lg);
+}
+.vw-incident-details { grid-area: details; }
+.vw-incident-linked { grid-area: linked; }
+.vw-incident-worklog { grid-area: worklog; display: flex; flex-direction: column; contain: size; min-height: 300px; }
+.vw-incident-worklog > .vw-card-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.vw-incident-worklog-entries { flex: 1; min-height: 0; overflow: auto; overflow-wrap: anywhere; padding: 8px; }
+@media (max-width: 991px) {
+  .vw-incident-detail-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "details" "worklog" "linked"; }
+  .vw-incident-worklog { contain: none; min-height: 0; max-height: 480px; }
+}

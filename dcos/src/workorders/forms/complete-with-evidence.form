@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "complete-with-evidence",
+  "type": "default",
+  "components": [
+    { "id": "Text_cwe_intro", "type": "text", "text": "### Complete with evidence\nSay what was done and attach the evidence: photos, a test report or a checklist. List anything still open. Open items decide where the process goes next: back for more work, or on." },
+    { "id": "Field_summary", "type": "textarea", "key": "summary", "label": "What was done", "validate": {"required": true} },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Evidence", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "description": "Photos, reports or checklists. Several files at once are fine.", "validate": {"required": true}, "conditional": {"hide": "=evidenceElsewhere = true"} },
+    { "id": "Field_evidenceElsewhere", "type": "checkbox", "key": "evidenceElsewhere", "label": "The evidence is kept in another system" },
+    { "id": "Field_evidenceRef", "type": "textfield", "key": "evidenceRef", "label": "Where to find the evidence", "description": "Document number, photo set or report id.", "validate": {"required": true}, "conditional": {"hide": "=not(evidenceElsewhere = true)"} },
+    { "id": "List_openItemsList", "type": "dynamiclist", "path": "openItemsList", "label": "Open items (defects, exceptions, pending consents or waves still to run)", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_oi_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_oi", "columns": 8} },
+      { "id": "Field_oi_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_oi", "columns": 4} },
+      { "id": "Field_oi_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_oi", "columns": 4} }
+    ] },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_exceptions", "type": "expression", "key": "exceptions", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_defects", "type": "expression", "key": "defects", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_remainingWaves", "type": "expression", "key": "remainingWaves", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_failedTests", "type": "expression", "key": "failedTests", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_snags", "type": "expression", "key": "snags", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_pendingConsents", "type": "expression", "key": "pendingConsents", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" },
+    { "id": "Expr_blocked", "type": "expression", "key": "blocked", "expression": "=(if openItemsList = null then 0 else count(openItemsList)) > 0", "computeOn": "change" }
+  ]
+}

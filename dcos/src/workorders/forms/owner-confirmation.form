@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "owner-confirmation",
+  "type": "default",
+  "components": [
+    { "id": "Text_oc_intro", "type": "text", "text": "### Owner confirmation\nList each service or workload with its owner and whether they confirmed. Anything not confirmed goes back to be resolved first." },
+    { "id": "List_confirmations", "type": "dynamiclist", "path": "confirmations", "label": "Services or workloads", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_oc_service", "type": "textfield", "key": "service", "label": "Service or workload", "validate": {"required": true}, "layout": {"row": "Row_oc_1", "columns": 6} },
+      { "id": "Field_oc_owner", "type": "textfield", "key": "owner", "label": "Owner", "validate": {"required": true}, "layout": {"row": "Row_oc_1", "columns": 5} },
+      { "id": "Field_oc_status", "type": "select", "key": "status", "label": "Status", "values": [{"label": "Confirmed", "value": "confirmed"}, {"label": "Not confirmed", "value": "not-confirmed"}], "validate": {"required": true}, "layout": {"row": "Row_oc_1", "columns": 5} },
+      { "id": "Field_oc_note", "type": "textfield", "key": "note", "label": "Note", "layout": {"row": "Row_oc_2", "columns": 16} }
+    ] },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Confirmations received (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*", "description": "Emails, tickets or minutes." },
+    { "id": "Field_signedBy", "type": "textfield", "key": "signedBy", "label": "Recorded by", "readonly": true, "description": "The signed-in user. If this should be someone else, ask them to complete the task." },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=confirmations != null and count(confirmations) > 0 and count(confirmations[status = \"not-confirmed\"]) = 0", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if confirmations = null then 0 else count(confirmations[status = \"not-confirmed\"]))", "computeOn": "change" }
+  ]
+}

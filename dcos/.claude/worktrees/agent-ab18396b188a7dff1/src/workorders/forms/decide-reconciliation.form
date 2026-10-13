@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 16,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": { "name": "DCOS process generator", "version": "1.0" },
+  "id": "decide-reconciliation",
+  "type": "default",
+  "components": [
+    { "id": "Text_dr_intro", "type": "text", "text": "### Reconciliation decision\nDiscovery and the record of truth disagree. Choose which side wins, or send someone to look." },
+    { "id": "Field_decision", "type": "radio", "key": "decision", "label": "Decision", "values": [
+      { "label": "Accept discovered state — update the record", "value": "accept" },
+      { "label": "Keep the record — discovery is wrong", "value": "keep" },
+      { "label": "Confirm by walk — send a technician", "value": "walk" }
+    ], "defaultValue": "accept", "validate": { "required": true } },
+    { "id": "Field_reason", "type": "textarea", "key": "reason", "label": "Reason" }
+  ]
+}

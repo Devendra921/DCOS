@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "visit-check-out",
+  "type": "default",
+  "components": [
+    { "id": "Text_vco_intro", "type": "text", "text": "### Check out\nCollect the badges and confirm the areas were left as found." },
+    { "id": "Field_departedAt", "type": "datetime", "key": "departedAt", "subtype": "datetime", "dateLabel": "Left", "timeLabel": "Time", "use24h": true, "validate": {"required": true} },
+    { "id": "Field_badgesReturned", "type": "radio", "key": "badgesReturned", "label": "Badges", "values": [{"label": "All badges returned", "value": "all"}, {"label": "Some badges are missing", "value": "missing"}], "validate": {"required": true} },
+    { "id": "Field_missingBadges", "type": "textfield", "key": "missingBadges", "label": "Missing badge numbers", "description": "Missing badges are disabled straight away.", "validate": {"required": true}, "conditional": {"hide": "=not(badgesReturned = \"missing\")"} },
+    { "id": "Field_areaLeftAsFound", "type": "checkbox", "key": "areaLeftAsFound", "label": "Areas left clean and secure, nothing left behind" },
+    { "id": "Field_issues", "type": "textarea", "key": "issues", "label": "Anything to report (optional)" }
+  ]
+}

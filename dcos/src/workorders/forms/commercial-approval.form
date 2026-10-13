@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "commercial-approval",
+  "type": "default",
+  "components": [
+    { "id": "Text_ca_intro", "type": "text", "text": "### Budget and purchase approval\nCheck the amount, the supplier and the quotes against the budget, then decide. A rejection needs a reason." },
+    { "id": "Field_amount", "type": "number", "key": "amount", "label": "Amount (USD)", "validate": {"required": true, "min": 0}, "appearance": {"prefixAdorner": "$"}, "layout": {"row": "Row_ca_1", "columns": 8} },
+    { "id": "Field_costCentre", "type": "textfield", "key": "costCentre", "label": "Cost centre", "validate": {"required": true}, "layout": {"row": "Row_ca_1", "columns": 8} },
+    { "id": "Field_supplier", "type": "textfield", "key": "supplier", "label": "Supplier or contractor", "validate": {"required": true}, "layout": {"row": "Row_ca_2", "columns": 8} },
+    { "id": "Field_poNumbers", "type": "textfield", "key": "poNumbers", "label": "PO or contract numbers (optional)", "layout": {"row": "Row_ca_2", "columns": 8} },
+    { "id": "Field_quotes", "type": "filepicker", "key": "quotes", "label": "Quotes or tender evaluation (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" },
+    { "id": "Field_withinBudget", "type": "radio", "key": "withinBudget", "label": "Within the approved budget?", "values": [{"label": "Yes", "value": "yes"}, {"label": "No, it is over budget", "value": "no"}], "validate": {"required": true} },
+    { "id": "Field_overBudgetReason", "type": "textarea", "key": "overBudgetReason", "label": "Why it is over budget and where the money comes from", "validate": {"required": true}, "conditional": {"hide": "=not(withinBudget = \"no\")"} },
+    { "id": "Field_approvalDecision", "type": "radio", "key": "approvalDecision", "label": "Your decision", "values": [{"label": "Approve", "value": "approve"}, {"label": "Approve with conditions", "value": "conditions"}, {"label": "Reject", "value": "reject"}], "validate": {"required": true} },
+    { "id": "Field_conditions", "type": "textarea", "key": "conditions", "label": "Conditions", "description": "What must be done or stay true for this approval to stand. They are kept with the record.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"conditions\")"} },
+    { "id": "Field_rejectionReason", "type": "textarea", "key": "rejectionReason", "label": "Reason for rejecting", "description": "Say what has to change for this to be approved.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"reject\")"} },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=if approvalDecision = null then null else approvalDecision != \"reject\"", "computeOn": "change" },
+    { "id": "Field_comment", "type": "textarea", "key": "comment", "label": "Comment (optional)" }
+  ]
+}

@@ -1,0 +1,23 @@
+---
+name: nst-design-system
+description: Generates Vision Waves / NST enterprise UI using repo components only. Use when building dashboards, KPI cards, admin consoles, forms, tables, HTML mocks, or React/SPA UI in this design-system repo. Enforces nst-design-system.css, vw-card/vw-chip classes, and COMPONENTS.md registry — never random designs.
+---
+
+# NST Design System
+
+This is a **project-local pointer**, not the source of truth. Full workflow, class registry,
+hard rules, KPI template, and the React/SPA usage section live in:
+
+- **`/SKILL.md`** (repo root) — full skill doc
+- **`/COMPONENTS.md`** (repo root) — component registry, Layer 1/2 tables, Framework usage section
+
+Read both before generating any UI. Do not restate their content here — edit those two files
+directly so this pointer and the `.claude/skills/nst-design-system/SKILL.md` copy never drift
+out of sync. See also the always-on rule: `.cursor/rules/nst-design-system.mdc`.
+
+## Quick workflow
+
+1. Read `COMPONENTS.md` — if the component exists (cards, chips, inputs, `nst-table`, etc.), use it
+2. Read the reference CSS + `preview/*.html` it points to
+3. Generate with those classes/tokens only — HTML or React (`className`), same classes either way
+4. Self-check against the Forbidden list in `COMPONENTS.md` before finishing

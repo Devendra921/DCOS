@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_liquid_retrofit" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_liquid_retrofit">
+    <bpmn:participant id="Participant_project_liquid_retrofit" name="PRJ-16 · Liquid retrofit" processRef="project-liquid-retrofit" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-liquid-retrofit" name="Liquid retrofit" isExecutable="true">
+    <bpmn:documentation>Converts live rows to liquid-cooled racks row by row: the design and structural check are approved, the facility water tie-in, row drain to swing positions, and pipework and power uprates run as work orders under change, the flush, fill and pressure test and the CDU failover test with load banks (L5) must pass, the rows are repopulated and operations accepts them.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_liquid_retrofit">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>revise_design</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Contractor" name="Contractor">
+        <bpmn:flowNodeRef>raise_tiein</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_tiein</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_pipework</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_pipework</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_leak</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_l5</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_drain</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_drain</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_repopulate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_repopulate</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Commissioning" name="Commissioning">
+        <bpmn:flowNodeRef>pressure</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_leak</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_l5</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>accept</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Retrofit approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve design and structural check">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P4D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:incoming>Flow_revise_design_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_g_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_design" name="Design approved?" default="Flow_g_design_raise_tiein">
+      <bpmn:incoming>Flow_design_g_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_design_raise_tiein</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_design_revise_design</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="revise_design" name="Revise design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_revise_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_revise_design_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_tiein" name="Raise facility water tie-in work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_raise_tiein</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_tiein_wait_tiein</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_tiein" name="Facility water tie-in work closed">
+      <bpmn:incoming>Flow_raise_tiein_wait_tiein</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_tiein_raise_drain</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_tiein" messageRef="Message_wait_tiein" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_drain" name="Raise row drain work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_tiein_raise_drain</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_drain_wait_drain</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_drain" name="Row drain work closed">
+      <bpmn:incoming>Flow_raise_drain_wait_drain</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_drain_raise_pipework</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_drain" messageRef="Message_wait_drain" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_pipework" name="Raise pipework and power uprate work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_drain_raise_pipework</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_pipework_wait_pipework</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_pipework" name="Pipework and power uprate work closed">
+      <bpmn:incoming>Flow_raise_pipework_wait_pipework</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_pipework_pressure</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_pipework" messageRef="Message_wait_pipework" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="pressure" name="Flush, fill and pressure test">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_pipework_pressure</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_leak_pressure</bpmn:incoming>
+      <bpmn:outgoing>Flow_pressure_g_leak</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_leak" name="No leaks?" default="Flow_g_leak_l5">
+      <bpmn:incoming>Flow_pressure_g_leak</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_leak_l5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_leak_fix_leak</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_leak" name="Fix leaks">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_leak_fix_leak</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_leak_pressure</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="l5" name="CDU failover test with load banks (L5)">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_leak_l5</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_l5_l5</bpmn:incoming>
+      <bpmn:outgoing>Flow_l5_g_l5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_l5" name="L5 passed?" default="Flow_g_l5_raise_repopulate">
+      <bpmn:incoming>Flow_l5_g_l5</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_l5_raise_repopulate</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_l5_fix_l5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_l5" name="Fix L5 findings">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_l5_fix_l5</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_l5_l5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_repopulate" name="Raise row repopulation work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_l5_raise_repopulate</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_repopulate_wait_repopulate</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_repopulate" name="Row repopulation work closed">
+      <bpmn:incoming>Flow_raise_repopulate_wait_repopulate</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_repopulate_accept</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_repopulate" messageRef="Message_wait_repopulate" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="accept" name="Accept rows into operations">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_repopulate_accept</bpmn:incoming>
+      <bpmn:outgoing>Flow_accept_end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="end" name="Rows in service">
+      <bpmn:incoming>Flow_accept_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_g_design" sourceRef="design" targetRef="g_design" />
+    <bpmn:sequenceFlow id="Flow_g_design_raise_tiein" name="approved" sourceRef="g_design" targetRef="raise_tiein">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_design_revise_design" name="rejected" sourceRef="g_design" targetRef="revise_design">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_revise_design_design" sourceRef="revise_design" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_raise_tiein_wait_tiein" sourceRef="raise_tiein" targetRef="wait_tiein" />
+    <bpmn:sequenceFlow id="Flow_wait_tiein_raise_drain" sourceRef="wait_tiein" targetRef="raise_drain" />
+    <bpmn:sequenceFlow id="Flow_raise_drain_wait_drain" sourceRef="raise_drain" targetRef="wait_drain" />
+    <bpmn:sequenceFlow id="Flow_wait_drain_raise_pipework" sourceRef="wait_drain" targetRef="raise_pipework" />
+    <bpmn:sequenceFlow id="Flow_raise_pipework_wait_pipework" sourceRef="raise_pipework" targetRef="wait_pipework" />
+    <bpmn:sequenceFlow id="Flow_wait_pipework_pressure" sourceRef="wait_pipework" targetRef="pressure" />
+    <bpmn:sequenceFlow id="Flow_pressure_g_leak" sourceRef="pressure" targetRef="g_leak" />
+    <bpmn:sequenceFlow id="Flow_g_leak_l5" name="dry" sourceRef="g_leak" targetRef="l5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_leak_fix_leak" name="leaks" sourceRef="g_leak" targetRef="fix_leak">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_leak_pressure" sourceRef="fix_leak" targetRef="pressure" />
+    <bpmn:sequenceFlow id="Flow_l5_g_l5" sourceRef="l5" targetRef="g_l5" />
+    <bpmn:sequenceFlow id="Flow_g_l5_raise_repopulate" name="passed" sourceRef="g_l5" targetRef="raise_repopulate">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_l5_fix_l5" name="failed" sourceRef="g_l5" targetRef="fix_l5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_l5_l5" sourceRef="fix_l5" targetRef="l5" />
+    <bpmn:sequenceFlow id="Flow_raise_repopulate_wait_repopulate" sourceRef="raise_repopulate" targetRef="wait_repopulate" />
+    <bpmn:sequenceFlow id="Flow_wait_repopulate_accept" sourceRef="wait_repopulate" targetRef="accept" />
+    <bpmn:sequenceFlow id="Flow_accept_end" sourceRef="accept" targetRef="end" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_tiein" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_tiein&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_drain" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_drain&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_pipework" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_pipework&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_repopulate" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_repopulate&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_liquid_retrofit">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_liquid_retrofit" bpmnElement="Collaboration_project_liquid_retrofit">
+      <bpmndi:BPMNShape id="Participant_project_liquid_retrofit_di" bpmnElement="Participant_project_liquid_retrofit" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2980" height="1110" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Contractor_di" bpmnElement="Lane_Contractor" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Commissioning_di" bpmnElement="Lane_Commissioning" isHorizontal="true">
+        <dc:Bounds x="190" y="890" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="1040" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_design_di" bpmnElement="g_design">
+        <dc:Bounds x="605" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="revise_design_di" bpmnElement="revise_design">
+        <dc:Bounds x="740" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_tiein_di" bpmnElement="raise_tiein">
+        <dc:Bounds x="740" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_tiein_di" bpmnElement="wait_tiein">
+        <dc:Bounds x="952" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_drain_di" bpmnElement="raise_drain">
+        <dc:Bounds x="1080" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_drain_di" bpmnElement="wait_drain">
+        <dc:Bounds x="1292" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_pipework_di" bpmnElement="raise_pipework">
+        <dc:Bounds x="1420" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_pipework_di" bpmnElement="wait_pipework">
+        <dc:Bounds x="1632" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="pressure_di" bpmnElement="pressure">
+        <dc:Bounds x="1760" y="925" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_leak_di" bpmnElement="g_leak">
+        <dc:Bounds x="1965" y="940" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_leak_di" bpmnElement="fix_leak">
+        <dc:Bounds x="2100" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l5_di" bpmnElement="l5">
+        <dc:Bounds x="2100" y="925" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_l5_di" bpmnElement="g_l5">
+        <dc:Bounds x="2305" y="940" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_l5_di" bpmnElement="fix_l5">
+        <dc:Bounds x="2440" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_repopulate_di" bpmnElement="raise_repopulate">
+        <dc:Bounds x="2440" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_repopulate_di" bpmnElement="wait_repopulate">
+        <dc:Bounds x="2652" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="accept_di" bpmnElement="accept">
+        <dc:Bounds x="2780" y="1075" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2992" y="1097" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="305" />
+        <di:waypoint x="400" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_g_design_di" bpmnElement="Flow_design_g_design">
+        <di:waypoint x="520" y="305" />
+        <di:waypoint x="605" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_raise_tiein_di" bpmnElement="Flow_g_design_raise_tiein">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="560" />
+        <di:waypoint x="740" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_revise_design_di" bpmnElement="Flow_g_design_revise_design">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="740" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_revise_design_design_di" bpmnElement="Flow_revise_design_design">
+        <di:waypoint x="800" y="450" />
+        <di:waypoint x="800" y="362" />
+        <di:waypoint x="460" y="362" />
+        <di:waypoint x="460" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_tiein_wait_tiein_di" bpmnElement="Flow_raise_tiein_wait_tiein">
+        <di:waypoint x="860" y="560" />
+        <di:waypoint x="952" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_tiein_raise_drain_di" bpmnElement="Flow_wait_tiein_raise_drain">
+        <di:waypoint x="988" y="560" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1055" y="815" />
+        <di:waypoint x="1080" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_drain_wait_drain_di" bpmnElement="Flow_raise_drain_wait_drain">
+        <di:waypoint x="1200" y="815" />
+        <di:waypoint x="1292" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_drain_raise_pipework_di" bpmnElement="Flow_wait_drain_raise_pipework">
+        <di:waypoint x="1328" y="815" />
+        <di:waypoint x="1395" y="815" />
+        <di:waypoint x="1395" y="560" />
+        <di:waypoint x="1420" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_pipework_wait_pipework_di" bpmnElement="Flow_raise_pipework_wait_pipework">
+        <di:waypoint x="1540" y="560" />
+        <di:waypoint x="1632" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_pipework_pressure_di" bpmnElement="Flow_wait_pipework_pressure">
+        <di:waypoint x="1668" y="560" />
+        <di:waypoint x="1735" y="560" />
+        <di:waypoint x="1735" y="965" />
+        <di:waypoint x="1760" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_pressure_g_leak_di" bpmnElement="Flow_pressure_g_leak">
+        <di:waypoint x="1880" y="965" />
+        <di:waypoint x="1965" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_leak_l5_di" bpmnElement="Flow_g_leak_l5">
+        <di:waypoint x="2015" y="965" />
+        <di:waypoint x="2100" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_leak_fix_leak_di" bpmnElement="Flow_g_leak_fix_leak">
+        <di:waypoint x="2015" y="965" />
+        <di:waypoint x="2075" y="965" />
+        <di:waypoint x="2075" y="665" />
+        <di:waypoint x="2100" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_leak_pressure_di" bpmnElement="Flow_fix_leak_pressure">
+        <di:waypoint x="2160" y="705" />
+        <di:waypoint x="2160" y="1022" />
+        <di:waypoint x="1820" y="1022" />
+        <di:waypoint x="1820" y="1005" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_l5_g_l5_di" bpmnElement="Flow_l5_g_l5">
+        <di:waypoint x="2220" y="965" />
+        <di:waypoint x="2305" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_l5_raise_repopulate_di" bpmnElement="Flow_g_l5_raise_repopulate">
+        <di:waypoint x="2355" y="965" />
+        <di:waypoint x="2415" y="965" />
+        <di:waypoint x="2415" y="815" />
+        <di:waypoint x="2440" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_l5_fix_l5_di" bpmnElement="Flow_g_l5_fix_l5">
+        <di:waypoint x="2355" y="965" />
+        <di:waypoint x="2415" y="965" />
+        <di:waypoint x="2415" y="665" />
+        <di:waypoint x="2440" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_l5_l5_di" bpmnElement="Flow_fix_l5_l5">
+        <di:waypoint x="2500" y="705" />
+        <di:waypoint x="2500" y="1022" />
+        <di:waypoint x="2160" y="1022" />
+        <di:waypoint x="2160" y="1005" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_repopulate_wait_repopulate_di" bpmnElement="Flow_raise_repopulate_wait_repopulate">
+        <di:waypoint x="2560" y="815" />
+        <di:waypoint x="2652" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_repopulate_accept_di" bpmnElement="Flow_wait_repopulate_accept">
+        <di:waypoint x="2688" y="815" />
+        <di:waypoint x="2755" y="815" />
+        <di:waypoint x="2755" y="1115" />
+        <di:waypoint x="2780" y="1115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_accept_end_di" bpmnElement="Flow_accept_end">
+        <di:waypoint x="2900" y="1115" />
+        <di:waypoint x="2992" y="1115" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

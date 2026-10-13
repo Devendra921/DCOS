@@ -1,0 +1,62 @@
+/* Plan pack printing. printPlanArea() sets html.plan-printing for the duration of the print dialog,
+   so ordinary browser printing elsewhere is not affected. Only the .plan-print-area on screen prints:
+   app chrome (sider, header, help rail, copilot button) and every sibling of the area's ancestors is hidden,
+   and the ancestors drop their fixed heights and scroll containers so the area flows across pages. */
+@media print {
+  html.plan-printing .vw-app-navigation,
+  html.plan-printing .ant-layout-sider,
+  html.plan-printing .dcos-app-header,
+  html.plan-printing .ant-layout-header,
+  html.plan-printing .plan-print-hide {
+    display: none !important;
+  }
+
+  html.plan-printing body *:not(:has(.plan-print-area)):not(.plan-print-area):not(.plan-print-area *) {
+    display: none !important;
+  }
+
+  html.plan-printing body *:has(.plan-print-area) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    transform: none !important;
+  }
+
+  html.plan-printing,
+  html.plan-printing body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  html.plan-printing .plan-print-area {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  html.plan-printing .plan-print-area .plan-print-sheet {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12px;
+  }
+
+  html.plan-printing .plan-print-area .plan-print-grid {
+    display: block !important;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}

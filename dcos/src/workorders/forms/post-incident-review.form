@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "post-incident-review",
+  "type": "default",
+  "components": [
+    { "id": "Text_pir_intro", "type": "text", "text": "### Post-incident review\nAgree what happened, the impact and what will change. The review is signed by you and kept with the incident." },
+    { "id": "Field_whatHappened", "type": "textarea", "key": "whatHappened", "label": "What happened", "description": "A short timeline: detection, response, restoration.", "validate": {"required": true} },
+    { "id": "Field_customerImpact", "type": "textarea", "key": "customerImpact", "label": "Impact on customers and services", "validate": {"required": true} },
+    { "id": "Field_slaBreached", "type": "radio", "key": "slaBreached", "label": "Was an SLA breached?", "values": [{"label": "No", "value": "no"}, {"label": "Yes", "value": "yes"}], "validate": {"required": true} },
+    { "id": "Field_wentWell", "type": "textarea", "key": "wentWell", "label": "What went well (optional)" },
+    { "id": "Field_toImprove", "type": "textarea", "key": "toImprove", "label": "What to improve", "validate": {"required": true} },
+    { "id": "List_reviewActions", "type": "dynamiclist", "path": "reviewActions", "label": "Actions", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_ra_action", "type": "textfield", "key": "action", "label": "Action", "validate": {"required": true}, "layout": {"row": "Row_ra", "columns": 8} },
+      { "id": "Field_ra_owner", "type": "textfield", "key": "owner", "label": "Owner", "validate": {"required": true}, "layout": {"row": "Row_ra", "columns": 4} },
+      { "id": "Field_ra_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_ra", "columns": 4} }
+    ] },
+    { "id": "Field_reviewReport", "type": "filepicker", "key": "reviewReport", "label": "Review report or minutes (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" },
+    { "id": "Field_signedBy", "type": "textfield", "key": "signedBy", "label": "Signed by", "readonly": true, "description": "The signed-in user. If this should be someone else, ask them to complete the task." },
+    { "id": "Field_approved", "type": "checkbox", "key": "approved", "label": "The review is complete and agreed with the people involved", "validate": {"required": true} },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if reviewActions = null then 0 else count(reviewActions))", "computeOn": "change" }
+  ]
+}

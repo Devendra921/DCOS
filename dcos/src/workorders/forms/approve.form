@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "approve",
+  "type": "default",
+  "components": [
+    { "id": "Text_approve_intro", "type": "text", "text": "### Decision\nRead the record details, then choose one option. Approving with conditions lets the work go ahead and keeps the conditions with the record. A rejection needs a reason." },
+    { "id": "Field_approvalDecision", "type": "radio", "key": "approvalDecision", "label": "Your decision", "values": [{"label": "Approve", "value": "approve"}, {"label": "Approve with conditions", "value": "conditions"}, {"label": "Reject", "value": "reject"}], "validate": {"required": true} },
+    { "id": "Field_conditions", "type": "textarea", "key": "conditions", "label": "Conditions", "description": "What must be done or stay true for this approval to stand. They are kept with the record.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"conditions\")"} },
+    { "id": "Field_rejectionReason", "type": "textarea", "key": "rejectionReason", "label": "Reason for rejecting", "description": "Say what has to change for this to be approved.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"reject\")"} },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=if approvalDecision = null then null else approvalDecision != \"reject\"", "computeOn": "change" },
+    { "id": "Field_riskAccepted", "type": "select", "key": "riskAccepted", "label": "Remaining risk", "values": [{"label": "Within policy", "value": "within-policy"}, {"label": "Accepted with conditions", "value": "with-conditions"}, {"label": "Not accepted", "value": "no"}], "description": "Optional. How the remaining risk sits against policy.", "conditional": {"hide": "=not(approvalDecision = \"approve\" or approvalDecision = \"conditions\")"} },
+    { "id": "Field_comment", "type": "textarea", "key": "comment", "label": "Comment (optional)" }
+  ]
+}

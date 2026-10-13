@@ -1,0 +1,11 @@
+/* EntityListPage on the Operate grid (DataTable + ListToolbar). Only
+   layout glue lives here; all colours are existing tokens. */
+.elp { min-width: 0; }
+.elp-head { border-bottom: 1px solid var(--line-soft); }
+.elp-subheader { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+.elp-bulk { gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-700); }
+.elp-actions { display: inline-flex; align-items: center; gap: 4px; }
+.elp-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line-soft); color: var(--ink-500); font-size: 12.5px; font-family: var(--num); }
+.elp-cols { gap: 2px; }
+.elp-col-row { gap: 10px; padding: 6px 4px; border-radius: 6px; cursor: pointer; font-size: 13.5px; color: var(--ink-800); }
+.elp-col-row:hover { background: var(--line-soft); }

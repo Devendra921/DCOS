@@ -1,0 +1,22 @@
+.ipam-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.ipam-tile { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--vw-color-slate-200); border-radius: 14px; background: #fff; cursor: pointer; text-align: left; font: inherit; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.ipam-tile:hover { border-color: var(--primaryColor300); box-shadow: 0 8px 24px -8px rgba(15, 23, 42, .12); transform: translateY(-1px); }
+.ipam-tile-ico { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.ipam-tile-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.ipam-tile-label { font-size: 13px; font-weight: 500; color: var(--vw-color-slate-500); }
+.ipam-tile-val { font-size: 24px; font-weight: 600; line-height: 1.1; color: var(--vw-color-slate-900); font-variant-numeric: tabular-nums; }
+.ipam-tile-go { color: var(--vw-color-slate-300); transition: color .15s, transform .15s; }
+.ipam-tile:hover .ipam-tile-go { color: var(--primaryColor500); transform: translateX(2px); }
+
+.ipam-util { display: flex; align-items: center; gap: 10px; min-width: 140px; }
+.ipam-util-bar { flex: 1; height: 8px; border-radius: 4px; background: var(--vw-color-slate-100); overflow: hidden; }
+.ipam-util-bar i { display: block; height: 100%; border-radius: 4px; }
+.ipam-util b { font-size: 13px; font-weight: 600; width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.ipam-vbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; background: var(--vw-color-slate-100); margin-bottom: 14px; }
+.ipam-vbar i { display: block; height: 100%; }
+.ipam-vrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--vw-color-slate-100); }
+.ipam-vrow:first-of-type { border-top: 0; }
+.ipam-vdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ipam-vpct { margin-left: auto; font-size: 12px; color: var(--vw-color-slate-500); }
+.ipam-vrow b { width: 36px; text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; }

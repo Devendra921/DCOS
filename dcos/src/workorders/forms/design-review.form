@@ -1,0 +1,30 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "design-review",
+  "type": "default",
+  "components": [
+    { "id": "Text_dsr_intro", "type": "text", "text": "### Design review\nRecord the documents you reviewed, your comments and your decision. Approving with conditions lets the work go ahead with the comments to be closed; a rejection sends the design back for revision." },
+    { "id": "List_documentsReviewed", "type": "dynamiclist", "path": "documentsReviewed", "label": "Documents reviewed", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_dr_document", "type": "textfield", "key": "document", "label": "Document or drawing", "validate": {"required": true}, "layout": {"row": "Row_dr", "columns": 11} },
+      { "id": "Field_dr_revision", "type": "textfield", "key": "revision", "label": "Revision", "layout": {"row": "Row_dr", "columns": 5} }
+    ] },
+    { "id": "List_reviewComments", "type": "dynamiclist", "path": "reviewComments", "label": "Review comments", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_rc_comment", "type": "textfield", "key": "comment", "label": "Comment", "validate": {"required": true}, "layout": {"row": "Row_rcm_1", "columns": 16} },
+      { "id": "Field_rc_severity", "type": "select", "key": "severity", "label": "Severity", "values": [{"label": "Must fix", "value": "major"}, {"label": "Should fix", "value": "minor"}, {"label": "Note only", "value": "note"}], "validate": {"required": true}, "layout": {"row": "Row_rcm_2", "columns": 6} },
+      { "id": "Field_rc_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_rcm_2", "columns": 5} },
+      { "id": "Field_rc_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_rcm_2", "columns": 5} }
+    ] },
+    { "id": "Field_markups", "type": "filepicker", "key": "markups", "label": "Marked-up drawings or comment sheet (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" },
+    { "id": "Field_approvalDecision", "type": "radio", "key": "approvalDecision", "label": "Your decision", "values": [{"label": "Approve", "value": "approve"}, {"label": "Approve with conditions", "value": "conditions"}, {"label": "Reject", "value": "reject"}], "validate": {"required": true} },
+    { "id": "Field_conditions", "type": "textarea", "key": "conditions", "label": "Conditions", "description": "What must be done or stay true for this approval to stand. They are kept with the record.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"conditions\")"} },
+    { "id": "Field_rejectionReason", "type": "textarea", "key": "rejectionReason", "label": "Reason for rejecting", "description": "Say what has to change for this to be approved.", "validate": {"required": true}, "conditional": {"hide": "=not(approvalDecision = \"reject\")"} },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=if approvalDecision = null then null else approvalDecision != \"reject\"", "computeOn": "change" }
+  ]
+}

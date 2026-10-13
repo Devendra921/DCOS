@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "install-record",
+  "type": "default",
+  "components": [
+    { "id": "Text_ir_intro", "type": "text", "text": "### Installation record\nRecord what was installed and where, the labelling and the cable and power test results, and attach photos of the finished work." },
+    { "id": "List_installedItems", "type": "dynamiclist", "path": "installedItems", "label": "What was installed", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_ii_item", "type": "textfield", "key": "item", "label": "Rack, device or cable run", "validate": {"required": true}, "layout": {"row": "Row_ii", "columns": 7} },
+      { "id": "Field_ii_location", "type": "textfield", "key": "location", "label": "Location (hall, row, rack, U)", "validate": {"required": true}, "layout": {"row": "Row_ii", "columns": 6} },
+      { "id": "Field_ii_quantity", "type": "number", "key": "quantity", "label": "Quantity", "defaultValue": 1, "validate": {"min": 1}, "layout": {"row": "Row_ii", "columns": 3} }
+    ] },
+    { "id": "Field_labelled", "type": "checkbox", "key": "labelled", "label": "Everything is labelled to the site standard" },
+    { "id": "Field_cableTests", "type": "radio", "key": "cableTests", "label": "Cable and power tests", "values": [{"label": "All passed", "value": "pass"}, {"label": "Some failed", "value": "fail"}, {"label": "Not applicable", "value": "na"}], "validate": {"required": true} },
+    { "id": "List_cableFailures", "type": "dynamiclist", "path": "cableFailures", "label": "Failed tests", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "conditional": {"hide": "=not(cableTests = \"fail\")"}, "components": [
+      { "id": "Field_cf_circuit", "type": "textfield", "key": "circuit", "label": "Cable or circuit", "validate": {"required": true}, "layout": {"row": "Row_cf", "columns": 8} },
+      { "id": "Field_cf_fault", "type": "textfield", "key": "fault", "label": "Fault", "layout": {"row": "Row_cf", "columns": 8} }
+    ] },
+    { "id": "Field_testReport", "type": "filepicker", "key": "testReport", "label": "Test results file (optional)", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "conditional": {"hide": "=not(cableTests != \"na\")"} },
+    { "id": "Field_photos", "type": "filepicker", "key": "photos", "label": "Photos of the finished work", "multiple": true, "accept": "image/*,.heic,.pdf", "validate": {"required": true} },
+    { "id": "Field_asBuiltUpdated", "type": "checkbox", "key": "asBuiltUpdated", "label": "Drawings and DCIM records are updated (as-built)" },
+    { "id": "List_openItemsList", "type": "dynamiclist", "path": "openItemsList", "label": "Still open", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_oi_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_oi", "columns": 8} },
+      { "id": "Field_oi_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_oi", "columns": 4} },
+      { "id": "Field_oi_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_oi", "columns": 4} }
+    ] },
+    { "id": "Field_summary", "type": "textarea", "key": "summary", "label": "Notes (optional)" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if openItemsList = null then 0 else count(openItemsList)) + (if cableTests = \"fail\" then (if cableFailures = null then 0 else count(cableFailures)) else 0)", "computeOn": "change" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "run-checks",
+  "type": "default",
+  "components": [
+    { "id": "Text_rc_intro", "type": "text", "text": "### Checks\nWork through each check and record the result. Any failed check sends the step back to be fixed; when every check passes the process moves on." },
+    { "id": "List_checks", "type": "dynamiclist", "path": "checks", "label": "Checks", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_c_check", "type": "textfield", "key": "check", "label": "Check or inspection", "validate": {"required": true}, "layout": {"row": "Row_c", "columns": 8} },
+      { "id": "Field_c_result", "type": "select", "key": "result", "label": "Result", "values": [{"label": "Pass", "value": "pass"}, {"label": "Fail", "value": "fail"}], "validate": {"required": true}, "layout": {"row": "Row_c", "columns": 3} },
+      { "id": "Field_c_note", "type": "textfield", "key": "note", "label": "Finding or reading", "layout": {"row": "Row_c", "columns": 5} }
+    ] },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Evidence (optional)", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "description": "Reports, certificates, screenshots or photos." },
+    { "id": "Field_summary", "type": "textarea", "key": "summary", "label": "Summary (optional)" },
+    { "id": "Expr_failedTests", "type": "expression", "key": "failedTests", "expression": "=(if checks = null then 0 else count(checks[result = \"fail\"]))", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if checks = null then 0 else count(checks[result = \"fail\"]))", "computeOn": "change" },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=checks != null and count(checks) > 0 and count(checks[result = \"fail\"]) = 0", "computeOn": "change" }
+  ]
+}

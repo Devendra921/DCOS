@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "remediation",
+  "type": "default",
+  "components": [
+    { "id": "Text_rem_intro", "type": "text", "text": "### Remediation\nRecord what was done to restore service and whether it worked. The closure checks come next." },
+    { "id": "Field_actionsTaken", "type": "textarea", "key": "actionsTaken", "label": "What was done", "validate": {"required": true} },
+    { "id": "Field_startedAt", "type": "datetime", "key": "startedAt", "subtype": "datetime", "dateLabel": "Started", "timeLabel": "Time", "use24h": true, "layout": {"row": "Row_rem", "columns": 8} },
+    { "id": "Field_finishedAt", "type": "datetime", "key": "finishedAt", "subtype": "datetime", "dateLabel": "Finished", "timeLabel": "Time", "use24h": true, "layout": {"row": "Row_rem", "columns": 8} },
+    { "id": "Field_outcome", "type": "radio", "key": "outcome", "label": "Result", "values": [{"label": "Service restored", "value": "restored"}, {"label": "Partly restored, workaround in place", "value": "workaround"}, {"label": "Not restored", "value": "not-restored"}], "validate": {"required": true} },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Evidence (optional)", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "description": "Photos, readings or screenshots." },
+    { "id": "List_openItemsList", "type": "dynamiclist", "path": "openItemsList", "label": "Follow-up actions", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_oi_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_oi", "columns": 8} },
+      { "id": "Field_oi_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_oi", "columns": 4} },
+      { "id": "Field_oi_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_oi", "columns": 4} }
+    ] },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if openItemsList = null then 0 else count(openItemsList))", "computeOn": "change" }
+  ]
+}

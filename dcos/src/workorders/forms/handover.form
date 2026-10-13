@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "handover",
+  "type": "default",
+  "components": [
+    { "id": "Text_ho_intro", "type": "text", "text": "### Handover to operations\nConfirm the handover pack is complete and list any snags still open. Open snags go back to be closed before the handover is accepted." },
+    { "id": "Field_handoverPack", "type": "checklist", "key": "handoverPack", "label": "Handover pack received", "values": [{"label": "As-built drawings", "value": "asbuilt"}, {"label": "Operation and maintenance manuals", "value": "om"}, {"label": "Test and commissioning certificates", "value": "certs"}, {"label": "Warranties", "value": "warranty"}, {"label": "Spares and special tools", "value": "spares"}, {"label": "Training delivered", "value": "training"}, {"label": "Asset register and DCIM updated", "value": "records"}] },
+    { "id": "Text_ho_warn", "type": "text", "text": "Part of the handover pack is missing. Add each missing item as a snag so it is tracked.", "conditional": {"hide": "=not(handoverPack = null or count(handoverPack) < 7)"} },
+    { "id": "Field_documents", "type": "filepicker", "key": "documents", "label": "Handover documents (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" },
+    { "id": "List_snagList", "type": "dynamiclist", "path": "snagList", "label": "Open snags", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_s_snag", "type": "textfield", "key": "snag", "label": "Snag", "validate": {"required": true}, "layout": {"row": "Row_s_1", "columns": 10} },
+      { "id": "Field_s_location", "type": "textfield", "key": "location", "label": "Location", "layout": {"row": "Row_s_1", "columns": 6} },
+      { "id": "Field_s_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_s_2", "columns": 8} },
+      { "id": "Field_s_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_s_2", "columns": 8} }
+    ] },
+    { "id": "Field_signedBy", "type": "textfield", "key": "signedBy", "label": "Signed by", "readonly": true, "description": "The signed-in user. If this should be someone else, ask them to complete the task." },
+    { "id": "Field_approved", "type": "checkbox", "key": "approved", "label": "I accept this handover on behalf of operations", "validate": {"required": true} },
+    { "id": "Field_conditions", "type": "textarea", "key": "conditions", "label": "Conditions (optional)" },
+    { "id": "Expr_snags", "type": "expression", "key": "snags", "expression": "=(if snagList = null then 0 else count(snagList))", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if snagList = null then 0 else count(snagList))", "computeOn": "change" }
+  ]
+}

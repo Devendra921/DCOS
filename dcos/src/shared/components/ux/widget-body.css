@@ -1,0 +1,34 @@
+.widget-body {
+  min-width: 0;
+  min-height: 0;
+  max-height: var(--widget-height, 320px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.widget-body--fill { height: var(--widget-height, 320px); }
+.widget-body > * { min-width: 0; flex-shrink: 0; }
+.widget-body:focus-visible, .widget-label:focus-visible {
+  outline: 2px solid var(--primaryColor500);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+.widget-label {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.widget-body .board-row { min-width: 0; }
+.widget-body .board-row .t { display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.widget-body .board-row .m { min-width: 0; flex-wrap: nowrap; }
+.widget-body .board-row .m > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.widget-body .board-row .m > span:first-child { flex-shrink: 1; }
+.widget-body .board-row .m > span:not(:first-child) { flex-shrink: 0; }
+
+.widget-body .board-row .m { overflow: hidden; }
+.widget-body .board-row .m > span:last-child { flex-shrink: 1; }
+.widget-body.col { gap: 12px; }

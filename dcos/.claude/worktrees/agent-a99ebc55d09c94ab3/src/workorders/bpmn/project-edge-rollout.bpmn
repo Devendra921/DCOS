@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_edge_rollout" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_edge_rollout">
+    <bpmn:participant id="Participant_project_edge_rollout" name="PRJ-17 · Edge site rollout" processRef="project-edge-rollout" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-edge-rollout" name="Edge site rollout" isExecutable="true">
+    <bpmn:documentation>Rolls out one wave of edge sites: site surveys run as contractor work orders, leases and landlord consents are signed (overdue ones escalated), the network operator connects power (a slipped date is re-planned), enclosures are installed as work orders under change, site acceptance tests must pass and the sites are handed to operations.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_edge_rollout">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>escalate_lease</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>replan</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>lease</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_lease_overdue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>power</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_power_late</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Contractor" name="Contractor">
+        <bpmn:flowNodeRef>raise_survey</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_survey</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_enclosure</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_enclosure</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Commissioning" name="Commissioning">
+        <bpmn:flowNodeRef>sat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_sat</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>golive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Wave approved">
+      <bpmn:outgoing>Flow_start_raise_survey</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="raise_survey" name="Raise site survey work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_raise_survey</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_survey_wait_survey</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_survey" name="Site survey work closed">
+      <bpmn:incoming>Flow_raise_survey_wait_survey</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_survey_lease</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_survey" messageRef="Message_wait_survey" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="lease" name="Sign leases and landlord consent">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT160H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_survey_lease</bpmn:incoming>
+      <bpmn:incoming>Flow_escalate_lease_lease</bpmn:incoming>
+      <bpmn:outgoing>Flow_lease_power</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_lease_overdue" name="Lease overdue" attachedToRef="lease" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_lease_overdue_escalate_lease</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_b_lease_overdue">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P14D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="escalate_lease" name="Escalate the lease">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acknowledge" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_lease_overdue_escalate_lease</bpmn:incoming>
+      <bpmn:outgoing>Flow_escalate_lease_lease</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="power" name="Power connection by the network operator">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P10D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_lease_power</bpmn:incoming>
+      <bpmn:incoming>Flow_replan_power</bpmn:incoming>
+      <bpmn:outgoing>Flow_power_raise_enclosure</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_power_late" name="Connection date slipped" attachedToRef="power" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_power_late_replan</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_power_late" messageRef="Message_b_power_late" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="replan" name="Re-plan the install dates">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_power_late_replan</bpmn:incoming>
+      <bpmn:outgoing>Flow_replan_power</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_enclosure" name="Raise enclosure install work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_power_raise_enclosure</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_enclosure_wait_enclosure</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_enclosure" name="Enclosure install work closed">
+      <bpmn:incoming>Flow_raise_enclosure_wait_enclosure</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_enclosure_sat</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_enclosure" messageRef="Message_wait_enclosure" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="sat" name="Site acceptance tests">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_enclosure_sat</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_sat</bpmn:incoming>
+      <bpmn:outgoing>Flow_sat_g_sat</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_sat" name="SAT passed?" default="Flow_g_sat_golive">
+      <bpmn:incoming>Flow_sat_g_sat</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_sat_golive</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_sat_fix</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix" name="Fix SAT findings">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_sat_fix</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_sat</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="golive" name="Hand sites to operations">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_sat_golive</bpmn:incoming>
+      <bpmn:outgoing>Flow_golive_end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="end" name="Sites live">
+      <bpmn:incoming>Flow_golive_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_raise_survey" sourceRef="start" targetRef="raise_survey" />
+    <bpmn:sequenceFlow id="Flow_raise_survey_wait_survey" sourceRef="raise_survey" targetRef="wait_survey" />
+    <bpmn:sequenceFlow id="Flow_wait_survey_lease" sourceRef="wait_survey" targetRef="lease" />
+    <bpmn:sequenceFlow id="Flow_lease_power" sourceRef="lease" targetRef="power" />
+    <bpmn:sequenceFlow id="Flow_power_raise_enclosure" sourceRef="power" targetRef="raise_enclosure" />
+    <bpmn:sequenceFlow id="Flow_raise_enclosure_wait_enclosure" sourceRef="raise_enclosure" targetRef="wait_enclosure" />
+    <bpmn:sequenceFlow id="Flow_wait_enclosure_sat" sourceRef="wait_enclosure" targetRef="sat" />
+    <bpmn:sequenceFlow id="Flow_sat_g_sat" sourceRef="sat" targetRef="g_sat" />
+    <bpmn:sequenceFlow id="Flow_escalate_lease_lease" sourceRef="escalate_lease" targetRef="lease" />
+    <bpmn:sequenceFlow id="Flow_replan_power" sourceRef="replan" targetRef="power" />
+    <bpmn:sequenceFlow id="Flow_g_sat_golive" name="passed" sourceRef="g_sat" targetRef="golive">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_sat_fix" name="findings" sourceRef="g_sat" targetRef="fix">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_sat" sourceRef="fix" targetRef="sat" />
+    <bpmn:sequenceFlow id="Flow_golive_end" sourceRef="golive" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_lease_overdue_escalate_lease" sourceRef="b_lease_overdue" targetRef="escalate_lease" />
+    <bpmn:sequenceFlow id="Flow_b_power_late_replan" sourceRef="b_power_late" targetRef="replan" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_survey" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_survey&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_b_power_late" name="connection-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_enclosure" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_enclosure&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_edge_rollout">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_edge_rollout" bpmnElement="Collaboration_project_edge_rollout">
+      <bpmndi:BPMNShape id="Participant_project_edge_rollout_di" bpmnElement="Participant_project_edge_rollout" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1960" height="960" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1930" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="1930" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Contractor_di" bpmnElement="Lane_Contractor" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="1930" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Commissioning_di" bpmnElement="Lane_Commissioning" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="1930" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="890" width="1930" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_survey_di" bpmnElement="raise_survey">
+        <dc:Bounds x="400" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_survey_di" bpmnElement="wait_survey">
+        <dc:Bounds x="612" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lease_di" bpmnElement="lease">
+        <dc:Bounds x="740" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_lease_overdue_di" bpmnElement="b_lease_overdue">
+        <dc:Bounds x="812" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="escalate_lease_di" bpmnElement="escalate_lease">
+        <dc:Bounds x="910" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="power_di" bpmnElement="power">
+        <dc:Bounds x="910" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_power_late_di" bpmnElement="b_power_late">
+        <dc:Bounds x="982" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="replan_di" bpmnElement="replan">
+        <dc:Bounds x="1080" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_enclosure_di" bpmnElement="raise_enclosure">
+        <dc:Bounds x="1080" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_enclosure_di" bpmnElement="wait_enclosure">
+        <dc:Bounds x="1292" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sat_di" bpmnElement="sat">
+        <dc:Bounds x="1420" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_sat_di" bpmnElement="g_sat">
+        <dc:Bounds x="1625" y="790" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_di" bpmnElement="fix">
+        <dc:Bounds x="1760" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="golive_di" bpmnElement="golive">
+        <dc:Bounds x="1760" y="925" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="1972" y="947" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_raise_survey_di" bpmnElement="Flow_start_raise_survey">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="560" />
+        <di:waypoint x="400" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_survey_wait_survey_di" bpmnElement="Flow_raise_survey_wait_survey">
+        <di:waypoint x="520" y="560" />
+        <di:waypoint x="612" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_survey_lease_di" bpmnElement="Flow_wait_survey_lease">
+        <di:waypoint x="648" y="560" />
+        <di:waypoint x="715" y="560" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="740" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_lease_power_di" bpmnElement="Flow_lease_power">
+        <di:waypoint x="860" y="410" />
+        <di:waypoint x="910" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_power_raise_enclosure_di" bpmnElement="Flow_power_raise_enclosure">
+        <di:waypoint x="1030" y="410" />
+        <di:waypoint x="1055" y="410" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1080" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_enclosure_wait_enclosure_di" bpmnElement="Flow_raise_enclosure_wait_enclosure">
+        <di:waypoint x="1200" y="560" />
+        <di:waypoint x="1292" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_enclosure_sat_di" bpmnElement="Flow_wait_enclosure_sat">
+        <di:waypoint x="1328" y="560" />
+        <di:waypoint x="1395" y="560" />
+        <di:waypoint x="1395" y="815" />
+        <di:waypoint x="1420" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_sat_g_sat_di" bpmnElement="Flow_sat_g_sat">
+        <di:waypoint x="1540" y="815" />
+        <di:waypoint x="1625" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_escalate_lease_lease_di" bpmnElement="Flow_escalate_lease_lease">
+        <di:waypoint x="970" y="300" />
+        <di:waypoint x="970" y="467" />
+        <di:waypoint x="800" y="467" />
+        <di:waypoint x="800" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_replan_power_di" bpmnElement="Flow_replan_power">
+        <di:waypoint x="1140" y="300" />
+        <di:waypoint x="1140" y="467" />
+        <di:waypoint x="970" y="467" />
+        <di:waypoint x="970" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_sat_golive_di" bpmnElement="Flow_g_sat_golive">
+        <di:waypoint x="1675" y="815" />
+        <di:waypoint x="1735" y="815" />
+        <di:waypoint x="1735" y="965" />
+        <di:waypoint x="1760" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_sat_fix_di" bpmnElement="Flow_g_sat_fix">
+        <di:waypoint x="1675" y="815" />
+        <di:waypoint x="1735" y="815" />
+        <di:waypoint x="1735" y="665" />
+        <di:waypoint x="1760" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_sat_di" bpmnElement="Flow_fix_sat">
+        <di:waypoint x="1820" y="705" />
+        <di:waypoint x="1820" y="872" />
+        <di:waypoint x="1480" y="872" />
+        <di:waypoint x="1480" y="855" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_golive_end_di" bpmnElement="Flow_golive_end">
+        <di:waypoint x="1880" y="965" />
+        <di:waypoint x="1972" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_lease_overdue_escalate_lease_di" bpmnElement="Flow_b_lease_overdue_escalate_lease">
+        <di:waypoint x="830" y="468" />
+        <di:waypoint x="830" y="478" />
+        <di:waypoint x="885" y="478" />
+        <di:waypoint x="885" y="260" />
+        <di:waypoint x="910" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_power_late_replan_di" bpmnElement="Flow_b_power_late_replan">
+        <di:waypoint x="1000" y="468" />
+        <di:waypoint x="1000" y="478" />
+        <di:waypoint x="1055" y="478" />
+        <di:waypoint x="1055" y="260" />
+        <di:waypoint x="1080" y="260" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

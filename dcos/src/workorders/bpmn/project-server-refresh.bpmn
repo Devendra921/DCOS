@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_server_refresh" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_server_refresh">
+    <bpmn:participant id="Participant_project_server_refresh" name="PRJ-14 · Server refresh" processRef="project-server-refresh" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-server-refresh" name="Server refresh" isExecutable="true">
+    <bpmn:documentation>Replaces ageing servers in waves: the old-to-new mapping and wave plan are approved, new servers are received (delays start an expedite), racked and burnt in, a pilot wave runs and is reviewed (adjusted and repeated if not accepted), the remaining waves run, old equipment is sanitised and disposed of and the CMDB and monitoring are updated.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_server_refresh">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>mapping</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>adjust</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>receive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_delayed_expedite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>expedite</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_burnin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_burnin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_pilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_pilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_waves</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_waves</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_disposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_disposal</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>pilot_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_pilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>records</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Refresh approved">
+      <bpmn:outgoing>Flow_start_mapping</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="mapping" name="Approve mapping and waves">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_mapping</bpmn:incoming>
+      <bpmn:outgoing>Flow_mapping_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="receive" name="Receive new servers">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="receive-delivery" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P5D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_mapping_receive</bpmn:incoming>
+      <bpmn:incoming>Flow_expedite_receive</bpmn:incoming>
+      <bpmn:outgoing>Flow_receive_raise_burnin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_delayed_expedite" name="Delivery delayed" attachedToRef="receive" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_delayed_expedite_expedite</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_delayed_expedite" messageRef="Message_b_delayed_expedite" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="expedite" name="Expedite with the vendor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_delayed_expedite_expedite</bpmn:incoming>
+      <bpmn:outgoing>Flow_expedite_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_burnin" name="Raise rack and burn-in work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_receive_raise_burnin</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_burnin_wait_burnin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_burnin" name="Rack and burn-in work closed">
+      <bpmn:incoming>Flow_raise_burnin_wait_burnin</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_burnin_raise_pilot</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_burnin" messageRef="Message_wait_burnin" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_pilot" name="Raise pilot wave work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_burnin_raise_pilot</bpmn:incoming>
+      <bpmn:incoming>Flow_adjust_raise_pilot</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_pilot_wait_pilot</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_pilot" name="Pilot wave work closed">
+      <bpmn:incoming>Flow_raise_pilot_wait_pilot</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_pilot_pilot_review</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_pilot" messageRef="Message_wait_pilot" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="pilot_review" name="Review the pilot wave">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_pilot_pilot_review</bpmn:incoming>
+      <bpmn:outgoing>Flow_pilot_review_g_pilot</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_pilot" name="Pilot accepted?" default="Flow_g_pilot_raise_waves">
+      <bpmn:incoming>Flow_pilot_review_g_pilot</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_pilot_raise_waves</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_pilot_adjust</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="adjust" name="Adjust the method">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_pilot_adjust</bpmn:incoming>
+      <bpmn:outgoing>Flow_adjust_raise_pilot</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_waves" name="Raise remaining waves work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_pilot_raise_waves</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_waves_wait_waves</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_waves" name="Remaining waves work closed">
+      <bpmn:incoming>Flow_raise_waves_wait_waves</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_waves_raise_disposal</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_waves" messageRef="Message_wait_waves" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_disposal" name="Raise sanitise and dispose work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_waves_raise_disposal</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_disposal_wait_disposal</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_disposal" name="Sanitise and dispose work closed">
+      <bpmn:incoming>Flow_raise_disposal_wait_disposal</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_disposal_records</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_disposal" messageRef="Message_wait_disposal" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="records" name="Update CMDB and monitoring">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.update-record" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_disposal_records</bpmn:incoming>
+      <bpmn:outgoing>Flow_records_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="Refresh complete">
+      <bpmn:incoming>Flow_records_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_mapping" sourceRef="start" targetRef="mapping" />
+    <bpmn:sequenceFlow id="Flow_mapping_receive" sourceRef="mapping" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_receive_raise_burnin" sourceRef="receive" targetRef="raise_burnin" />
+    <bpmn:sequenceFlow id="Flow_raise_burnin_wait_burnin" sourceRef="raise_burnin" targetRef="wait_burnin" />
+    <bpmn:sequenceFlow id="Flow_wait_burnin_raise_pilot" sourceRef="wait_burnin" targetRef="raise_pilot" />
+    <bpmn:sequenceFlow id="Flow_raise_pilot_wait_pilot" sourceRef="raise_pilot" targetRef="wait_pilot" />
+    <bpmn:sequenceFlow id="Flow_wait_pilot_pilot_review" sourceRef="wait_pilot" targetRef="pilot_review" />
+    <bpmn:sequenceFlow id="Flow_pilot_review_g_pilot" sourceRef="pilot_review" targetRef="g_pilot" />
+    <bpmn:sequenceFlow id="Flow_expedite_receive" sourceRef="expedite" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_g_pilot_raise_waves" name="accepted" sourceRef="g_pilot" targetRef="raise_waves">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_pilot_adjust" name="not accepted" sourceRef="g_pilot" targetRef="adjust">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_adjust_raise_pilot" sourceRef="adjust" targetRef="raise_pilot" />
+    <bpmn:sequenceFlow id="Flow_raise_waves_wait_waves" sourceRef="raise_waves" targetRef="wait_waves" />
+    <bpmn:sequenceFlow id="Flow_wait_waves_raise_disposal" sourceRef="wait_waves" targetRef="raise_disposal" />
+    <bpmn:sequenceFlow id="Flow_raise_disposal_wait_disposal" sourceRef="raise_disposal" targetRef="wait_disposal" />
+    <bpmn:sequenceFlow id="Flow_wait_disposal_records" sourceRef="wait_disposal" targetRef="records" />
+    <bpmn:sequenceFlow id="Flow_records_end" sourceRef="records" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_delayed_expedite_expedite" sourceRef="b_delayed_expedite" targetRef="expedite" />
+  </bpmn:process>
+  <bpmn:message id="Message_b_delayed_expedite" name="delivery-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_burnin" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_burnin&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_pilot" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_pilot&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_waves" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_waves&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_disposal" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_disposal&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_server_refresh">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_server_refresh" bpmnElement="Collaboration_project_server_refresh">
+      <bpmndi:BPMNShape id="Participant_project_server_refresh_di" bpmnElement="Participant_project_server_refresh" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2640" height="810" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2610" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="2610" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="590" width="2610" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2610" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="mapping_di" bpmnElement="mapping">
+        <dc:Bounds x="400" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receive_di" bpmnElement="receive">
+        <dc:Bounds x="570" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_delayed_expedite_di" bpmnElement="b_delayed_expedite">
+        <dc:Bounds x="642" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="expedite_di" bpmnElement="expedite">
+        <dc:Bounds x="740" y="475" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_burnin_di" bpmnElement="raise_burnin">
+        <dc:Bounds x="740" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_burnin_di" bpmnElement="wait_burnin">
+        <dc:Bounds x="952" y="647" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_pilot_di" bpmnElement="raise_pilot">
+        <dc:Bounds x="1080" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_pilot_di" bpmnElement="wait_pilot">
+        <dc:Bounds x="1292" y="647" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="pilot_review_di" bpmnElement="pilot_review">
+        <dc:Bounds x="1420" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_pilot_di" bpmnElement="g_pilot">
+        <dc:Bounds x="1625" y="790" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="adjust_di" bpmnElement="adjust">
+        <dc:Bounds x="1760" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_waves_di" bpmnElement="raise_waves">
+        <dc:Bounds x="1760" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_waves_di" bpmnElement="wait_waves">
+        <dc:Bounds x="1972" y="647" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_disposal_di" bpmnElement="raise_disposal">
+        <dc:Bounds x="2100" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_disposal_di" bpmnElement="wait_disposal">
+        <dc:Bounds x="2312" y="647" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="records_di" bpmnElement="records">
+        <dc:Bounds x="2440" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2652" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_mapping_di" bpmnElement="Flow_start_mapping">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="400" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_mapping_receive_di" bpmnElement="Flow_mapping_receive">
+        <di:waypoint x="520" y="155" />
+        <di:waypoint x="545" y="155" />
+        <di:waypoint x="545" y="410" />
+        <di:waypoint x="570" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_receive_raise_burnin_di" bpmnElement="Flow_receive_raise_burnin">
+        <di:waypoint x="690" y="410" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="715" y="665" />
+        <di:waypoint x="740" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_burnin_wait_burnin_di" bpmnElement="Flow_raise_burnin_wait_burnin">
+        <di:waypoint x="860" y="665" />
+        <di:waypoint x="952" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_burnin_raise_pilot_di" bpmnElement="Flow_wait_burnin_raise_pilot">
+        <di:waypoint x="988" y="665" />
+        <di:waypoint x="1080" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_pilot_wait_pilot_di" bpmnElement="Flow_raise_pilot_wait_pilot">
+        <di:waypoint x="1200" y="665" />
+        <di:waypoint x="1292" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_pilot_pilot_review_di" bpmnElement="Flow_wait_pilot_pilot_review">
+        <di:waypoint x="1328" y="665" />
+        <di:waypoint x="1395" y="665" />
+        <di:waypoint x="1395" y="815" />
+        <di:waypoint x="1420" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_pilot_review_g_pilot_di" bpmnElement="Flow_pilot_review_g_pilot">
+        <di:waypoint x="1540" y="815" />
+        <di:waypoint x="1625" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_expedite_receive_di" bpmnElement="Flow_expedite_receive">
+        <di:waypoint x="800" y="555" />
+        <di:waypoint x="800" y="467" />
+        <di:waypoint x="630" y="467" />
+        <di:waypoint x="630" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_pilot_raise_waves_di" bpmnElement="Flow_g_pilot_raise_waves">
+        <di:waypoint x="1675" y="815" />
+        <di:waypoint x="1735" y="815" />
+        <di:waypoint x="1735" y="665" />
+        <di:waypoint x="1760" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_pilot_adjust_di" bpmnElement="Flow_g_pilot_adjust">
+        <di:waypoint x="1675" y="815" />
+        <di:waypoint x="1735" y="815" />
+        <di:waypoint x="1735" y="260" />
+        <di:waypoint x="1760" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_adjust_raise_pilot_di" bpmnElement="Flow_adjust_raise_pilot">
+        <di:waypoint x="1820" y="300" />
+        <di:waypoint x="1820" y="722" />
+        <di:waypoint x="1140" y="722" />
+        <di:waypoint x="1140" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_waves_wait_waves_di" bpmnElement="Flow_raise_waves_wait_waves">
+        <di:waypoint x="1880" y="665" />
+        <di:waypoint x="1972" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_waves_raise_disposal_di" bpmnElement="Flow_wait_waves_raise_disposal">
+        <di:waypoint x="2008" y="665" />
+        <di:waypoint x="2100" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_disposal_wait_disposal_di" bpmnElement="Flow_raise_disposal_wait_disposal">
+        <di:waypoint x="2220" y="665" />
+        <di:waypoint x="2312" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_disposal_records_di" bpmnElement="Flow_wait_disposal_records">
+        <di:waypoint x="2348" y="665" />
+        <di:waypoint x="2415" y="665" />
+        <di:waypoint x="2415" y="815" />
+        <di:waypoint x="2440" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_records_end_di" bpmnElement="Flow_records_end">
+        <di:waypoint x="2560" y="815" />
+        <di:waypoint x="2652" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_delayed_expedite_expedite_di" bpmnElement="Flow_b_delayed_expedite_expedite">
+        <di:waypoint x="660" y="468" />
+        <di:waypoint x="660" y="478" />
+        <di:waypoint x="715" y="478" />
+        <di:waypoint x="715" y="515" />
+        <di:waypoint x="740" y="515" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

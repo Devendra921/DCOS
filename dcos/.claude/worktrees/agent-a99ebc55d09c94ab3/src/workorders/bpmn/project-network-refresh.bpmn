@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_network_refresh" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_network_refresh">
+    <bpmn:participant id="Participant_project_network_refresh" name="PRJ-05 · Network refresh" processRef="project-network-refresh" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-network-refresh" name="Network refresh" isExecutable="true">
+    <bpmn:documentation>Refreshes a network fabric layer: the target design is approved, new devices are staged and pre-configured, the maintenance window is booked, the cut-over runs as a change per device group, the NOC validates service (issues go to remediation) and the old devices are removed.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_network_refresh">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Network_design" name="Network design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>revise_design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>remediate</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_stage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_stage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_cutover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_cutover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_removal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_removal</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>book_window</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>validate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_healthy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Refresh approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve target design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Network Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT64H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:incoming>Flow_revise_design_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_g_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_design" name="Design approved?" default="Flow_g_design_raise_stage">
+      <bpmn:incoming>Flow_design_g_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_design_raise_stage</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_design_revise_design</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="revise_design" name="Revise design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Network Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_revise_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_revise_design_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_stage" name="Raise staging and pre-config work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_raise_stage</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_stage_wait_stage</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_stage" name="Staging and pre-config work closed">
+      <bpmn:incoming>Flow_raise_stage_wait_stage</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_stage_book_window</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_stage" messageRef="Message_wait_stage" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="book_window" name="Book the maintenance window">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_stage_book_window</bpmn:incoming>
+      <bpmn:outgoing>Flow_book_window_raise_cutover</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_cutover" name="Raise cut-over work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_book_window_raise_cutover</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_cutover_wait_cutover</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_cutover" name="Cut-over work closed">
+      <bpmn:incoming>Flow_raise_cutover_wait_cutover</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_cutover_validate</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_cutover" messageRef="Message_wait_cutover" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="validate" name="Validate and monitor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="NOC Lead" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_cutover_validate</bpmn:incoming>
+      <bpmn:incoming>Flow_remediate_validate</bpmn:incoming>
+      <bpmn:outgoing>Flow_validate_g_healthy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_healthy" name="Service healthy?" default="Flow_g_healthy_raise_removal">
+      <bpmn:incoming>Flow_validate_g_healthy</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_healthy_raise_removal</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_healthy_remediate</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="remediate" name="Remediate issues">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Network Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_healthy_remediate</bpmn:incoming>
+      <bpmn:outgoing>Flow_remediate_validate</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_removal" name="Raise old device removal work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_healthy_raise_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_removal_wait_removal</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_removal" name="Old device removal work closed">
+      <bpmn:incoming>Flow_raise_removal_wait_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_removal_end</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_removal" messageRef="Message_wait_removal" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="end" name="Fabric refreshed">
+      <bpmn:incoming>Flow_wait_removal_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_g_design" sourceRef="design" targetRef="g_design" />
+    <bpmn:sequenceFlow id="Flow_g_design_raise_stage" name="approved" sourceRef="g_design" targetRef="raise_stage">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_design_revise_design" name="rejected" sourceRef="g_design" targetRef="revise_design">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_revise_design_design" sourceRef="revise_design" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_raise_stage_wait_stage" sourceRef="raise_stage" targetRef="wait_stage" />
+    <bpmn:sequenceFlow id="Flow_wait_stage_book_window" sourceRef="wait_stage" targetRef="book_window" />
+    <bpmn:sequenceFlow id="Flow_book_window_raise_cutover" sourceRef="book_window" targetRef="raise_cutover" />
+    <bpmn:sequenceFlow id="Flow_raise_cutover_wait_cutover" sourceRef="raise_cutover" targetRef="wait_cutover" />
+    <bpmn:sequenceFlow id="Flow_wait_cutover_validate" sourceRef="wait_cutover" targetRef="validate" />
+    <bpmn:sequenceFlow id="Flow_validate_g_healthy" sourceRef="validate" targetRef="g_healthy" />
+    <bpmn:sequenceFlow id="Flow_g_healthy_raise_removal" name="healthy" sourceRef="g_healthy" targetRef="raise_removal">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_healthy_remediate" name="issues" sourceRef="g_healthy" targetRef="remediate">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_remediate_validate" sourceRef="remediate" targetRef="validate" />
+    <bpmn:sequenceFlow id="Flow_raise_removal_wait_removal" sourceRef="raise_removal" targetRef="wait_removal" />
+    <bpmn:sequenceFlow id="Flow_wait_removal_end" sourceRef="wait_removal" targetRef="end" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_stage" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_stage&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_cutover" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_cutover&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_removal" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_removal&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_network_refresh">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_network_refresh" bpmnElement="Collaboration_project_network_refresh">
+      <bpmndi:BPMNShape id="Participant_project_network_refresh_di" bpmnElement="Participant_project_network_refresh" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2300" height="705" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Network_design_di" bpmnElement="Lane_Network_design" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="635" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_design_di" bpmnElement="g_design">
+        <dc:Bounds x="605" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="revise_design_di" bpmnElement="revise_design">
+        <dc:Bounds x="740" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_stage_di" bpmnElement="raise_stage">
+        <dc:Bounds x="740" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_stage_di" bpmnElement="wait_stage">
+        <dc:Bounds x="952" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="book_window_di" bpmnElement="book_window">
+        <dc:Bounds x="1080" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_cutover_di" bpmnElement="raise_cutover">
+        <dc:Bounds x="1250" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_cutover_di" bpmnElement="wait_cutover">
+        <dc:Bounds x="1462" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="validate_di" bpmnElement="validate">
+        <dc:Bounds x="1590" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_healthy_di" bpmnElement="g_healthy">
+        <dc:Bounds x="1795" y="685" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="remediate_di" bpmnElement="remediate">
+        <dc:Bounds x="1930" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_removal_di" bpmnElement="raise_removal">
+        <dc:Bounds x="1930" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_removal_di" bpmnElement="wait_removal">
+        <dc:Bounds x="2142" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2312" y="692" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="305" />
+        <di:waypoint x="400" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_g_design_di" bpmnElement="Flow_design_g_design">
+        <di:waypoint x="520" y="305" />
+        <di:waypoint x="605" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_raise_stage_di" bpmnElement="Flow_g_design_raise_stage">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="560" />
+        <di:waypoint x="740" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_revise_design_di" bpmnElement="Flow_g_design_revise_design">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="740" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_revise_design_design_di" bpmnElement="Flow_revise_design_design">
+        <di:waypoint x="800" y="450" />
+        <di:waypoint x="800" y="362" />
+        <di:waypoint x="460" y="362" />
+        <di:waypoint x="460" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_stage_wait_stage_di" bpmnElement="Flow_raise_stage_wait_stage">
+        <di:waypoint x="860" y="560" />
+        <di:waypoint x="952" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_stage_book_window_di" bpmnElement="Flow_wait_stage_book_window">
+        <di:waypoint x="988" y="560" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1055" y="710" />
+        <di:waypoint x="1080" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_book_window_raise_cutover_di" bpmnElement="Flow_book_window_raise_cutover">
+        <di:waypoint x="1200" y="710" />
+        <di:waypoint x="1225" y="710" />
+        <di:waypoint x="1225" y="560" />
+        <di:waypoint x="1250" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_cutover_wait_cutover_di" bpmnElement="Flow_raise_cutover_wait_cutover">
+        <di:waypoint x="1370" y="560" />
+        <di:waypoint x="1462" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_cutover_validate_di" bpmnElement="Flow_wait_cutover_validate">
+        <di:waypoint x="1498" y="560" />
+        <di:waypoint x="1565" y="560" />
+        <di:waypoint x="1565" y="710" />
+        <di:waypoint x="1590" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_validate_g_healthy_di" bpmnElement="Flow_validate_g_healthy">
+        <di:waypoint x="1710" y="710" />
+        <di:waypoint x="1795" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_healthy_raise_removal_di" bpmnElement="Flow_g_healthy_raise_removal">
+        <di:waypoint x="1845" y="710" />
+        <di:waypoint x="1905" y="710" />
+        <di:waypoint x="1905" y="560" />
+        <di:waypoint x="1930" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_healthy_remediate_di" bpmnElement="Flow_g_healthy_remediate">
+        <di:waypoint x="1845" y="710" />
+        <di:waypoint x="1905" y="710" />
+        <di:waypoint x="1905" y="410" />
+        <di:waypoint x="1930" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_remediate_validate_di" bpmnElement="Flow_remediate_validate">
+        <di:waypoint x="1990" y="450" />
+        <di:waypoint x="1990" y="767" />
+        <di:waypoint x="1650" y="767" />
+        <di:waypoint x="1650" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_removal_wait_removal_di" bpmnElement="Flow_raise_removal_wait_removal">
+        <di:waypoint x="2050" y="560" />
+        <di:waypoint x="2142" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_removal_end_di" bpmnElement="Flow_wait_removal_end">
+        <di:waypoint x="2178" y="560" />
+        <di:waypoint x="2245" y="560" />
+        <di:waypoint x="2245" y="710" />
+        <di:waypoint x="2312" y="710" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

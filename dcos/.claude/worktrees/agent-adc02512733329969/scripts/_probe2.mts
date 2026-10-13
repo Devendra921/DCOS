@@ -1,0 +1,15 @@
+import { buildSnapshot } from '../src/mock/db/seed';
+import { evaluate } from '../src/modules/planner/lib/engine';
+import { plannerDataFromSnapshot } from '../src/modules/planner/lib/plannerData';
+import type * as T from '../src/mock/data/types';
+const snap = buildSnapshot('small') as unknown as Record<string, unknown[]>;
+const data = plannerDataFromSnapshot(snap);
+const templates = snap.plannerTemplates as unknown as T.PlannerTemplate[];
+const benchmarks = snap.plannerBenchmarks as unknown as T.PlannerBenchmark[];
+const [id, ...checks] = process.argv.slice(2);
+const p = data.plannerPlans.find(x => x.plnId === id)!;
+const ev = evaluate(p, null, templates, benchmarks, undefined, data);
+for (const f of ev.findings.filter(f => !checks.length || checks.includes(f.rule.check) || checks.includes(f.rule.id))) console.log(f.rule.id, f.rule.check, f.status, f.detail);
+console.log('classes', JSON.stringify(ev.sizing.rackClasses), 'racks', ev.sizing.racks, 'it', ev.sizing.itKw);
+console.log('ladder', ev.ladder.map(r => `${r.bindingConstraint} ${JSON.stringify(r.headrooms)}`).join(' | '));
+console.log('candidates', JSON.stringify(p.candidates?.map(c => ({ n: c.name, mva: c.gridOfferMva, ch: c.chosen }))), 'params grid', p.params.gridOfferMva);

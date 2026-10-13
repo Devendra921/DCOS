@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "permit-check",
+  "type": "default",
+  "components": [
+    { "id": "Text_pc_intro", "type": "text", "text": "### Permits and consents\nList each permit or consent the work needs, with its status. The work goes ahead only when every one is granted; otherwise the authority is chased." },
+    { "id": "List_permits", "type": "dynamiclist", "path": "permits", "label": "Permits and consents", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_p_permit", "type": "textfield", "key": "permit", "label": "Permit or consent", "validate": {"required": true}, "layout": {"row": "Row_p_1", "columns": 8} },
+      { "id": "Field_p_authority", "type": "textfield", "key": "authority", "label": "Authority", "layout": {"row": "Row_p_1", "columns": 8} },
+      { "id": "Field_p_reference", "type": "textfield", "key": "reference", "label": "Reference", "layout": {"row": "Row_p_2", "columns": 5} },
+      { "id": "Field_p_status", "type": "select", "key": "status", "label": "Status", "values": [{"label": "Granted", "value": "granted"}, {"label": "Pending", "value": "pending"}, {"label": "Refused", "value": "refused"}], "validate": {"required": true}, "layout": {"row": "Row_p_2", "columns": 5} },
+      { "id": "Field_p_expiry", "type": "datetime", "key": "expiry", "subtype": "date", "dateLabel": "Expires", "layout": {"row": "Row_p_2", "columns": 6} }
+    ] },
+    { "id": "Field_documents", "type": "filepicker", "key": "documents", "label": "Permit documents (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" },
+    { "id": "Field_note", "type": "textarea", "key": "note", "label": "Note (optional)" },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=permits != null and count(permits) > 0 and count(permits[status != \"granted\"]) = 0", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if permits = null then 0 else count(permits[status != \"granted\"]))", "computeOn": "change" }
+  ]
+}

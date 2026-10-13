@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 16,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": { "name": "DCOS process generator", "version": "1.0" },
+  "id": "acknowledge",
+  "type": "default",
+  "components": [
+    { "id": "Text_ack_intro", "type": "text", "text": "### Acknowledge\nConfirm you own this step. Acknowledging stops the escalation timer." },
+    { "id": "Field_acknowledged", "type": "checkbox", "key": "acknowledged", "label": "I acknowledge and take ownership", "defaultValue": true, "validate": { "required": true } },
+    { "id": "Field_eta", "type": "select", "key": "eta", "label": "Expected time to next update", "values": [
+      { "label": "15 minutes", "value": "PT15M" },
+      { "label": "1 hour", "value": "PT1H" },
+      { "label": "4 hours", "value": "PT4H" },
+      { "label": "Next business day", "value": "P1D" }
+    ], "defaultValue": "PT1H" },
+    { "id": "Field_note", "type": "textarea", "key": "note", "label": "Note" }
+  ]
+}

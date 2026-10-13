@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "visit-request",
+  "type": "default",
+  "components": [
+    { "id": "Text_vr_intro", "type": "text", "text": "### Visit request\nWho is coming, when, why and which areas they need. Security approves the areas next." },
+    { "id": "List_visitors", "type": "dynamiclist", "path": "visitors", "label": "Visitors", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_v_name", "type": "textfield", "key": "name", "label": "Name", "validate": {"required": true}, "layout": {"row": "Row_v", "columns": 8} },
+      { "id": "Field_v_company", "type": "textfield", "key": "company", "label": "Company", "validate": {"required": true}, "layout": {"row": "Row_v", "columns": 8} }
+    ] },
+    { "id": "Field_purpose", "type": "textarea", "key": "purpose", "label": "Purpose of the visit", "validate": {"required": true} },
+    { "id": "Field_arrival", "type": "datetime", "key": "arrival", "subtype": "datetime", "dateLabel": "Arrival", "timeLabel": "Time", "use24h": true, "validate": {"required": true}, "layout": {"row": "Row_vr", "columns": 8} },
+    { "id": "Field_departure", "type": "datetime", "key": "departure", "subtype": "datetime", "dateLabel": "Expected departure", "timeLabel": "Time", "use24h": true, "validate": {"required": true}, "layout": {"row": "Row_vr", "columns": 8} },
+    { "id": "Field_zones", "type": "checklist", "key": "zones", "label": "Areas needed", "values": [{"label": "Data hall", "value": "data-hall"}, {"label": "Customer cage", "value": "cage"}, {"label": "Plant rooms", "value": "plant"}, {"label": "Loading bay", "value": "loading-bay"}, {"label": "Roof", "value": "roof"}, {"label": "Offices and meeting rooms", "value": "office"}], "validate": {"required": true} },
+    { "id": "Field_host", "type": "textfield", "key": "host", "label": "Host on site", "validate": {"required": true} },
+    { "id": "Field_documents", "type": "filepicker", "key": "documents", "label": "Method statement or risk assessment (optional)", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*" }
+  ]
+}

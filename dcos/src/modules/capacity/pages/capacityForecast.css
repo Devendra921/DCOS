@@ -1,0 +1,8 @@
+/* StatGrid has no 4-column variant in the shared strip CSS; the forecast tiles need one. */
+.dco-card.dco-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1360px) {
+  .dco-card.dco-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dco-card.dco-cols-4 .dco-tile:nth-child(3) { border-left: 0; }
+  .dco-card.dco-cols-4 .dco-tile:nth-child(4) { border-left: 1px solid var(--vw-color-slate-200); }
+  .dco-card.dco-cols-4 .dco-tile:nth-child(n+3) { border-top: 1px solid var(--vw-color-slate-200); }
+}

@@ -1,0 +1,25 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ran-app",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export NVM_DIR=\"$HOME/.nvm\"; if [ -s \"$NVM_DIR/nvm.sh\" ]; then . \"$NVM_DIR/nvm.sh\" && nvm use 20 >/dev/null 2>&1 || true; fi; exec npx vite --port 5183 --strictPort --configLoader=runner"
+      ],
+      "port": 5183,
+      "cwd": "."
+    },
+    {
+      "name": "dcos-ops",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export NVM_DIR=\"$HOME/.nvm\"; if [ -s \"$NVM_DIR/nvm.sh\" ]; then . \"$NVM_DIR/nvm.sh\" && nvm use 20 >/dev/null 2>&1 || true; fi; cd ../dcos-ops/app && exec npx vite --port 5181 --strictPort"
+      ],
+      "port": 5181,
+      "cwd": "."
+    }
+  ]
+}

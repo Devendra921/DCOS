@@ -1,0 +1,219 @@
+/* AntD specificity bridge, copied from canonical NST button rules.
+   Base selectors remain unchanged in the vendored design system. */
+.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--vw-radius-sm);
+  font-family: var(--fontFamily);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+
+  /* default size = md */
+  font-size: var(--vw-font-label-md);
+  line-height: 20px;
+  padding: 8px 16px;
+
+  /* default variant = outline */
+  background: var(--vw-color-white);
+  color: var(--vw-color-gray-900);
+  border: 1px solid var(--vw-color-slate-200);
+}
+.ant-btn:hover {
+  border-color: var(--color-primary, var(--primaryColor500));
+  color: var(--color-primary, var(--primaryColor500));
+}
+.ant-btn:focus-visible {
+  outline: 2px solid var(--color-primary, var(--primaryColor500));
+  outline-offset: 2px;
+}
+.ant-btn:disabled,
+.ant-btn.nst-btn.is-disabled {
+  background: var(--vw-color-gray-100);
+  color: var(--vw-color-gray-400);
+  border-color: var(--vw-color-slate-200);
+  cursor: not-allowed;
+}
+.ant-btn.nst-btn--xs { font-size: var(--vw-font-label-sm); line-height: 16px; padding: 4px; }
+.ant-btn:is(.nst-btn--sm, .ant-btn-sm:not(.nst-btn)) { font-size: 13px; line-height: 18px; padding: 6px 8px; }
+.ant-btn.nst-btn--md { font-size: var(--vw-font-label-md); line-height: 20px; padding: 8px 16px; }
+.ant-btn:is(.nst-btn--lg, .ant-btn-lg:not(.nst-btn)) { font-size: var(--vw-font-label-lg); line-height: 24px; padding: 8px 16px; }
+.ant-btn.nst-btn--icon.ant-btn.nst-btn--xs { width: 24px; height: 24px; padding: 0; }
+.ant-btn.nst-btn--icon.ant-btn:is(.nst-btn--sm, .ant-btn-sm:not(.nst-btn)) { width: 30px; height: 30px; padding: 0; }
+.ant-btn.nst-btn--icon.ant-btn.nst-btn--md,
+.ant-btn.nst-btn--icon           { width: 36px; height: 36px; padding: 0; }
+.ant-btn.nst-btn--icon.ant-btn:is(.nst-btn--lg, .ant-btn-lg:not(.nst-btn)) { width: 40px; height: 40px; padding: 0; }
+.ant-btn:is(.nst-btn--filled, .ant-btn-primary:not(.nst-btn)) {
+  background: var(--color-primary, var(--primaryColor500));
+  border-color: var(--color-primary, var(--primaryColor500));
+  color: var(--vw-color-white);
+}
+.ant-btn:is(.nst-btn--filled, .ant-btn-primary:not(.nst-btn)):hover {
+  background: var(--color-primary-hover, var(--primaryColor400));
+  border-color: var(--color-primary-hover, var(--primaryColor400));
+  color: var(--vw-color-white);
+}
+.ant-btn.nst-btn--gray {
+  background: var(--vw-color-gray-100);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.ant-btn.nst-btn--gray:hover {
+  background: var(--vw-color-gray-200);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.ant-btn:is(.nst-btn--ghost, .ant-btn-text:not(.nst-btn)) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.ant-btn:is(.nst-btn--ghost, .ant-btn-text:not(.nst-btn)):hover {
+  background: var(--vw-color-gray-100);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.ant-btn:is(.nst-btn--action, .ant-btn-link:not(.nst-btn)) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary, var(--primaryColor500));
+}
+.ant-btn:is(.nst-btn--action, .ant-btn-link:not(.nst-btn)):hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary-hover, var(--primaryColor400));
+}
+.ant-btn.nst-btn--danger {
+  background: var(--vw-color-red-600);
+  border-color: var(--vw-color-red-600);
+  color: var(--vw-color-white);
+}
+.ant-btn.nst-btn--danger:hover {
+  background: var(--vw-color-red-500);
+  border-color: var(--vw-color-red-500);
+  color: var(--vw-color-white);
+}
+.ant-btn.nst-btn--danger-subtle {
+  background: var(--vw-color-white);
+  border-color: var(--vw-color-red-200);
+  color: var(--vw-color-red-700);
+}
+.ant-btn.nst-btn--danger-subtle:hover {
+  background: var(--vw-color-red-50);
+  border-color: var(--vw-color-red-300);
+  color: var(--vw-color-red-700);
+}
+
+.ant-btn:not(.nst-btn--icon):not(.ant-btn-icon-only) { height: auto; min-height: 0; box-shadow: none; }
+.vw-table-host table.nst-table { border: 0; border-radius: 0; }
+/* rc-table owns scrolling on its body wrapper. A clipping table would become
+   a second sticky container and move fixed body cells away from their headers. */
+.vw-table-host table.nst-table { overflow: visible; }
+
+/* Labels remain legible in flex toolbars; actions wrap at their container. */
+.ant-btn { flex-shrink: 0; }
+.ant-btn.nst-btn > span { white-space: nowrap; }
+.ant-btn:disabled { background: var(--vw-color-gray-100); color: var(--vw-color-gray-400); border-color: var(--vw-color-slate-200); }
+
+/* A bounded grid owns row scrolling; its header is outside that scrollport. */
+.vw-ag-grid { width: 100%; min-width: 0; height: clamp(300px, 55dvh, 640px); border-radius: var(--vw-radius-lg); overflow: hidden; }
+.vw-ag-grid .ag-cell { display: flex; align-items: center; }
+.vw-ag-grid .ag-cell-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.vw-ag-grid .ag-cell a { color: var(--vw-color-gray-900); }
+.vw-ag-grid .ag-cell a:hover { text-decoration: underline; }
+.vw-ag-grid .ag-header-cell-label { font-weight: 500; }
+.vw-card-body { min-height: 0; }
+.vw-card-parent { gap: 0; }
+.vw-card-child .vw-card-title, .vw-card-child-shaded .vw-card-title { font-size: var(--vw-font-label-md); }
+.vw-card-child > .vw-card-body, .vw-card-child-shaded > .vw-card-body { height: auto; }
+.vw-grid-footer { display: flex; align-items: center; justify-content: space-between; gap: var(--vw-space-sm); padding: var(--vw-space-sm) var(--vw-space-lg); border-top: 1px solid var(--vw-color-neutral-200); color: var(--vw-color-neutral-500); font-size: var(--vw-font-label-sm); }
+/* Opaque header and fixed cells prevent scrolled rows bleeding through. */
+.vw-table-host .ant-table-header { background: var(--vw-color-neutral-50); }
+.vw-table-host .ant-table-body { overscroll-behavior: contain; }
+.vw-table-host .ant-table-cell-fix-left, .vw-table-host .ant-table-cell-fix-right { background: var(--vw-color-white); }
+.vw-table-host .ant-table-thead .ant-table-cell-fix-left, .vw-table-host .ant-table-thead .ant-table-cell-fix-right { background: var(--vw-color-neutral-50); }
+
+.ant-btn.ant-btn-dangerous:not(.nst-btn) { background: var(--vw-color-white); border-color: var(--vw-color-red-200); color: var(--vw-color-red-700); }
+.ant-btn.ant-btn-dangerous.ant-btn-primary:not(.nst-btn) { background: var(--vw-color-red-600); border-color: var(--vw-color-red-600); color: var(--vw-color-white); }
+.ant-statistic-content { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: var(--vw-space-xxs); row-gap: var(--vw-space-xs); }
+.vw-grid-loading { display: grid; place-items: center; color: var(--vw-color-gray-500); }
+@media (min-width: 360px) and (max-width: 767px) {
+  .vw-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vw-summary-grid .vw-card-title { font-size: var(--vw-font-label-md); }
+  .vw-summary-grid .vw-card-icon-md { width: 24px; height: 24px; flex-shrink: 0; }
+}
+/* Reserve the bottom-right launcher footprint so list actions stay clickable. */
+.vw-grid-footer { padding-inline-end: 88px; flex-wrap: wrap; }
+.vw-table-progress { display: flex; flex-direction: column; gap: var(--vw-space-xxs); min-width: 140px; }
+.vw-table-progress .ant-progress { display: block; margin: 0; }
+.vw-table-progress small { color: var(--vw-color-gray-500); line-height: 16px; }
+
+/* Multi-step forms: one viewport, persistent identity/progress/actions, scrolling content. */
+/* Embedded production builds have no app shell to constrain the wizard.
+   Fill the host viewport (the iframe viewport when embedded), not its content. */
+.ran-headless-layout:has(.vw-wizard-page) { height: 100dvh; min-height: 0; overflow: hidden; }
+.ran-headless-outlet:has(> .vw-wizard-page) { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.vw-page-container:has(> .vw-wizard-page) { display: flex; flex-direction: column; align-items: stretch; overflow: hidden !important; }
+.vw-wizard-page { flex: 1 1 0; height: auto; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--vw-color-white); border: 1px solid var(--vw-color-slate-200); border-radius: var(--vw-radius-lg); overflow: hidden; }
+.vw-wizard-page { width: 100%; max-width: 100%; }
+.vw-wizard-header, .vw-wizard-steps, .vw-wizard-content, .vw-wizard-footer { min-width: 0; }
+.vw-wizard-header { flex: none; padding: var(--vw-space-lg); border-bottom: 1px solid var(--vw-color-slate-200); }
+.vw-wizard-header h1 { margin: 0 0 var(--vw-space-lg); }
+.vw-wizard-steps { overflow-x: auto; padding: var(--vw-space-xxs); }
+.vw-wizard-steps .ant-steps { min-width: 540px; }
+.vw-wizard-content { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: var(--vw-space-lg); background: var(--vw-color-slate-50); scrollbar-gutter: stable; }
+.vw-wizard-content:focus-visible { outline: 2px solid var(--vw-color-accent-500); outline-offset: -2px; }
+.vw-wizard-content-inner { max-width: 1100px; margin-inline: auto; }
+.vw-wizard-content .ant-form { max-width: 900px; margin-inline: auto; }
+.vw-wizard-footer { flex: none; padding: var(--vw-space-md) 88px var(--vw-space-md) var(--vw-space-lg); border-top: 1px solid var(--vw-color-slate-200); background: var(--vw-color-white); }
+.vw-wizard-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--vw-space-sm); flex-wrap: wrap; }
+.vw-wizard-actions .vw-wizard-cancel { order: -1; margin-inline-end: auto; }
+.vw-wizard-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--vw-space-md); }
+.vw-wizard-modal { top: 24px; padding-bottom: 0; }
+.vw-wizard-modal .ant-modal-content { display: flex; flex-direction: column; max-height: calc(100dvh - 48px); padding: 0; overflow: hidden; }
+.vw-wizard-modal .ant-modal-header { padding: var(--vw-space-lg); margin: 0; border-bottom: 1px solid var(--vw-color-slate-200); }
+.vw-wizard-modal .ant-modal-body { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.vw-wizard-modal-steps { flex: none; padding: var(--vw-space-lg); border-bottom: 1px solid var(--vw-color-slate-200); }
+.vw-wizard-modal-content { min-height: 0; overflow: auto; padding: var(--vw-space-lg); overscroll-behavior: contain; }
+.vw-wizard-modal .ant-modal-footer { flex: none; margin: 0; padding: var(--vw-space-md) var(--vw-space-lg); border-top: 1px solid var(--vw-color-slate-200); }
+@media (max-width: 600px) {
+  .vw-wizard-header, .vw-wizard-content { padding: var(--vw-space-md); }
+  .vw-wizard-steps .ant-steps { min-width: 480px; }
+  .vw-wizard-fields { grid-template-columns: minmax(0, 1fr); }
+  .vw-wizard-modal { top: 12px; }
+  .vw-wizard-modal .ant-modal-content { max-height: calc(100dvh - 24px); }
+}
+/* Disabled state must outrank the primary/destructive variant selectors. */
+.ant-btn.nst-btn:disabled, .ant-btn.ant-btn-primary:disabled, .ant-btn.ant-btn-default:disabled {
+  background: var(--vw-color-gray-100); color: var(--vw-color-gray-400); border-color: var(--vw-color-slate-200); box-shadow: none;
+}
+@media (max-width: 600px) {
+  .vw-wizard-footer .ant-btn.nst-btn { padding: 6px 8px; font-size: 13px; line-height: 18px; }
+}
+/* Long forms in standard dialogs use the same fixed header/footer contract. */
+.ant-modal:not(.vw-wizard-modal) { top: 24px; padding-bottom: 24px; }
+.ant-modal:not(.vw-wizard-modal) .ant-modal-content { max-height: calc(100dvh - 48px); display: flex; flex-direction: column; }
+.ant-modal:not(.vw-wizard-modal) .ant-modal-header,
+.ant-modal:not(.vw-wizard-modal) .ant-modal-footer { flex-shrink: 0; }
+.ant-modal:not(.vw-wizard-modal) .ant-modal-body { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+@media (max-width: 600px) {
+  .vw-wizard-modal .ant-modal-content { max-height: calc(100dvh - 40px); }
+}
+.vw-floor-plan-editor { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: var(--vw-space-lg); }
+.vw-floor-plan-inspector { min-width: 0; }
+@media (max-width: 1024px) { .vw-floor-plan-editor { grid-template-columns: minmax(0, 1fr); } }
+
+.vw-plan-header { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--vw-space-lg); margin-bottom: var(--vw-space-md); }
+.vw-plan-identity { flex: 1 1 360px; min-width: 0; }
+.vw-plan-identity h1 { margin: var(--vw-space-xxs) 0 var(--vw-space-sm); overflow-wrap: anywhere; }
+.vw-plan-actions { display: flex; flex-wrap: wrap; gap: var(--vw-space-sm); align-items: center; }
+.vw-plan-actions:empty { display: none; }
+.vw-plan-progress { overflow-x: auto; }
+.vw-plan-progress > * { min-width: 620px; }
+@media (max-width: 600px) {
+  .vw-plan-identity { flex-basis: 100%; }
+  .vw-plan-actions { width: 100%; justify-content: flex-end; }
+}

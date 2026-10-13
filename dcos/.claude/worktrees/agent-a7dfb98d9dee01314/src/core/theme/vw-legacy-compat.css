@@ -1,0 +1,382 @@
+/* Legacy-only utilities and aliases. Canonical selectors and tokens are excluded. */
+:root {
+  --direction: ltr;
+  --vw-radius-none: 0;
+  --vw-color-info: var(--vw-color-blue-600);
+  --vw-color-info-hover: var(--vw-color-blue-700);
+  --vw-color-info-active: var(--vw-color-blue-800);
+  --vw-color-info-light: var(--vw-color-blue-50);
+  --vw-color-info-contrast: var(--grayColor10);
+  --vw-color-success: var(--vw-color-green-500);
+  --vw-color-success-hover: var(--vw-color-green-700);
+  --vw-color-success-active: var(--vw-color-green-700);
+  --vw-color-success-light: var(--vw-color-green-50);
+  --vw-color-success-contrast: var(--grayColor10);
+  --vw-color-warning: var(--vw-color-amber-500);
+  --vw-color-warning-hover: var(--vw-color-amber-600);
+  --vw-color-warning-active: var(--vw-color-amber-600);
+  --vw-color-warning-light: var(--vw-color-amber-50);
+  --vw-color-warning-contrast: var(--grayColor900);
+  --vw-color-danger: var(--vw-color-red-500);
+  --vw-color-danger-hover: var(--vw-color-red-600);
+  --vw-color-danger-active: var(--vw-color-red-600);
+  --vw-color-danger-light: var(--vw-color-red-50);
+  --vw-color-danger-contrast: var(--grayColor10);
+
+  --vw-color-background: var(--bgColor50);
+  --vw-color-surface: var(--grayColor10);
+  --vw-color-surface-hover: var(--bgColor100);
+  --vw-color-surface-active: var(--bgColor200);
+  --vw-color-surface-selected: var(--bgColor50);
+  --vw-color-surface-disabled: var(--bgColor100);
+  --vw-color-surface-elevated: var(--grayColor10);
+
+  --vw-color-text-primary: var(--grayColor900);
+  --vw-color-text-secondary: var(--grayColor600);
+  --vw-color-text-tertiary: var(--grayColor500);
+  --vw-color-text-disabled: var(--grayColor400);
+  --vw-color-text-inverse: var(--grayColor10);
+  --vw-color-text-link: var(--primaryColor500);
+  --vw-color-text-link-hover: var(--primaryColor600);
+
+  --vw-color-border: var(--grayColor300);
+  --vw-color-border-hover: var(--grayColor400);
+  --vw-color-border-focus: var(--primaryColor500);
+  --vw-color-border-error: var(--vw-color-danger);
+  --vw-color-border-success: var(--vw-color-success);
+  --vw-color-border-disabled: var(--grayColor200);
+
+  --vw-color-focus-ring: rgba(33, 150, 243, 0.4);
+  --vw-color-focus-ring-danger: rgba(244, 67, 54, 0.4);
+  --vw-color-overlay: rgba(0, 0, 0, 0.5);
+  --vw-color-overlay-light: rgba(0, 0, 0, 0.3);
+
+  --vw-color-icon-primary: var(--grayColor700);
+  --vw-color-icon-secondary: var(--grayColor500);
+  --vw-color-icon-disabled: var(--grayColor400);
+  --vw-color-icon-inverse: var(--grayColor10);
+  --vw-color-icon-interactive: var(--primaryColor500);
+}
+.vw-text--white {
+color: var(--grayColor10);
+}
+
+.vw-text--accent {
+color: var(--accentColor500);
+}
+
+.vw-text--success {
+color: #047857;
+}
+
+.vw-text--error {
+color: #B91C1C;
+}
+
+.vw-text--warning {
+color: #A16207;
+}
+
+.vw-text--info {
+color: #1D4ED8;
+}
+.context-selectable-mode {
+  cursor: pointer;
+  outline: 1px dashed rgba(25, 118, 210, 0.5);
+  outline-offset: -1px;
+  border-radius: 4px;
+}
+.context-selectable-selected {
+  outline: 1px solid var(--accentColor500);
+  outline-offset: -1px;
+  border-radius: 4px;
+}
+.vw-card-parent-child-shaded-top{
+  border-radius: .75rem .75rem 0rem 0rem;
+  padding: .75rem;
+  background-color: var(--vw-color-slate-50);
+  }
+   
+  .vw-card-parent-child-shaded-bottom{
+  border-radius: 0rem 0rem .75rem .75rem ;
+  padding: .75rem;
+  background-color: var(--vw-color-slate-50);
+  }
+  .vw-card-section-child-shaded-top{
+    border-radius: 1rem 1rem 0rem 0rem;
+    padding: 1rem;
+    background-color: var(--vw-color-slate-50);
+    }
+     
+    .vw-card-section-child-shaded-bottom{
+    border-radius: 0rem 0rem 1rem 1rem ;
+    padding: 1rem;
+    background-color: var(--vw-color-slate-50);
+    }
+.vw-card-section-p0 {
+  background-color: #ffffff;
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: 16px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
+.vw-card-parent-p0 {
+    background-color: var(--vw-color-white);
+    border: 1px solid var(--vw-color-slate-200);
+    border-radius: var(--vw-radius-md);
+    gap: var(--vw-space-sm);
+    }
+
+  .vw-tab-section {
+    background-color: #ffffff;
+    border: 1px solid var(--vw-color-slate-200);
+    border-radius: 12px;
+    padding: var(--vw-space-sm);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
+
+.vw-card-child-p0{
+  padding: 0;
+  border: 1px solid var(--vw-color-slate-300);
+  border-radius: var(--vw-radius-sm);
+  background-color: var(--vw-color-white);
+}
+
+.vw-card-title-sm-lt {
+  font-size: var(--vw-font-heading-sm);
+  font-weight: 400;
+  line-height: var(--vw-line-heading-sm);
+  color: var(--vw-color-gray-500);
+}
+
+.vw-card-description-sm {
+  font-size: var(--vw-font-value-sm);
+  line-height: var(--vw-line-description);
+  font-weight: 400;
+  color: var(--vw-color-gray-500);
+}
+
+.vw-card-metric-lg-sub {
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.4;
+  color: var(--vw-color-gray-900);
+}
+.vw-card--pink {
+  background-color: #fef7fb;
+  border-color: #ec4899;
+}
+.vw-chip--accent {
+  color: var(--accentColor500);
+  background-color: var(--accentColor50)
+}
+
+.common-brown-chip {
+  color: #7A3E1D;
+  background-color: #EFE6DD;
+}
+
+.common-coffee-chip {
+  color: #6B3F1D;
+  background-color: #F3ECE7;
+  }
+
+.common-magenta-chip {
+  color: #A21CAF;
+  background-color: #FAE8FF;
+  }
+
+.common-lavender-chip {
+  color: #5B21B6;
+  background-color: #F5EEFF;
+  }
+.common-lightBlue-chip {
+  color: #0369A1;
+  background-color: #E0F2FE;
+  }
+.common-teal-chip {
+  color: #0F766E;
+  background-color: #CCFBF1;
+  }
+
+.common-indigo-chip {
+  color: #4338CA;
+  background-color: #E0E7FF;
+  }
+
+.common-disable-chip {
+  color: #374151;
+  background-color: #F3F4F6;
+  }
+
+.common-violet-chip {
+  color: #6D28D9;
+  background-color: #EDE9FE;
+  }
+
+.common-cyan-chip {
+  color: #0E7490;
+  background-color: #CFFAFE;
+  }
+.vw-tabs-title {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+}
+.vw-accent-btn,
+.ai-card__footer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em;
+  min-width: 6em;
+  height: 2.5em;
+  border-radius: 8px;
+  background: var(--vw-color-accent-500, #1290e0);
+  color: var(--bgColor10);
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-align: center;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ai-card__footer-btn {
+  width: 100%;
+}
+
+.vw-accent-btn:hover:not(:disabled),
+.ai-card__footer-btn:hover:not(:disabled) {
+  background: var(--vw-color-accent-600, #0d75be);
+}
+
+.vw-accent-btn:focus-visible,
+.ai-card__footer-btn:focus-visible {
+  outline: var(--focusOuterOutline);
+  outline-offset: 2px;
+}
+.vw-segment-group {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 0.125rem;
+  box-shadow: none;
+  background-color: var(--toggleButtonBgColor, #ffffff);
+  border-radius: var(--buttonRadius, 0.75rem);
+  padding: var(--toggleButtonPadding, 0.2em);
+}
+
+.vw-segment-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.3em 0.75em;
+  min-width: 2.75rem;
+  height: var(--toggleButtonHeight, 2.3em);
+  border-radius: var(--buttonRadius, 0.75rem);
+  border-style: solid;
+  border-width: var(--buttonFilledAccentBorderWidth, 0.084em);
+  border-color: transparent;
+  background: transparent;
+  color: var(--toggleButtonUncheckedTextColor, #4b5563);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.vw-segment-btn:hover:not(.vw-segment-btn--active):not(:disabled) {
+  color: var(--grayColor900, #111827);
+}
+
+.vw-segment-group .vw-segment-btn.vw-segment-btn--active {
+  background-color: var(--buttonFilledAccentBgColor, var(--accentColor500, #2563eb));
+  color: var(--buttonFilledAccentTextColor, #ffffff);
+  border-color: var(--buttonFilledAccentBorderColor, var(--accentColor500, #2563eb));
+}
+
+.vw-segment-btn--active:hover:not(:disabled) {
+  background-color: var(--buttonFilledAccentHoverBgColor, var(--accentColor600, #2563eb));
+  color: var(--buttonFilledAccentHoverTextColor, #ffffff);
+  border-color: var(--buttonFilledAccentHoverBorderColor, var(--accentColor600, #2563eb));
+}
+
+.vw-segment-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accentColor200, rgba(59, 130, 246, 0.35));
+}
+
+.vw-segment-btn:disabled {
+  opacity: var(--op-value, 0.5);
+  cursor: not-allowed;
+}
+.vw-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 0.125rem;
+  box-shadow: none;
+  background-color: var(--toggleButtonBgColor, #ffffff);
+  border-radius: var(--buttonRadius, 0.75rem);
+  padding: var(--toggleButtonPadding, 0.2em);
+}
+
+.vw-toggle-group__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.3em 0.75em;
+  min-width: 2.75rem;
+  height: var(--toggleButtonHeight, 2.3em);
+  border-radius: var(--buttonRadius, 0.75rem);
+  border-style: solid;
+  border-width: var(--buttonFilledAccentBorderWidth, 0.084em);
+  border-color: transparent;
+  background: transparent;
+  color: var(--toggleButtonUncheckedTextColor, #4b5563);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.vw-toggle-group__btn:hover:not(.vw-toggle-group__btn--checked) {
+  color: var(--grayColor900, #111827);
+}
+
+.vw-toggle-group .vw-toggle-group__btn.vw-toggle-group__btn--checked {
+  background-color: var(--buttonFilledAccentBgColor, var(--accentColor500, #2563eb));
+  color: var(--buttonFilledAccentTextColor, #ffffff);
+  border-color: var(--buttonFilledAccentBorderColor, var(--accentColor500, #2563eb));
+}
+
+.vw-toggle-group__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accentColor200, rgba(59, 130, 246, 0.35));
+}
+.vw-text-primary { color: var(--vw-color-text-primary); }
+.vw-text-secondary { color: var(--vw-color-text-secondary); }
+.vw-text-tertiary { color: var(--vw-color-text-tertiary); }
+.vw-text-disabled { color: var(--vw-color-text-disabled); }
+.vw-text-inverse { color: var(--vw-color-text-inverse); }
+.vw-text-link { color: var(--vw-color-text-link); }
+.vw-text-link-hover:hover { color: var(--vw-color-text-link-hover); }
+.vw-text-success { color: var(--vw-color-success); }
+.vw-text-warning { color: var(--vw-color-warning); }
+.vw-text-danger { color: var(--vw-color-danger); }
+.vw-text-danger-soft { color: var(--vw-color-red-300); }
+.vw-text-info { color: var(--vw-color-info); }
+.vw-text-gray { color: var(--vw-color-gray-500); }
+.vw-success { color: var(--vw-color-emerald-600); }
+

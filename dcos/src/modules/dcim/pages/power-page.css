@@ -1,0 +1,6 @@
+/* Power: panels register beside the feeds register. */
+.dcim-power-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
+.dcim-power-grid > * { min-width: 0; }
+@media (max-width: 991px) {
+  .dcim-power-grid { grid-template-columns: minmax(0, 1fr); }
+}

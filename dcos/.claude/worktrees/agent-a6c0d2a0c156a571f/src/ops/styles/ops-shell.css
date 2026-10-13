@@ -1,0 +1,4 @@
+/* Operate bar inside the DCOS content area */
+.ops-root.main { display: flex; flex-direction: column; min-width: 0; }
+.ops-root .ops-bar { position: sticky; top: 0; z-index: 30; margin: calc(-1 * var(--vw-space-lg, 16px)) calc(-1 * var(--vw-space-lg, 16px)) 0; padding: 0 var(--vw-space-lg, 16px); background: var(--surface); border-bottom: 1px solid var(--line); }
+.ops-root .page { padding-top: var(--vw-space-lg, 16px); }

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "media-sanitisation",
+  "type": "default",
+  "components": [
+    { "id": "Text_ms_intro", "type": "text", "text": "### Media sanitisation\nRecord how the storage media were sanitised, the certificate and any media that could not be certified. Uncertified media are wiped again or destroyed before anything leaves the site." },
+    { "id": "Field_mediaCount", "type": "number", "key": "mediaCount", "label": "Media items in scope", "validate": {"required": true, "min": 0}, "layout": {"row": "Row_ms_1", "columns": 6} },
+    { "id": "Field_method", "type": "select", "key": "method", "label": "Method", "values": [{"label": "Clear (overwrite)", "value": "clear"}, {"label": "Purge (cryptographic or block erase)", "value": "purge"}, {"label": "Destroy (shred or crush)", "value": "destroy"}, {"label": "Degauss", "value": "degauss"}], "description": "As defined in NIST SP 800-88.", "validate": {"required": true}, "layout": {"row": "Row_ms_1", "columns": 10} },
+    { "id": "Field_tool", "type": "textfield", "key": "tool", "label": "Tool or service used (optional)" },
+    { "id": "Field_certificateNumber", "type": "textfield", "key": "certificateNumber", "label": "Certificate number", "validate": {"required": true}, "layout": {"row": "Row_ms_2", "columns": 8} },
+    { "id": "Field_witness", "type": "textfield", "key": "witness", "label": "Witnessed by", "validate": {"required": true}, "layout": {"row": "Row_ms_2", "columns": 8} },
+    { "id": "Field_certificate", "type": "filepicker", "key": "certificate", "label": "Certificate of sanitisation", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*", "validate": {"required": true} },
+    { "id": "List_uncertified", "type": "dynamiclist", "path": "uncertified", "label": "Media not certified", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_u_serial", "type": "textfield", "key": "serial", "label": "Serial number", "validate": {"required": true}, "layout": {"row": "Row_u", "columns": 6} },
+      { "id": "Field_u_device", "type": "textfield", "key": "device", "label": "Device", "layout": {"row": "Row_u", "columns": 5} },
+      { "id": "Field_u_reason", "type": "textfield", "key": "reason", "label": "Reason", "layout": {"row": "Row_u", "columns": 5} }
+    ] },
+    { "id": "Expr_failedTests", "type": "expression", "key": "failedTests", "expression": "=(if uncertified = null then 0 else count(uncertified))", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if uncertified = null then 0 else count(uncertified))", "computeOn": "change" }
+  ]
+}

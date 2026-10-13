@@ -1,0 +1,88 @@
+/**
+ * Capacity Forecaster — design tokens (CSS variables only).
+ * Import anywhere: import "./cf-tokens.css";
+ * Use in components: color: var(--cf-color-tab-active);
+ */
+:root {
+  /* Layout */
+  --cf-layout-gap: 0.5em;
+
+  /* Typography */
+  --cf-font-page-title-size: var(--vw-font-heading-2xl, 1.5rem);
+  --cf-font-page-title-weight: 600;
+  --cf-font-page-title-line-height: 1.75;
+  --cf-font-page-title-color: var(--vw-color-gray-900, #111827);
+
+  --cf-font-heading-md-size: 1rem;
+  --cf-font-heading-md-weight: 500;
+  --cf-font-heading-md-line-height: 1.75;
+  --cf-font-heading-md-color: #111827;
+
+  --cf-font-description-size: 0.87rem;
+  --cf-font-description-weight: 300;
+  --cf-font-description-line-height: var(--vw-line-description, 1.25);
+  --cf-font-description-color: var(--vw-color-gray-500, #6b7280);
+
+  --cf-font-card-title-size: 16px;
+  --cf-font-card-title-weight: 200;
+  --cf-font-card-title-line-height: 1.4;
+  --cf-font-card-title-color: var(--vw-color-gray-900, #111827);
+
+  --metric-lg-size: 22px;
+  --metric-lg-weight: 300;
+  --metric-lg-line-height: 1.4;
+  --metric-lg-color: var(--vw-color-gray-900, #111827);
+
+  /* Semantic text */
+  --metric-sm-size: 12px;
+  --metric-sm-weight: 400;
+  --metric-sm-line-height: 1.2;
+  --metric-sm-color: var(--vw-color-gray-900, #111827);
+  --vw-font-description:0.875rem;
+  --vw-line-description:1.25;
+  --vw-color-gray-500:#6b7280;
+
+  --cf-color-warning: #fbbf24;
+  --cf-color-success: #047857;
+  --cf-color-critical: #dc2626;
+  --cf-color-muted: #05272e;
+
+  /* Surfaces */
+  --cf-panel-bg: #f8fafc;
+  --cf-panel-border: #e2e8f0;
+  --cf-panel-radius: 8px;
+  --cf-panel-radius-parent: 12px;
+  --cf-panel-padding: 0.5rem;
+  --vw-color-emerald-600:#059669;
+  --vw-radius-lg:12px;
+  /* Icon badge */
+  --cf-icon-size: 2.5rem;
+  --cf-icon-radius: var(--vw-radius-full, 999px);
+  --cf-icon-color: #05272e;
+  --cf-icon-border: #05272e;
+
+  /* Tabs */
+  --cf-tab-shell-bg: #ffffff;
+  --cf-tab-shell-border: #e5e7eb;
+  --cf-tab-shell-radius: 9999px;
+  --cf-tab-shell-padding: 0.375rem 0.625rem;
+  --cf-tab-inactive-color: #9ca3af;
+  --cf-tab-active-color: #111827;
+  --cf-tab-active-underline: #111827;
+  --cf-tab-font-size: 0.875rem;
+  --cf-tab-font-weight: 500;
+
+  /* Range input */
+  --cf-range-track-bg: #e5e7eb;
+  --cf-range-thumb-bg: var(--thumb-color, #dc2626);
+  --cf-range-thumb-border: #ffffff;
+
+  /* Buttons (filled accent) */
+  --buttonPadding: 0.5rem 1rem;
+  --buttonHeight: 2.25rem;
+  --buttonRadius: 9999px;
+  --buttonFilledAccentBgColor: var(--accentColor500, #00A4E0);
+  --buttonFilledAccentTextColor: #ffffff;
+  --buttonFilledAccentBorderColor: transparent;
+  --buttonFilledAccentBorderWidth: 1px;
+}

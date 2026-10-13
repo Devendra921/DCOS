@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_rack_replacement" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_rack_replacement">
+    <bpmn:participant id="Participant_project_rack_replacement" name="PRJ-15 · Rack replacement" processRef="project-rack-replacement" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-rack-replacement" name="Rack replacement" isExecutable="true">
+    <bpmn:documentation>Swaps racks and rack power strips in change windows: the swap method and outlet plan are approved, every affected tenant consents (overdue consents are escalated), new racks are received and pre-built, a pilot swap runs, the remaining swaps run, old racks are removed and DCIM is updated.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_rack_replacement">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>consent</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_consent_overdue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>escalate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_consent</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>method</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>receive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_delayed_expedite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>expedite</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_pilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_pilot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_swaps</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_swaps</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_removal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_removal</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>records</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Replacement approved">
+      <bpmn:outgoing>Flow_start_method</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="method" name="Approve swap method and outlet plan">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_method</bpmn:incoming>
+      <bpmn:outgoing>Flow_method_consent</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="consent" name="Collect tenant consent">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_method_consent</bpmn:incoming>
+      <bpmn:incoming>Flow_escalate_consent</bpmn:incoming>
+      <bpmn:incoming>Flow_g_consent_consent</bpmn:incoming>
+      <bpmn:outgoing>Flow_consent_g_consent</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_consent_overdue" name="Consent overdue" attachedToRef="consent" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_consent_overdue_escalate</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_b_consent_overdue">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P7D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="escalate" name="Escalate to the account manager">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_consent_overdue_escalate</bpmn:incoming>
+      <bpmn:outgoing>Flow_escalate_consent</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_consent" name="All tenants consented?" default="Flow_g_consent_receive">
+      <bpmn:incoming>Flow_consent_g_consent</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_consent_receive</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_consent_consent</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="receive" name="Receive and pre-build racks">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="receive-delivery" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_consent_receive</bpmn:incoming>
+      <bpmn:incoming>Flow_expedite_receive</bpmn:incoming>
+      <bpmn:outgoing>Flow_receive_raise_pilot</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_delayed_expedite" name="Delivery delayed" attachedToRef="receive" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_delayed_expedite_expedite</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_delayed_expedite" messageRef="Message_b_delayed_expedite" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="expedite" name="Expedite with the vendor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_delayed_expedite_expedite</bpmn:incoming>
+      <bpmn:outgoing>Flow_expedite_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_pilot" name="Raise pilot swap work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_receive_raise_pilot</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_pilot_wait_pilot</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_pilot" name="Pilot swap work closed">
+      <bpmn:incoming>Flow_raise_pilot_wait_pilot</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_pilot_raise_swaps</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_pilot" messageRef="Message_wait_pilot" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_swaps" name="Raise rack swap work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_pilot_raise_swaps</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_swaps_wait_swaps</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_swaps" name="Rack swap work closed">
+      <bpmn:incoming>Flow_raise_swaps_wait_swaps</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_swaps_raise_removal</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_swaps" messageRef="Message_wait_swaps" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_removal" name="Raise old rack removal work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_swaps_raise_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_removal_wait_removal</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_removal" name="Old rack removal work closed">
+      <bpmn:incoming>Flow_raise_removal_wait_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_removal_records</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_removal" messageRef="Message_wait_removal" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="records" name="Update DCIM">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.update-record" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_removal_records</bpmn:incoming>
+      <bpmn:outgoing>Flow_records_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="Racks replaced">
+      <bpmn:incoming>Flow_records_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_method" sourceRef="start" targetRef="method" />
+    <bpmn:sequenceFlow id="Flow_method_consent" sourceRef="method" targetRef="consent" />
+    <bpmn:sequenceFlow id="Flow_consent_g_consent" sourceRef="consent" targetRef="g_consent" />
+    <bpmn:sequenceFlow id="Flow_escalate_consent" sourceRef="escalate" targetRef="consent" />
+    <bpmn:sequenceFlow id="Flow_g_consent_receive" name="all consented" sourceRef="g_consent" targetRef="receive">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=pendingConsents = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_consent_consent" name="pending" sourceRef="g_consent" targetRef="consent">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=pendingConsents &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_expedite_receive" sourceRef="expedite" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_receive_raise_pilot" sourceRef="receive" targetRef="raise_pilot" />
+    <bpmn:sequenceFlow id="Flow_raise_pilot_wait_pilot" sourceRef="raise_pilot" targetRef="wait_pilot" />
+    <bpmn:sequenceFlow id="Flow_wait_pilot_raise_swaps" sourceRef="wait_pilot" targetRef="raise_swaps" />
+    <bpmn:sequenceFlow id="Flow_raise_swaps_wait_swaps" sourceRef="raise_swaps" targetRef="wait_swaps" />
+    <bpmn:sequenceFlow id="Flow_wait_swaps_raise_removal" sourceRef="wait_swaps" targetRef="raise_removal" />
+    <bpmn:sequenceFlow id="Flow_raise_removal_wait_removal" sourceRef="raise_removal" targetRef="wait_removal" />
+    <bpmn:sequenceFlow id="Flow_wait_removal_records" sourceRef="wait_removal" targetRef="records" />
+    <bpmn:sequenceFlow id="Flow_records_end" sourceRef="records" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_consent_overdue_escalate" sourceRef="b_consent_overdue" targetRef="escalate" />
+    <bpmn:sequenceFlow id="Flow_b_delayed_expedite_expedite" sourceRef="b_delayed_expedite" targetRef="expedite" />
+  </bpmn:process>
+  <bpmn:message id="Message_b_delayed_expedite" name="delivery-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_pilot" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_pilot&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_swaps" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_swaps&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_removal" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_removal&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_rack_replacement">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_rack_replacement" bpmnElement="Collaboration_project_rack_replacement">
+      <bpmndi:BPMNShape id="Participant_project_rack_replacement_di" bpmnElement="Participant_project_rack_replacement" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2300" height="960" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2270" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="890" width="2270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="method_di" bpmnElement="method">
+        <dc:Bounds x="400" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="consent_di" bpmnElement="consent">
+        <dc:Bounds x="570" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_consent_overdue_di" bpmnElement="b_consent_overdue">
+        <dc:Bounds x="642" y="177" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="escalate_di" bpmnElement="escalate">
+        <dc:Bounds x="740" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_consent_di" bpmnElement="g_consent">
+        <dc:Bounds x="775" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receive_di" bpmnElement="receive">
+        <dc:Bounds x="910" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_delayed_expedite_di" bpmnElement="b_delayed_expedite">
+        <dc:Bounds x="982" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="expedite_di" bpmnElement="expedite">
+        <dc:Bounds x="1080" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_pilot_di" bpmnElement="raise_pilot">
+        <dc:Bounds x="1080" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_pilot_di" bpmnElement="wait_pilot">
+        <dc:Bounds x="1292" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_swaps_di" bpmnElement="raise_swaps">
+        <dc:Bounds x="1420" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_swaps_di" bpmnElement="wait_swaps">
+        <dc:Bounds x="1632" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_removal_di" bpmnElement="raise_removal">
+        <dc:Bounds x="1760" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_removal_di" bpmnElement="wait_removal">
+        <dc:Bounds x="1972" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="records_di" bpmnElement="records">
+        <dc:Bounds x="2100" y="925" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2312" y="947" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_method_di" bpmnElement="Flow_start_method">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="410" />
+        <di:waypoint x="400" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_method_consent_di" bpmnElement="Flow_method_consent">
+        <di:waypoint x="520" y="410" />
+        <di:waypoint x="545" y="410" />
+        <di:waypoint x="545" y="155" />
+        <di:waypoint x="570" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_consent_g_consent_di" bpmnElement="Flow_consent_g_consent">
+        <di:waypoint x="690" y="155" />
+        <di:waypoint x="775" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_escalate_consent_di" bpmnElement="Flow_escalate_consent">
+        <di:waypoint x="800" y="300" />
+        <di:waypoint x="800" y="212" />
+        <di:waypoint x="630" y="212" />
+        <di:waypoint x="630" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_consent_receive_di" bpmnElement="Flow_g_consent_receive">
+        <di:waypoint x="825" y="155" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="885" y="560" />
+        <di:waypoint x="910" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_consent_consent_di" bpmnElement="Flow_g_consent_consent">
+        <di:waypoint x="800" y="180" />
+        <di:waypoint x="800" y="212" />
+        <di:waypoint x="630" y="212" />
+        <di:waypoint x="630" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_expedite_receive_di" bpmnElement="Flow_expedite_receive">
+        <di:waypoint x="1140" y="705" />
+        <di:waypoint x="1140" y="617" />
+        <di:waypoint x="970" y="617" />
+        <di:waypoint x="970" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_receive_raise_pilot_di" bpmnElement="Flow_receive_raise_pilot">
+        <di:waypoint x="1030" y="560" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1055" y="815" />
+        <di:waypoint x="1080" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_pilot_wait_pilot_di" bpmnElement="Flow_raise_pilot_wait_pilot">
+        <di:waypoint x="1200" y="815" />
+        <di:waypoint x="1292" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_pilot_raise_swaps_di" bpmnElement="Flow_wait_pilot_raise_swaps">
+        <di:waypoint x="1328" y="815" />
+        <di:waypoint x="1420" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_swaps_wait_swaps_di" bpmnElement="Flow_raise_swaps_wait_swaps">
+        <di:waypoint x="1540" y="815" />
+        <di:waypoint x="1632" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_swaps_raise_removal_di" bpmnElement="Flow_wait_swaps_raise_removal">
+        <di:waypoint x="1668" y="815" />
+        <di:waypoint x="1760" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_removal_wait_removal_di" bpmnElement="Flow_raise_removal_wait_removal">
+        <di:waypoint x="1880" y="815" />
+        <di:waypoint x="1972" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_removal_records_di" bpmnElement="Flow_wait_removal_records">
+        <di:waypoint x="2008" y="815" />
+        <di:waypoint x="2075" y="815" />
+        <di:waypoint x="2075" y="965" />
+        <di:waypoint x="2100" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_records_end_di" bpmnElement="Flow_records_end">
+        <di:waypoint x="2220" y="965" />
+        <di:waypoint x="2312" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_consent_overdue_escalate_di" bpmnElement="Flow_b_consent_overdue_escalate">
+        <di:waypoint x="660" y="213" />
+        <di:waypoint x="660" y="223" />
+        <di:waypoint x="715" y="223" />
+        <di:waypoint x="715" y="260" />
+        <di:waypoint x="740" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_delayed_expedite_expedite_di" bpmnElement="Flow_b_delayed_expedite_expedite">
+        <di:waypoint x="1000" y="618" />
+        <di:waypoint x="1000" y="628" />
+        <di:waypoint x="1055" y="628" />
+        <di:waypoint x="1055" y="665" />
+        <di:waypoint x="1080" y="665" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

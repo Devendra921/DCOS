@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "acceptance-tests",
+  "type": "default",
+  "components": [
+    { "id": "Text_at_intro", "type": "text", "text": "### Test results\nRecord each test you witnessed with its result, attach the signed test report and list any defects. A failed test or a blocking defect sends the step to be fixed and tested again." },
+    { "id": "Field_levels", "type": "checklist", "key": "levels", "label": "Levels covered (optional)", "values": [{"label": "L1 Factory acceptance", "value": "L1"}, {"label": "L2 Delivery and installation checks", "value": "L2"}, {"label": "L3 Start-up and pre-functional", "value": "L3"}, {"label": "L4 Functional performance", "value": "L4"}, {"label": "L5 Integrated systems test", "value": "L5"}] },
+    { "id": "List_tests", "type": "dynamiclist", "path": "tests", "label": "Tests", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_t_test", "type": "textfield", "key": "test", "label": "Test or check", "validate": {"required": true}, "layout": {"row": "Row_t", "columns": 8} },
+      { "id": "Field_t_result", "type": "select", "key": "result", "label": "Result", "values": [{"label": "Pass", "value": "pass"}, {"label": "Fail", "value": "fail"}], "validate": {"required": true}, "layout": {"row": "Row_t", "columns": 3} },
+      { "id": "Field_t_note", "type": "textfield", "key": "note", "label": "Reading or note", "layout": {"row": "Row_t", "columns": 5} }
+    ] },
+    { "id": "Field_witnessedBy", "type": "textfield", "key": "witnessedBy", "label": "Witnessed by", "description": "Names and companies of the witnesses.", "validate": {"required": true} },
+    { "id": "Field_testReport", "type": "filepicker", "key": "testReport", "label": "Signed test report", "multiple": true, "accept": ".pdf,.doc,.docx,.xls,.xlsx,image/*", "validate": {"required": true} },
+    { "id": "Field_photos", "type": "filepicker", "key": "photos", "label": "Photos (optional)", "multiple": true, "accept": "image/*,.heic,.pdf" },
+    { "id": "List_defectsList", "type": "dynamiclist", "path": "defectsList", "label": "Defects", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_d_defect", "type": "textfield", "key": "defect", "label": "Defect", "validate": {"required": true}, "layout": {"row": "Row_d_1", "columns": 16} },
+      { "id": "Field_d_severity", "type": "select", "key": "severity", "label": "Severity", "values": [{"label": "Blocks acceptance", "value": "blocking"}, {"label": "Minor, track as a snag", "value": "minor"}], "validate": {"required": true}, "layout": {"row": "Row_d_2", "columns": 6} },
+      { "id": "Field_d_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_d_2", "columns": 5} },
+      { "id": "Field_d_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_d_2", "columns": 5} }
+    ] },
+    { "id": "Expr_failedTests", "type": "expression", "key": "failedTests", "expression": "=(if tests = null then 0 else count(tests[result = \"fail\"])) + (if defectsList = null then 0 else count(defectsList[severity = \"blocking\"]))", "computeOn": "change" },
+    { "id": "Expr_defects", "type": "expression", "key": "defects", "expression": "=(if tests = null then 0 else count(tests[result = \"fail\"])) + (if defectsList = null then 0 else count(defectsList[severity = \"blocking\"]))", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if tests = null then 0 else count(tests[result = \"fail\"])) + (if defectsList = null then 0 else count(defectsList))", "computeOn": "change" }
+  ]
+}

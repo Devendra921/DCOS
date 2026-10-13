@@ -1,0 +1,41 @@
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+export interface Bubble { id: string; lat: number; lng: number; r: number; color: string; tip: string; selected?: boolean }
+
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+const WORLD: L.LatLngBoundsExpression = [[-45, -130], [62, 155]];
+const boundsOf = (bs: Bubble[]): L.LatLngBoundsExpression => (bs.length ? L.latLngBounds(bs.map(b => [b.lat, b.lng] as [number, number])).pad(0.3) : WORLD);
+
+/* Geography of rollout: one bubble per circle, sized by location count. */
+export function CircleMap({ bubbles, onPick, height = '100%' }: { bubbles: Bubble[]; onPick: (id: string) => void; height?: number | string }) {
+  const el = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const layer = useRef<L.LayerGroup | null>(null);
+  const pick = useRef(onPick); pick.current = onPick;
+  const bubblesRef = useRef(bubbles); bubblesRef.current = bubbles;
+  useEffect(() => {
+    if (!el.current || map.current) return;
+    const m = L.map(el.current, { zoomSnap: 0.25, attributionControl: true, scrollWheelZoom: false, zoomAnimation: false, fadeAnimation: false }).fitBounds(WORLD);
+    L.tileLayer(`${ESRI}/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`, { attribution: '© Esri, HERE', maxZoom: 12 }).addTo(m);
+    layer.current = L.layerGroup().addTo(m);
+    map.current = m;
+    let fitted = false;
+    const ro = new ResizeObserver(() => { if (!el.current?.isConnected) return; m.invalidateSize({ animate: false }); if (!fitted && el.current.clientHeight > 100) { fitted = true; m.fitBounds(boundsOf(bubblesRef.current), { animate: false, padding: [16, 16], maxZoom: 6 }); } });
+    ro.observe(el.current);
+    return () => { ro.disconnect(); m.remove(); map.current = null; layer.current = null; };
+  }, []);
+  useEffect(() => {
+    const g = layer.current; if (!g) return;
+    g.clearLayers();
+    if (bubbles.length && map.current) map.current.fitBounds(boundsOf(bubbles), { animate: false, padding: [16, 16], maxZoom: 6 });
+    [...bubbles].sort((a, b) => b.r - a.r).forEach(b => {
+      const c = L.circleMarker([b.lat, b.lng], { radius: b.r, color: b.selected ? '#0F172A' : '#ffffff', weight: b.selected ? 3 : 1.5, fillColor: b.color, fillOpacity: 0.82 });
+      c.bindTooltip(b.tip, { direction: 'top', className: 'map-tip' });
+      c.on('click', () => pick.current(b.id));
+      c.addTo(g);
+    });
+  }, [bubbles]);
+  return <div className="map" style={{ height }}><div ref={el} style={{ position: 'absolute', inset: 0 }} /></div>;
+}

@@ -1,0 +1,145 @@
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import * as I from 'lucide-react';
+import { getServices, useQuery, usePersona } from '../../api';
+import { DataTable, type Col } from '../../ui/DataTable';
+import { Empty, Panel } from '../../ui/kit';
+import { ListToolbar, useParamPatch } from '../../ui/ListToolbar';
+import { BarList } from '../../charts/BarList';
+import { SummaryStrip } from './SummaryStrip';
+import { fmtNum, fmtQty } from '../../lib/format';
+import { SevDot } from '../../ui/status';
+import type { ImpactCause } from '../../api/types';
+import type { SiteData } from './Site';
+
+type Cause = ImpactCause & { svcs: number; codes: string[] };
+/* one physical fault can surface under several alert codes (device + rack + link views of the same "Link Down") */
+const causeKey = (c: ImpactCause) => `${c.title}|${c.where}|${c.kind}`;
+type Row = { id: string; name: string; segment: string; premium: boolean; services: number; types: string[]; qty: number; degraded: number; down: number; impacted: number; causes: Cause[]; slaTarget: number; uptime: number; belowSla: number; racks: number; contractedKw: number };
+const SEV_RANK = { critical: 0, major: 1, minor: 2, warning: 3 } as const;
+const risky = (r: Row) => r.degraded > 0 || r.belowSla > 0 || r.impacted > 0;
+type View = 'all' | 'risk' | 'premium';
+
+/* Who depends on this datacenter (customers, tenants, accounts or business
+   units, by persona), who is impacted right now, and WHY: each row names the
+   active fault on its own services' path (device, interface, link, rack or
+   site), so a fault on 3 of 10 servers in a rack implicates only the
+   customers on those 3. */
+export function Customers({ data }: { data: SiteData }) {
+  const { dc } = data;
+  const { vocab } = usePersona();
+  const [allCauses, setAllCauses] = useState(false);
+  const nav = useNavigate();
+  const [sp, setSp] = useSearchParams();
+  const applyParams = useParamPatch();
+  const q = sp.get('q') ?? '', view = (sp.get('cview') ?? 'all') as View, cause = sp.get('cause') ?? '', seg = sp.get('seg') ?? '';
+  const set = (k: string, v: string) => { const n = new URLSearchParams(sp); if (v && v !== 'all') n.set(k, v); else n.delete(k); setSp(n, { replace: true }); };
+  const { data: svcs, reload } = useQuery(() => getServices({ dcId: dc.id }), [dc.id]);
+  /* size things in the unit this site's services are actually sold in (the persona default is only a fallback) */
+  const unit = useMemo(() => { const by = new Map<string, number>(); for (const s of svcs ?? []) by.set(s.unit, (by.get(s.unit) ?? 0) + 1); return [...by.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? vocab.primaryUnit; }, [svcs, vocab.primaryUnit]);
+
+  const rows = useMemo<Row[]>(() => {
+    /* racks this site leases to each tenant and the power they contracted */
+    const lease = new Map<string, { racks: number; kw: number }>();
+    for (const k of dc.racks) if (k.owner === 'tenant' && k.tenantId) { const e = lease.get(k.tenantId) ?? { racks: 0, kw: 0 }; e.racks++; e.kw += k.contractedKw ?? 0; lease.set(k.tenantId, e); }
+    const by = new Map<string, Row>();
+    for (const s of svcs ?? []) {
+      const c = s.customer;
+      const leased = lease.get(c.id);
+      const r = by.get(c.id) ?? { id: c.id, name: c.name, segment: c.segment, premium: c.premium, services: 0, types: [], qty: 0, degraded: 0, down: 0, impacted: 0, causes: [], slaTarget: 0, uptime: 100, belowSla: 0, racks: leased?.racks ?? 0, contractedKw: leased?.kw ?? 0 };
+      r.services++; if (s.unit === unit) r.qty += s.qty;
+      if (!r.types.includes(s.type)) r.types.push(s.type);
+      if (s.status === 'Degraded' || s.status === 'Down') r.degraded++;
+      if (s.status === 'Down') r.down++;
+      if (s.causes.length && s.status !== 'Disabled') {
+        r.impacted++;
+        for (const c of s.causes) { const e = r.causes.find(x => causeKey(x) === causeKey(c)); if (e) { e.svcs++; if (!e.codes.includes(c.code)) e.codes.push(c.code); } else r.causes.push({ ...c, svcs: 1, codes: [c.code] }); }
+      }
+      r.slaTarget = Math.max(r.slaTarget, s.slaTarget); r.uptime = Math.min(r.uptime, s.uptime30d);
+      if (s.uptime30d < s.slaTarget) r.belowSla++;
+      by.set(c.id, r);
+    }
+    const out = [...by.values()];
+    out.forEach(r => r.causes.sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity] || b.svcs - a.svcs));
+    return out;
+  }, [svcs, unit, dc.racks]);
+  /* the causes behind this site's impact, each with the customers it hits */
+  const byCause = useMemo(() => {
+    const m = new Map<string, { c: Cause; rows: Row[]; svcs: number }>();
+    rows.forEach(r => r.causes.forEach(c => { const k = causeKey(c); const e = m.get(k) ?? { c, rows: [], svcs: 0 }; e.rows.push(r); e.svcs += c.svcs; m.set(k, e); }));
+    return [...m.values()].sort((a, b) => SEV_RANK[a.c.severity] - SEV_RANK[b.c.severity] || b.rows.length - a.rows.length);
+  }, [rows]);
+  const shown = rows.filter(r => (view === 'all' || (view === 'risk' ? risky(r) : r.premium)) && (!cause || r.causes.some(c => c.codes.includes(cause))) && (!seg || r.segment === seg) && (!q || `${r.name} ${r.id} ${r.segment}`.toLowerCase().includes(q.toLowerCase())));
+  if (!svcs) return null;
+
+  const atRisk = rows.filter(risky);
+  const segs = Object.entries(rows.reduce<Record<string, number>>((a, r) => { a[r.segment] = (a[r.segment] ?? 0) + 1; return a; }, {})).sort((a, b) => b[1] - a[1]);
+  const types = Object.entries((svcs ?? []).reduce<Record<string, number>>((a, s) => { a[s.type] = (a[s.type] ?? 0) + 1; return a; }, {})).sort((a, b) => b[1] - a[1]);
+
+  const cols: Col<Row>[] = [
+    { key: 'name', header: vocab.customer, width: 200, wrap: true, sort: r => r.name, render: r => <span className="cell-2"><span className="strong" style={{ fontWeight: 500 }}>{r.name}{r.premium && <span className="vw-chip vw-chip--info cmd-chip cust-tier">{vocab.premium}</span>}</span><small>{r.id} · {r.segment}</small></span> },
+    { key: 'svc', header: vocab.services, width: 150, wrap: true, sort: r => r.services, render: r => <span className="cell-2"><span className="num">{r.services}{r.qty ? <span className="faint"> · {fmtQty(r.qty, unit)}</span> : null}</span><small>{r.types.join(' · ')}</small></span> },
+    { key: 'lease', header: 'Leased racks', width: 120, sort: r => r.contractedKw, render: r => r.racks ? <span className="cell-2"><span className="num">{r.racks}</span><small>{fmtNum(Math.round(r.contractedKw))} kW contracted</small></span> : <span className="faint">—</span> },
+    { key: 'why', header: 'Why at risk', wrap: true, sort: r => (r.causes[0] ? SEV_RANK[r.causes[0].severity] : r.belowSla ? 8 : 9), render: r => <WhyCell r={r} total={r.services} unit={vocab.services.toLowerCase()} /> },
+    { key: 'sla', header: 'SLA · 30 d', width: 104, sort: r => r.uptime - r.slaTarget, render: r => <span className="cell-2"><span className="num" style={{ color: r.uptime < r.slaTarget ? 'var(--vw-color-red-600)' : undefined }}>{r.uptime}%</span><small>target {r.slaTarget}%</small></span> },
+    { key: 'state', header: 'Status', width: 108, sort: r => r.down * 1000 + r.degraded * 100 + r.impacted * 10 + r.belowSla, render: r => r.down ? <span className="vw-chip vw-chip--error cmd-chip">{r.down} down</span> : r.degraded ? <span className="vw-chip vw-chip--error cmd-chip">{r.degraded} degraded</span> : r.impacted ? <span className="vw-chip vw-chip--warning cmd-chip">At risk</span> : r.belowSla ? <span className="vw-chip vw-chip--warning cmd-chip">Below SLA</span> : <span className="vw-chip vw-chip--neutral cmd-chip">Normal</span> }
+  ];
+
+  return (
+    <div className="col" style={{ gap: 16 }}>
+      <SummaryStrip items={[
+        { key: 'all', label: `${vocab.customers} served`, value: rows.length, sub: `${rows.filter(r => r.premium).length} ${vocab.premium.toLowerCase()}`, onClick: () => set('cview', ''), active: view === 'all' },
+        { key: 'svc', label: `${vocab.services} from this DC`, value: fmtNum(svcs.length), sub: svcs.length ? (() => { const q = svcs.filter(s => s.unit === unit).reduce((a, s) => a + s.qty, 0); return q ? `${fmtQty(q, unit)} provisioned` : `${types.length} ${vocab.service.toLowerCase()} type${types.length === 1 ? '' : 's'}`; })() : 'none provisioned yet' },
+        { key: 'risk', label: `${vocab.customers} at risk`, value: atRisk.length, sub: byCause.length ? `${byCause.length} active cause${byCause.length === 1 ? '' : 's'}` : 'degraded or below SLA', tone: atRisk.length ? 'warn' : undefined, onClick: () => set('cview', 'risk'), active: view === 'risk' },
+        { key: 'prem', label: `${vocab.premium} affected`, value: atRisk.filter(r => r.premium).length, sub: `of ${rows.filter(r => r.premium).length} ${vocab.premium.toLowerCase()}`, tone: atRisk.some(r => r.premium) ? 'bad' : undefined, onClick: () => set('cview', 'premium'), active: view === 'premium' }
+      ]} />
+      <div className="grid cust-grid">
+        <section className="card">
+          {!rows.length ? <Empty icon={I.Users} title={`No ${vocab.customers.toLowerCase()} served from this site yet`}>{dc.status === 'planned' || dc.status === 'in-progress' ? `${dc.name} is not live; ${vocab.services.toLowerCase()} are provisioned once the first hall is ready for service.` : `No ${vocab.services.toLowerCase()} are mapped to this site.`}</Empty> : <DataTable rows={shown} cols={cols} pageSize={15} defaultSort={{ key: 'state', dir: 'desc' }} onRow={r => nav(`/customers/${r.id}`)}
+            toolbar={
+              <ListToolbar onApply={applyParams} shown={shown.length} total={rows.length} onRefresh={reload}
+                search={{ value: q, onChange: v => set('q', v), placeholder: vocab.searchHint }}
+                filters={[
+                  { id: 'cview', label: 'Condition', quick: true, value: view, defaultValue: 'all', onChange: v => set('cview', v), options: [{ id: 'all', label: `All ${vocab.customers.toLowerCase()}`, count: rows.length }, { id: 'risk', label: 'At risk', count: atRisk.length }, { id: 'premium', label: vocab.premium, count: rows.filter(r => r.premium).length }] },
+                  { id: 'cause', label: 'Cause', quick: true, value: cause, anyLabel: 'Any cause', onChange: v => set('cause', v), options: byCause.map(x => ({ id: x.c.codes[0], label: `${x.c.title} · ${x.c.where}`, count: x.rows.length })) },
+                  { id: 'seg', label: 'Segment', value: seg, anyLabel: 'Any segment', onChange: v => set('seg', v), options: segs.map(([k, v]) => ({ id: k, label: k, count: v })) }
+                ]} />
+            } />}
+        </section>
+        <div className="col" style={{ gap: 16 }}>
+          {byCause.length > 0 && (
+            <Panel title="What is impacting them" icon={I.TriangleAlert} sub={`${byCause.length} active fault${byCause.length === 1 ? '' : 's'} on ${vocab.customer.toLowerCase()} paths · click to filter`}>
+              <div className="cust-causes">
+                {(allCauses ? byCause : byCause.slice(0, 6)).map(x => (
+                  <button key={causeKey(x.c)} type="button" className={`cust-cause${x.c.codes.includes(cause) ? ' is-on' : ''}`} onClick={() => set('cause', x.c.codes.includes(cause) ? '' : x.c.codes[0])}>
+                    <span className="cust-cause-h"><SevDot s={x.c.severity} /><b>{x.c.title}</b></span>
+                    <span className="cust-cause-w">{x.c.where} · {KIND[x.c.kind]}</span>
+                    <span className="cust-cause-n">{x.rows.length} {(x.rows.length === 1 ? vocab.customer : vocab.customers).toLowerCase()} · {x.svcs} {(x.svcs === 1 ? vocab.service : vocab.services).toLowerCase()}</span>
+                    <span className="cust-cause-who">{x.rows.slice(0, 3).map(r => r.name).join(', ')}{x.rows.length > 3 ? ` +${x.rows.length - 3}` : ''}</span>
+                  </button>
+                ))}
+                {byCause.length > 6 && <button type="button" className="panel-link" onClick={() => setAllCauses(v => !v)}>{allCauses ? 'Show fewer' : `Show all ${byCause.length} faults`}</button>}
+              </div>
+            </Panel>
+          )}
+          <Panel title="By segment" icon={I.Building}><BarList items={segs.map(([k, v]) => ({ key: k, label: k, value: v, display: String(v) }))} /></Panel>
+          <Panel title={`By ${vocab.service.toLowerCase()} type`} icon={I.Layers}><BarList items={types.map(([k, v]) => ({ key: k, label: k, value: v, display: String(v) }))} /></Panel>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const KIND: Record<ImpactCause['kind'], string> = { device: 'device fault', interface: 'port fault', link: 'link fault', rack: 'rack fault', site: 'site facility', utilisation: 'capacity' };
+
+/* the reason a row is at risk: worst cause first, where it is, how much of the customer's load it hits */
+function WhyCell({ r, total, unit }: { r: Row; total: number; unit: string }) {
+  const c = r.causes[0];
+  if (!c) return r.belowSla ? <span className="cell-2"><span className="cust-why-t">SLA missed over 30 days</span><small>no active fault now</small></span> : <span className="faint">—</span>;
+  return (
+    <span className="cell-2 cust-why">
+      <span className="cust-why-t"><SevDot s={c.severity} />{c.title}{c.related ? <span className="faint" style={{ fontWeight: 400 }}> +{c.related} related</span> : null}</span>
+      <small>{c.where} · {r.impacted} of {total} {total === 1 ? unit.replace(/s$/, '') : unit}{r.causes.length > 1 ? ` · +${r.causes.length - 1} more cause${r.causes.length > 2 ? 's' : ''}` : ''}</small>
+    </span>
+  );
+}

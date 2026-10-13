@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 16,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": { "name": "DCOS process generator", "version": "1.0" },
+  "id": "complete-with-evidence",
+  "type": "default",
+  "components": [
+    { "id": "Text_cwe_intro", "type": "text", "text": "### Complete with evidence\nRecord what was done and attach a reference to the evidence (photo set, test report, checklist). Open items left here drive the next gateway — defects, exceptions or remaining waves." },
+    { "id": "Field_summary", "type": "textarea", "key": "summary", "label": "Work summary", "validate": { "required": true } },
+    { "id": "Field_evidenceRef", "type": "textfield", "key": "evidenceRef", "label": "Evidence reference", "description": "Document id, photo set or test report reference.", "validate": { "required": true } },
+    { "id": "Field_openItems", "type": "number", "key": "openItems", "label": "Open items", "description": "Defects, exceptions or remaining waves still open. 0 lets the process move on.", "defaultValue": 0, "validate": { "min": 0 } },
+    { "id": "Field_disruptive", "type": "checkbox", "key": "disruptive", "label": "Follow-up requires a disruptive step", "defaultValue": false },
+    { "id": "Field_complete", "type": "checkbox", "key": "complete", "label": "All work on this step is complete", "defaultValue": true }
+  ]
+}

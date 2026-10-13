@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "visit-check-in",
+  "type": "default",
+  "components": [
+    { "id": "Text_vci_intro", "type": "text", "text": "### Check in\nCheck each visitor's photo ID against the approved request, give the safety briefing and issue badges." },
+    { "id": "List_visitorsIn", "type": "dynamiclist", "path": "visitorsIn", "label": "Visitors on site", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_vi_name", "type": "textfield", "key": "name", "label": "Name", "validate": {"required": true}, "layout": {"row": "Row_vi", "columns": 7} },
+      { "id": "Field_vi_badge", "type": "textfield", "key": "badge", "label": "Badge number", "validate": {"required": true}, "layout": {"row": "Row_vi", "columns": 5} },
+      { "id": "Field_vi_idChecked", "type": "checkbox", "key": "idChecked", "label": "Photo ID checked", "validate": {"required": true}, "layout": {"row": "Row_vi", "columns": 4} }
+    ] },
+    { "id": "Field_arrivedAt", "type": "datetime", "key": "arrivedAt", "subtype": "datetime", "dateLabel": "Arrived", "timeLabel": "Time", "use24h": true, "validate": {"required": true} },
+    { "id": "Field_escort", "type": "textfield", "key": "escort", "label": "Escorted by", "validate": {"required": true} },
+    { "id": "Field_safetyBriefing", "type": "checkbox", "key": "safetyBriefing", "label": "Site safety briefing given", "validate": {"required": true} }
+  ]
+}

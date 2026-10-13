@@ -1,0 +1,120 @@
+/* Sentinel copilot — deterministic mock. Questions are matched to intents and
+   answered from the live mock estate, so every statement carries evidence the
+   operator can open. A real LLM/RAG service would return the same shape. */
+
+import { raw, isOpen, linksOf, summarize, slaState, changes as listChanges } from './server';
+import { HOUR, DAY } from './seed';
+import { fmtDateTime, fmtDate, fmtINR } from '../lib/format';
+
+export interface Evidence { label: string; to: string }
+export interface Answer { title: string; confidence: number; lines: string[]; evidence: Evidence[]; actions: { label: string; to: string }[]; followups: string[] }
+export interface Ctx { dcId?: string; neId?: string; incidentId?: string; linkId?: string; serviceId?: string }
+
+export function suggestions(ctx: Ctx): string[] {
+  const db = raw();
+  const dc = ctx.dcId ? db.datacenters.find(d => d.id === ctx.dcId) : undefined;
+  const s: string[] = [];
+  if (ctx.incidentId) s.push(`What changed before ${ctx.incidentId}?`, `Who is impacted by ${ctx.incidentId}?`);
+  if (ctx.neId) s.push(`What services depend on ${ctx.neId}?`, `Why is ${ctx.neId} alarming?`);
+  if (ctx.linkId) s.push(`What services depend on ${ctx.linkId}?`, `When will ${ctx.linkId} cross 85%?`);
+  if (dc) s.push(`What is at risk in ${dc.city}?`, `Summarise ${dc.id}`);
+  /* estate-wide prompts: the busiest live site by open alarms, then capacity and recent change */
+  const busy = [...db.datacenters].filter(d => d.status === 'on-air' && d.id !== ctx.dcId).sort((a, b) => openAlarms(b.id) - openAlarms(a.id))[0];
+  if (busy) s.push(`What is at risk in ${busy.city}?`);
+  s.push('Which links will exhaust first?', 'What changed in the last 24 hours?');
+  return [...new Set(s)].slice(0, 5);
+}
+
+const openAlarms = (dcId: string) => raw().alerts.filter(a => a.dcId === dcId && a.state !== 'cleared' && a.scope !== 'downstream').length;
+
+export function ask(q: string, ctx: Ctx): Answer {
+  const db = raw();
+  const t = q.toLowerCase();
+  const incId = (q.match(/INC-(?:OPS-)?\d{4}/i)?.[0] ?? ctx.incidentId)?.toUpperCase();
+  /* devices are ASSET-nnnn in the DCOS estate; a device name (ash-dc1-h1-leaf-02) also resolves */
+  const neByName = db.nes.find(n => n.name && t.includes(n.name.toLowerCase()))?.id;
+  const neId = q.match(/ASSET-\d+/i)?.[0]?.toUpperCase() ?? neByName ?? ctx.neId;
+  const lnk = q.match(/LNK-\d{5}/i)?.[0]?.toUpperCase() ?? ctx.linkId;
+  const dcByText = db.datacenters.filter(d => t.includes(d.id.toLowerCase()) || t.includes(d.city.toLowerCase()) || t.includes(d.name.toLowerCase()) || (d.state && t.includes(d.state.toLowerCase())));
+
+  /* what changed before an incident */
+  if (/chang/.test(t) && incId && /before|prior|cause/.test(t)) {
+    const i = db.incidents.find(x => x.id === incId);
+    if (i) {
+      const cs = db.changes.filter(c => c.dcId === i.dcId && c.windowEnd <= i.detected && c.windowEnd > i.detected - 3 * DAY);
+      return { title: `Changes in ${i.dcId} in the 72 h before ${i.id}`, confidence: 95,
+        lines: cs.length ? cs.map(c => `${c.id} (${c.status}) ended ${Math.round((i.detected - c.windowEnd) / HOUR)} h before detection: ${c.title}.${c.scope.some(s => i.affected.some(a => a.id === s)) ? ' It touched the affected device — treat as a strong RCA lead.' : ''}`) : ['No change or maintenance window closed in the 72 hours before detection.'],
+        evidence: [...cs.map(c => ({ label: c.id, to: `/changes?id=${c.id}` })), { label: i.id, to: `/incidents/${i.id}` }], actions: [{ label: 'Open RCA workspace', to: `/incidents/${i.id}` }], followups: [`Who is impacted by ${i.id}?`] };
+    }
+  }
+  /* incident impact */
+  if (incId && /impact|affected|who/.test(t)) {
+    const i = db.incidents.find(x => x.id === incId);
+    if (i) {
+      /* same rule as the incident record: a service is hit when it is hosted on, or transits, an affected device or link */
+      const neSet = new Set(i.affected.filter(a => a.kind === 'NE').map(a => a.id)), lnSet = new Set(i.affected.filter(a => a.kind === 'Link').map(a => a.id));
+      const svcs = db.services.filter(s => s.status !== 'Disabled' && (neSet.has(s.neId) || s.path.some(p => neSet.has(p)) || s.linkIds.some(l => lnSet.has(l))));
+      const custs = [...new Set(svcs.map(s => s.customerId))].map(id => db.customers.find(c => c.id === id)!).filter(Boolean);
+      const im = { services: svcs, customers: custs, premium: custs.filter(c => c.premium), revenue: svcs.reduce((x, s) => x + s.revenueMonthly, 0) };
+      const noScope = !neSet.size && !lnSet.size && i.impact.services > 0;
+      return { title: `Impact of ${i.id}`, confidence: 90,
+        lines: [noScope ? `${i.impact.services} services and ${i.impact.customers} customers on the affected scope (${i.impact.premium} premium) — counts from the incident record; the scope is a facility system.` : `${im.services.length} services and ${im.customers.length} customers sit on the affected scope (${im.premium.length} premium).`, ...im.premium.slice(0, 4).map(c => `${c.name} — ${im.services.filter(s => s.customerId === c.id).map(s => `${s.id} (${s.type}, SLA ${s.slaTarget}%)`).join(', ')}`), `Monthly revenue on the path: ${fmtINR(im.revenue)}.`],
+        evidence: [...im.services.slice(0, 6).map(s => ({ label: s.id, to: `/services/${s.id}` })), { label: i.id, to: `/incidents/${i.id}` }], actions: [{ label: 'Open incident', to: `/incidents/${i.id}` }], followups: [`What changed before ${i.id}?`] };
+    }
+  }
+  /* service dependency */
+  if (/depend|services on|ride|traverse/.test(t) && (neId || lnk)) {
+    const svcs = lnk ? db.services.filter(s => s.linkIds.includes(lnk)) : db.services.filter(s => s.neId === neId || s.path.includes(neId!));
+    const custs = [...new Set(svcs.map(s => s.customerId))].map(id => db.customers.find(c => c.id === id)!);
+    return { title: `Services depending on ${lnk ?? neId}`, confidence: 97,
+      lines: svcs.length ? [`${svcs.length} services for ${custs.length} customers (${custs.filter(c => c.premium).length} premium)${neId && !lnk ? ` — ${svcs.filter(s => s.neId === neId).length} hosted on this device, ${svcs.filter(s => s.neId !== neId).length} transiting it from other devices` : ''}.`, ...svcs.slice(0, 8).map(s => `${s.id} · ${s.type} · ${db.customers.find(c => c.id === s.customerId)!.name} · ${s.bandwidthMbps >= 1000 ? `${s.bandwidthMbps / 1000} Gbps` : `${s.bandwidthMbps} Mbps`} · ${s.status}`)] : ['No provisioned service rides this element. It carries infrastructure traffic only.'],
+      evidence: svcs.slice(0, 8).map(s => ({ label: s.id, to: `/services/${s.id}` })), actions: neId ? [{ label: 'Open network services tab', to: `/ne/${neId}?tab=services` }] : [], followups: neId ? [`Why is ${neId} alarming?`] : [] };
+  }
+  /* NE alarm explanation */
+  if (neId && /why|alarm|wrong|health/.test(t)) {
+    const ne = db.neById.get(neId);
+    if (ne) {
+      const al = db.alerts.filter(a => a.neId === neId && a.state !== 'cleared');
+      const inc = db.incidents.find(i => isOpen(i) && i.alertIds.some(a => al.some(x => x.id === a)));
+      return { title: `${neId} — ${al.length} active alarm${al.length === 1 ? '' : 's'}`, confidence: inc ? inc.rca[0].confidence : 70,
+        lines: [`Health ${ne.healthScore}/100 · CPU ${ne.cpu}% · Mem ${ne.mem}% · ${ne.tempC}°C.`, ...(inc ? [`Correlated into ${inc.id}: ${inc.rca[0].cause} (${inc.rca[0].confidence}% confidence).`] : []), ...al.slice(0, 5).map(a => `${a.code} ${a.severity}: ${a.title} — ${a.description}`)],
+        evidence: [...al.slice(0, 5).map(a => ({ label: a.code, to: `/ne/${neId}?tab=alerts` })), ...(inc ? [{ label: inc.id, to: `/incidents/${inc.id}` }] : [])], actions: [{ label: 'Alerts & diagnostics', to: `/ne/${neId}?tab=alerts` }], followups: [`What services depend on ${neId}?`] };
+    }
+  }
+  /* exhaustion */
+  if (/exhaust|cross|85|forecast|capacity/.test(t)) {
+    const ls = linksOf({ protocol: 'LLDP' }).filter(l => (l.role === 'Backhaul' || l.role === 'Uplink') && (!lnk || l.id === lnk)).sort((a, b) => a.forecastMonths - b.forecastMonths).slice(0, lnk ? 1 : 5);
+    return { title: lnk ? `When ${lnk} crosses 85%` : 'Links that exhaust first', confidence: 82,
+      lines: ls.map(l => `${l.aNe} ${l.aIf} → ${l.zNe}: ${l.utilPct}% today, +${l.growthPct}%/mo (6-month trend ${l.history[0]}% → ${l.utilPct}%). ${l.forecastMonths === 0 ? 'Already above the 85% warning line.' : `Crosses 85% around ${fmtDate(l.forecastDate!)}; 95% in ~${Math.max(1, Math.round(l.critMonths))} months.`}`).concat(['Forecast = compound growth of the last six monthly peaks; approved capacity plans are not yet netted in.']),
+      evidence: ls.map(l => ({ label: `${l.aNe} ${l.aIf}`, to: `/ne/${l.aNe}?tab=links&if=${encodeURIComponent(l.aIf)}` })), actions: [{ label: 'Utilization alarms', to: '/alerts?q=Utilization' }, { label: 'Capacity plans', to: '/capacity/plans' }], followups: suggestions(ctx).filter(x => /risk/.test(x)).slice(0, 1) };
+  }
+  /* last 24 h */
+  if (/last 24|today|recent/.test(t)) {
+    const since = db.now - 24 * HOUR;
+    const cs = listChanges({}).filter(c => c.windowStart >= since && c.windowStart <= db.now);
+    const inc = db.incidents.filter(i => i.detected >= since);
+    return { title: 'Last 24 hours', confidence: 99, lines: [`${inc.length} incidents opened, ${db.alerts.filter(a => a.start >= since).length} alerts raised, ${cs.length} changes/maintenance started.`, ...cs.map(c => `${c.id} ${c.status}: ${c.title} (${c.dcId}, ${fmtDateTime(c.windowStart)})`), ...inc.slice(0, 4).map(i => `${i.id} SEV${i.sev} ${i.status}: ${i.title}`)],
+      evidence: [...cs.map(c => ({ label: c.id, to: `/changes?id=${c.id}` })), ...inc.slice(0, 4).map(i => ({ label: i.id, to: `/incidents/${i.id}` }))], actions: [], followups: [] };
+  }
+  /* risk at a location / summary — the page's site only answers when the question is about a site */
+  const aboutSite = /risk|summar|status|health|how is|what.*(going|happening|wrong)|site|datacenter|data center|\bdc\b/.test(t);
+  const dcs = dcByText.length ? dcByText : ctx.dcId && aboutSite ? db.datacenters.filter(d => d.id === ctx.dcId) : [];
+  if (dcs.length) {
+    const lines: string[] = []; const ev: Evidence[] = [];
+    for (const d of dcs) {
+      const s = summarize(d);
+      const inc = db.incidents.filter(i => i.dcId === d.id && isOpen(i));
+      const hot = linksOf({ dcId: d.id, protocol: 'LLDP' }).filter(l => l.utilPct >= 80 && l.role !== 'Access');
+      lines.push(`${d.id} (${d.status}, ${d.city}): health ${s.healthScore}, ${s.activeAlerts} active alarms, ${inc.length} open incidents, coverage ${s.coveragePct}% (${s.notDiscovered} not discovered, ${s.drifted} drifted).`);
+      inc.slice(0, 3).forEach(i => { lines.push(`  • ${i.id} SEV${i.sev} — ${i.title}${slaState(i).breaching ? ' (breaching SLA)' : ''}`); ev.push({ label: i.id, to: `/incidents/${i.id}` }); });
+      d.risks.filter(r => r.severity === 'critical' || r.severity === 'major').slice(0, 2).forEach(r => lines.push(`  • ${r.domain}: ${r.title}`));
+      hot.slice(0, 2).forEach(l => lines.push(`  • ${l.aNe} ${l.aIf} at ${l.utilPct}% (+${l.growthPct}%/mo)`));
+      ev.push({ label: d.id, to: `/datacenters/${d.id}?tab=attention` });
+    }
+    return { title: dcs.length > 1 ? `Risk across ${dcs.map(d => d.id).join(', ')}` : `What is at risk in ${dcs[0].id}`, confidence: 88, lines, evidence: ev, actions: [{ label: 'Open site attention', to: `/datacenters/${dcs[0].id}?tab=attention` }], followups: ['Which links will exhaust first?'] };
+  }
+  const egDc = db.datacenters.find(d => d.status === 'on-air') ?? db.datacenters[0];
+  const egNe = db.nes.find(n => n.discovery !== 'not-discovered');
+  const egInc = db.incidents.find(isOpen) ?? db.incidents[0];
+  return { title: 'I can answer from the live estate', confidence: 0, lines: [`Ask about a site ("what is at risk in ${egDc?.city ?? 'Ashburn'}?"), a device ("what services depend on ${egNe?.id ?? 'ASSET-0001'}?"), an incident ("what changed before ${egInc?.id ?? 'INC-0001'}?") or capacity ("which links will exhaust first?").`], evidence: [], actions: [], followups: suggestions(ctx) };
+}

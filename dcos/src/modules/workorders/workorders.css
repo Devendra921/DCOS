@@ -1,0 +1,151 @@
+/* Work orders module — bpmn-js / dmn-js / form-js overrides on NST tokens.
+   These are the only page-local styles: diagram markers (completed / active / incident /
+   taken flow), heat classes, overlays, the DMN rule highlight and form-js theming. */
+
+.wf-diagram {
+  position: relative;
+  background: var(--vw-color-gray-10);
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-md);
+  overflow: hidden;
+}
+.wf-diagram .djs-container,
+.wf-diagram .djs-container text,
+.wf-dmn .dmn-decision-table-container,
+.wf-form .fjs-container {
+  font-family: 'Poppins', sans-serif;
+}
+.wf-diagram .djs-container { background: var(--vw-color-gray-10); }
+.wf-diagram .djs-container .djs-visual > text { fill: var(--vw-color-gray-800); }
+
+/* ── Markers ─────────────────────────────────────────────────────────────── */
+.wf-diagram .wf-completed .djs-visual > :nth-child(1) {
+  stroke: var(--vw-color-green-600) !important;
+  fill: var(--vw-color-green-50) !important;
+}
+.wf-diagram .wf-active .djs-visual > :nth-child(1) {
+  stroke: var(--vw-color-blue-600) !important;
+  stroke-width: 3px !important;
+  fill: var(--vw-color-blue-50) !important;
+  animation: wf-pulse 1.8s ease-in-out infinite;
+}
+.wf-diagram .wf-incident .djs-visual > :nth-child(1) {
+  stroke: var(--vw-color-red-600) !important;
+  stroke-width: 3px !important;
+  fill: var(--vw-color-red-50) !important;
+  animation: wf-pulse 1.1s ease-in-out infinite;
+}
+.wf-diagram .wf-taken .djs-visual > path {
+  stroke: var(--vw-color-green-600) !important;
+  stroke-width: 2.5px !important;
+}
+.wf-diagram .wf-selected .djs-outline {
+  stroke: var(--vw-color-blue-500) !important;
+  stroke-width: 2px;
+  visibility: visible !important;
+}
+@keyframes wf-pulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.3; }
+}
+
+/* ── Heat (instance counts / waiting hours per node) ─────────────────────── */
+.wf-diagram .wf-heat-1 .djs-visual > :nth-child(1) { fill: var(--vw-color-amber-50) !important; }
+.wf-diagram .wf-heat-2 .djs-visual > :nth-child(1) { fill: var(--vw-color-amber-100) !important; }
+.wf-diagram .wf-heat-3 .djs-visual > :nth-child(1) { fill: var(--vw-color-orange-200) !important; }
+.wf-diagram .wf-heat-4 .djs-visual > :nth-child(1) { fill: var(--vw-color-orange-300) !important; stroke: var(--vw-color-orange-700) !important; }
+.wf-heat-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-orange-600);
+  color: var(--vw-color-gray-10);
+  font: 600 11px/22px 'Poppins', sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Overlays on waiting user tasks ──────────────────────────────────────── */
+.wf-overlay {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 8px;
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-gray-900);
+  color: var(--vw-color-gray-10);
+  font: 500 11px/1.3 'Poppins', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+.wf-overlay small { font-weight: 400; opacity: 0.8; }
+.wf-overlay--overdue { background: var(--vw-color-red-600); }
+.wf-overlay--incident { background: var(--vw-color-red-700); white-space: normal; width: 240px; }
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.wf-legend { display: inline-flex; gap: var(--vw-space-md); align-items: center; font-size: var(--vw-font-label-xs); color: var(--vw-color-gray-600); }
+.wf-legend-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 2px solid; margin-right: 4px; vertical-align: -2px; }
+.wf-legend-swatch--completed { border-color: var(--vw-color-green-600); background: var(--vw-color-green-50); }
+.wf-legend-swatch--active { border-color: var(--vw-color-blue-600); background: var(--vw-color-blue-50); }
+.wf-legend-swatch--incident { border-color: var(--vw-color-red-600); background: var(--vw-color-red-50); }
+.wf-legend-swatch--heat { border-color: var(--vw-color-orange-700); background: var(--vw-color-orange-200); }
+
+/* ── DMN (dmn-js read-only table) ────────────────────────────────────────── */
+.wf-dmn {
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-md);
+  overflow: auto;
+  background: var(--vw-color-gray-10);
+}
+.wf-dmn .dmn-decision-table-container { padding: var(--vw-space-md); }
+.wf-dmn .dmn-decision-table-container .tjs-table { font-size: var(--vw-font-label-sm); }
+.wf-dmn .dmn-decision-table-container td.wf-rule-hit,
+.wf-dmn .dmn-decision-table-container .wf-rule-hit {
+  background: var(--vw-color-green-100) !important;
+  box-shadow: inset 0 0 0 1px var(--vw-color-green-600);
+}
+.wf-dmn .dmn-decision-table-container .decision-table-name { font-family: 'Poppins', sans-serif; }
+
+/* ── form-js ─────────────────────────────────────────────────────────────── */
+.wf-form .fjs-container .fjs-form { font-family: 'Poppins', sans-serif; padding: 0; }
+.wf-form .fjs-container .fjs-form-field { margin: 0 0 var(--vw-space-sm); }
+.wf-form .fjs-container .fjs-input,
+.wf-form .fjs-container .fjs-textarea,
+.wf-form .fjs-container .fjs-select {
+  border-radius: var(--vw-radius-sm);
+  border-color: var(--vw-color-gray-300);
+  font-family: 'Poppins', sans-serif;
+}
+.wf-form .fjs-container .fjs-form-field-label { font-size: var(--vw-font-label-sm); color: var(--vw-color-gray-800); }
+.wf-form .fjs-container .fjs-form-field-description { color: var(--vw-color-gray-500); }
+.wf-form .fjs-container .fjs-powered-by { display: none; }
+
+/* ── Selectable rows (process catalogue, task inbox) on the Operate .chg-row ── */
+.wf-pick { width: 100%; text-align: left; font: inherit; background: var(--surface); cursor: pointer; align-items: flex-start; }
+.wf-pick:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.wf-pick.is-selected { border-color: var(--primary); background: var(--primary-50); }
+.wf-pick.is-overdue { border-left: 3px solid var(--vw-color-red-500); }
+.wf-pick .wf-pick-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.wf-pick .wf-pick-body b { font-size: 13.5px; font-weight: 500; color: var(--ink-900); }
+.wf-scroll { max-height: 720px; overflow-y: auto; }
+.wf-kv { display: grid; grid-template-columns: minmax(0, 40%) 1fr; gap: 2px var(--vw-space-sm); font-size: var(--vw-font-label-sm); }
+.wf-kv dt { color: var(--vw-color-gray-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wf-kv dd { margin: 0; color: var(--vw-color-gray-900); overflow-wrap: anywhere; }
+
+/* compact the dmn-js table so a 7-rule decision fits without scrolling */
+.wf-dmn .dmn-decision-table-container .tjs-table th,
+.wf-dmn .dmn-decision-table-container .tjs-table td { padding: 4px 8px; font-size: var(--vw-font-label-sm); }
+.wf-dmn .dmn-decision-table-container .tjs-table .input-label,
+.wf-dmn .dmn-decision-table-container .tjs-table .output-label { font-size: var(--vw-font-label-sm); }
+.wf-dmn .dmn-decision-table-container .decision-table-header .decision-table-name { font-size: var(--vw-font-heading-xs); }
+.wf-dmn .dmn-decision-table-container .decision-table-properties { font-size: var(--vw-font-label-xs); }
+
+/* form-js lays fields on a Carbon grid with 32 px side padding; inside a card that only narrows the form. */
+.wf-form .fjs-container .fjs-vertical-layout.cds--grid { padding-inline: 0; }
+
+/* record context beside the task form (My tasks) */
+.wf-context { padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--vw-color-slate-50); }
+.panel.wf-incident { border-color: var(--vw-color-red-300); background: var(--vw-color-red-50); }

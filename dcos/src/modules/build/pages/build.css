@@ -1,0 +1,9 @@
+/* Build & Deploy board — page-local; reuses the Operate tokens */
+.build-board { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 16px; overflow-x: auto; }
+.build-col .panel-body { display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow-y: auto; }
+.build-card { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--vw-color-white, #fff); cursor: pointer; min-width: 0; }
+.build-card:hover { border-color: var(--primaryColor500); background: var(--vw-color-slate-50); }
+.build-card .t { font-size: 13px; font-weight: 500; color: var(--ink-900); }
+.build-card .m { font-size: 12px; color: var(--ink-500); }
+.build-card .p { font-size: 12px; color: var(--vw-color-blue-600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .build-board { grid-template-columns: repeat(4, 240px); } }

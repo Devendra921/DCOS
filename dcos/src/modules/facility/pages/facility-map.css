@@ -1,0 +1,22 @@
+.fmap-grid { display: grid; grid-template-columns: 264px minmax(0, 1fr); gap: 16px; align-items: start; }
+.fmap-grid.has-sel { grid-template-columns: 264px minmax(0, 1fr) 320px; }
+@media (max-width: 1200px) { .fmap-grid.has-sel { grid-template-columns: 264px minmax(0, 1fr); } .fmap-grid.has-sel > :last-child { grid-column: 1 / -1; } }
+@media (max-width: 860px) { .fmap-grid, .fmap-grid.has-sel { grid-template-columns: minmax(0, 1fr); } }
+
+.fmap-canvas-panel { display: flex; flex-direction: column; align-self: stretch; }
+.fmap-canvas-panel > .panel-head { flex-shrink: 0; }
+.fmap-canvas-panel > .panel-body { position: relative; flex: 1; min-height: 600px; }
+.map.fmap-map { position: absolute; inset: 0; height: auto; }
+@media (max-width: 860px) {
+  .fmap-canvas-panel > .panel-body { min-height: clamp(320px, 60dvh, 600px); }
+}
+.fmap-legend-note { color: var(--vw-color-gray-500); }
+
+.fmap-sec { font-size: 12px; font-weight: 500; color: var(--vw-color-gray-500); margin: 14px 0 8px; }
+.fmap-layers .panel-body > .fmap-sec:first-child { margin-top: 0; }
+.fmap-layers .seg { display: flex; flex-direction: column; width: 100%; }
+.fmap-layers .seg button { justify-content: flex-start; width: 100%; }
+.fmap-layers .search { min-width: 0; width: 100%; }
+.fmap-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.fmap-chipbtn { border: 0; background: transparent; padding: 0; cursor: pointer; line-height: 0; }
+.fmap-chipbtn > .vw-chip { line-height: normal; }

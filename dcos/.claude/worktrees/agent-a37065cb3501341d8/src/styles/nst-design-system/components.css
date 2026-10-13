@@ -1,0 +1,1771 @@
+/* ============================================================
+   NST Design System — Component Tokens & Base Styles
+
+   Requires, in this order:
+     colors.css             --vw-color-*      (163 uses here)
+     spacing.css            --vw-space-*, --vw-radius-*
+     typography-tokens.css  --fontFamily, --vw-font-*
+     theme-tokens.css       --primaryColor*   (fallback chain only)
+
+   This header previously said "import after colors.css and
+   typography-semantic.css". That was wrong and actively harmful, and
+   it has already been vendored into consuming apps. typography-semantic.css
+   defines ZERO variables, so nothing here depends on it — and linking it
+   restyles body/p/h1-h6 globally and sets the body font to Inter, silently
+   breaking the Poppins rule on any dashboard. See COMPONENTS.md → Layer 2.
+   ============================================================ */
+
+/* ============================================================
+   Elevation Tokens
+   Two levels — both share the same slate-200 border.
+   ============================================================ */
+
+:root {
+  --elevation-border:   1px solid var(--vw-color-slate-200);
+  --shadow-resting:     none;                                   /* Level 1 — border only */
+  --shadow-sm:          0 2px 4px 0 rgba(0, 0, 0, 0.06);       /* Level 2 — raised      */
+}
+
+/* Utility classes */
+.nst-surface {
+  border: var(--elevation-border);
+  box-shadow: var(--shadow-resting);
+  background: var(--vw-color-white);
+  border-radius: 8px;
+}
+
+.nst-surface--raised {
+  border: var(--elevation-border);
+  box-shadow: var(--shadow-sm);
+  background: var(--vw-color-white);
+  border-radius: 8px;
+}
+
+/* ============================================================
+   Button — .nst-btn
+   Ported from preview/buttons-styles.html + buttons-sizes.html, which
+   previously existed only as specimens (no reusable class shipped).
+
+   Base class = md size + outline variant. Add one size and one variant:
+     <button class="nst-btn nst-btn--filled">        primary action
+     <button class="nst-btn nst-btn--sm">             small outline
+     <button class="nst-btn nst-btn--ghost">          borderless
+     <button class="nst-btn nst-btn--danger">         destructive
+
+   Variants: filled | outline (default) | gray | ghost | action | danger
+   Sizes:    xs | sm | md (default) | lg
+   Hover LIGHTENS (never darkens) — per the guidelines' state spec.
+   ============================================================ */
+
+.nst-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--vw-radius-sm);
+  font-family: var(--fontFamily);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+
+  /* default size = md */
+  font-size: var(--vw-font-label-md);
+  line-height: 20px;
+  padding: 8px 16px;
+
+  /* default variant = outline */
+  background: var(--vw-color-white);
+  color: var(--vw-color-gray-900);
+  border: 1px solid var(--vw-color-slate-200);
+}
+
+.nst-btn:hover {
+  border-color: var(--color-primary, var(--primaryColor500));
+  color: var(--color-primary, var(--primaryColor500));
+}
+
+.nst-btn:focus-visible {
+  outline: 2px solid var(--color-primary, var(--primaryColor500));
+  outline-offset: 2px;
+}
+
+.nst-btn:disabled,
+.nst-btn.is-disabled {
+  background: var(--vw-color-gray-100);
+  color: var(--vw-color-gray-400);
+  border-color: var(--vw-color-slate-200);
+  cursor: not-allowed;
+}
+
+/* ── Sizes ───────────────────────────────────────────────── */
+.nst-btn--xs { font-size: var(--vw-font-label-sm); line-height: 16px; padding: 4px; }
+.nst-btn--sm { font-size: 13px; line-height: 18px; padding: 6px 8px; }
+.nst-btn--md { font-size: var(--vw-font-label-md); line-height: 20px; padding: 8px 16px; }
+.nst-btn--lg { font-size: var(--vw-font-label-lg); line-height: 24px; padding: 8px 16px; }
+
+/* Icon-only — square, matching each size's text-button height */
+.nst-btn--icon.nst-btn--xs { width: 24px; height: 24px; padding: 0; }
+.nst-btn--icon.nst-btn--sm { width: 30px; height: 30px; padding: 0; }
+.nst-btn--icon.nst-btn--md,
+.nst-btn--icon           { width: 36px; height: 36px; padding: 0; }
+.nst-btn--icon.nst-btn--lg { width: 40px; height: 40px; padding: 0; }
+
+/* ── Variants ────────────────────────────────────────────── */
+.nst-btn--filled {
+  background: var(--color-primary, var(--primaryColor500));
+  border-color: var(--color-primary, var(--primaryColor500));
+  color: var(--vw-color-white);
+}
+.nst-btn--filled:hover {
+  background: var(--color-primary-hover, var(--primaryColor400));
+  border-color: var(--color-primary-hover, var(--primaryColor400));
+  color: var(--vw-color-white);
+}
+
+.nst-btn--gray {
+  background: var(--vw-color-gray-100);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.nst-btn--gray:hover {
+  background: var(--vw-color-gray-200);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+
+.nst-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+.nst-btn--ghost:hover {
+  background: var(--vw-color-gray-100);
+  border-color: transparent;
+  color: var(--vw-color-gray-900);
+}
+
+.nst-btn--action {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary, var(--primaryColor500));
+}
+.nst-btn--action:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary-hover, var(--primaryColor400));
+}
+
+.nst-btn--danger {
+  background: var(--vw-color-red-600);
+  border-color: var(--vw-color-red-600);
+  color: var(--vw-color-white);
+}
+.nst-btn--danger:hover {
+  background: var(--vw-color-red-500);
+  border-color: var(--vw-color-red-500);
+  color: var(--vw-color-white);
+}
+
+/* Subtle destructive — for dense boards where several destructive actions
+   sit side by side and solid red would shout. */
+.nst-btn--danger-subtle {
+  background: var(--vw-color-white);
+  border-color: var(--vw-color-red-200);
+  color: var(--vw-color-red-700);
+}
+.nst-btn--danger-subtle:hover {
+  background: var(--vw-color-red-50);
+  border-color: var(--vw-color-red-300);
+  color: var(--vw-color-red-700);
+}
+
+/* ============================================================
+   Input Field
+   ============================================================ */
+
+.nst-input {
+  display: flex;
+  min-height: 36px;
+  padding: 6px 8px;
+  align-items: center;
+  gap: 8px;
+
+  border-radius: 8px;
+  border: 1px solid var(--vw-color-gray-200);
+  background: var(--vw-color-white);
+
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--vw-color-gray-700);
+
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+/* Label above input */
+.nst-input-label {
+  overflow: hidden;
+  color: var(--vw-color-gray-500);
+  font-feature-settings: 'ss01' on, 'cv01' on, 'cv11' on;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+/* Placeholder text */
+.nst-input::placeholder {
+  color: var(--vw-color-gray-400);
+}
+
+/* States */
+.nst-input:hover {
+  border-color: var(--vw-color-gray-400);
+}
+
+.nst-input:focus,
+.nst-input:focus-visible {
+  outline: none;
+  border-color: var(--vw-color-accent-500);
+  box-shadow: 0 0 0 3px var(--vw-color-accent-100);
+}
+
+.nst-input.nst-input--error {
+  border-color: var(--vw-color-red-500);
+}
+
+.nst-input.nst-input--error:focus {
+  box-shadow: 0 0 0 3px var(--vw-color-red-100);
+}
+
+.nst-input:disabled,
+.nst-input.nst-input--disabled {
+  background: var(--vw-color-gray-50);
+  border-color: var(--vw-color-gray-200);
+  color: var(--vw-color-gray-300);
+  cursor: not-allowed;
+}
+
+/* Hint / error message below input */
+.nst-input-hint {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--vw-color-gray-400);
+}
+
+.nst-input-hint.nst-input-hint--error {
+  color: var(--vw-color-red-600);
+}
+
+/* Required marker — hideRequiredMarker in the guideline is the inverse
+   of this. Matches .vw-check-label--required so a form reads the same
+   whichever control the field uses. */
+.nst-input-label--required::after {
+  content: " *";
+  color: var(--vw-color-red-500);
+}
+
+/* inputReadonly in the guideline. Deliberately NOT the disabled look:
+   a readonly field is still focusable, selectable and submitted — it
+   just cannot be edited. Greying it out the way :disabled does would
+   tell the user the wrong thing. */
+.nst-input[readonly],
+.nst-input-shell:has(input[readonly]) {
+  background: var(--vw-color-gray-50);
+  cursor: default;
+}
+
+.nst-input[readonly]:focus,
+.nst-input[readonly]:focus-visible {
+  border-color: var(--vw-color-gray-400);
+  box-shadow: none;
+}
+
+/* maxlength counter. A consuming app built this as its own char-counter;
+   pairs with .nst-input-hint on the same row. */
+.nst-input-counter {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: 18px;
+  color: var(--vw-color-gray-400);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.nst-input-counter.is-over { color: var(--vw-color-red-600); }
+
+/* The row under a field: hint on the left, counter hard right. */
+.nst-input-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--vw-space-sm);
+  margin-top: var(--vw-space-xxs);
+}
+
+/* Input wrapper (shell for icon + input + suffix) */
+.nst-input-shell {
+  display: flex;
+  min-height: 36px;
+  padding: 6px 8px;
+  align-items: center;
+  gap: 8px;
+
+  border-radius: 8px;
+  border: 1px solid var(--vw-color-gray-200);
+  background: var(--vw-color-white);
+
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.nst-input-shell:hover                   { border-color: var(--vw-color-gray-400); }
+.nst-input-shell:focus-within            { border-color: var(--vw-color-accent-500); box-shadow: 0 0 0 3px var(--vw-color-accent-100); }
+/* The shell is also used as a popover trigger (date picker field,
+   select, autocomplete). :focus-within cannot express "this field owns
+   the open popover", because clicking inside the popover moves focus
+   out of the shell. .is-active persists for as long as it is open. */
+.nst-input-shell.is-active               { border-color: var(--vw-color-accent-500); box-shadow: 0 0 0 3px var(--vw-color-accent-100); }
+.nst-input-shell.nst-input--error        { border-color: var(--vw-color-red-500); }
+.nst-input-shell.nst-input--error:focus-within { box-shadow: 0 0 0 3px var(--vw-color-red-100); }
+.nst-input-shell.nst-input--disabled     { background: var(--vw-color-gray-50); border-color: var(--vw-color-gray-200); cursor: not-allowed; }
+
+.nst-input-shell input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  line-height: 20px;
+  color: var(--vw-color-gray-700);
+  min-width: 0;
+}
+
+.nst-input-shell input::placeholder { color: var(--vw-color-gray-400); }
+.nst-input-shell input:disabled     { cursor: not-allowed; color: var(--vw-color-gray-300); }
+
+.nst-input-shell .nst-input-icon {
+  flex-shrink: 0;
+  color: var(--vw-color-gray-400);
+  width: 16px;
+  height: 16px;
+}
+
+.nst-input-shell.nst-input--disabled .nst-input-icon {
+  color: var(--vw-color-gray-300);
+}
+
+/* ============================================================
+   Table
+   Usage: wrap your table in .nst-table-card, set
+   grid-template-columns on .nst-table-head + each .nst-table-row.
+   ============================================================ */
+
+/* Outer card */
+/* Cell metrics, shared by BOTH table variants so they cannot drift apart again.
+   .nst-table-card (the grid variant) is the canonical look — signed off against
+   the vendor-table reference — and .nst-table now matches it rather than running
+   its own 63px-row, gray/slate-family version.
+
+   10px and 13px have no token: --vw-space-* jumps 8px -> 12px and --vw-font-*
+   jumps 12px -> 14px. Snapping to the nearest would change the approved density,
+   so they live here once instead of being retyped in four rule blocks. Closing
+   that scale gap properly is a registry decision, logged not silently taken. */
+.nst-table-card,
+.nst-table {
+  --nst-table-cell-py: 10px;
+  --nst-table-cell-px: 8px;
+  --nst-table-cell-fs: 13px;
+  --nst-table-cell-lh: 20px;
+}
+
+.nst-table-card {
+  background: var(--vw-color-white);
+  border-radius: 12px;
+  border: 1px solid var(--vw-color-neutral-200);
+  overflow: hidden;
+}
+
+/* Toolbar strip */
+.nst-table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  flex-wrap: nowrap;
+}
+
+/* The divider belongs to the nested case only. This class is documented as
+   working "above any list, not only a .nst-table-card", but the border-bottom
+   used to be unconditional — so standing it on a page background produced a
+   transparent row with an orphan rule under it and no surface of its own.
+
+   That is not hypothetical: the semantic .nst-table variant puts the surface
+   on the <table> element itself, and a <div> cannot live inside a <table>, so
+   an app using that variant has nowhere to put the toolbar except outside the
+   card. One consuming app hit exactly this and hand-rolled a six-line flex row
+   instead. Now the base class is that flex row. */
+.nst-table-card > .nst-table-toolbar {
+  border-bottom: 1px solid var(--vw-color-neutral-200);
+}
+
+/* Header row — set grid-template-columns to match your column widths */
+.nst-table-head {
+  display: grid;
+  background: var(--vw-color-neutral-50);
+  border-bottom: 1px solid var(--vw-color-neutral-200);
+}
+
+.nst-table-th {
+  padding: var(--nst-table-cell-py) var(--nst-table-cell-px);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  font-weight: 500;
+  line-height: var(--nst-table-cell-lh);
+  color: var(--vw-color-neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Body row — set the same grid-template-columns as .nst-table-head */
+.nst-table-row {
+  display: grid;
+  border-bottom: 1px solid var(--vw-color-neutral-100);
+  background: var(--vw-color-white);
+  transition: background 100ms;
+}
+
+.nst-table-row:hover {
+  background: var(--vw-color-neutral-50);
+}
+
+.nst-table-row--selected {
+  background: var(--vw-color-accent-50);
+}
+
+.nst-table-row--selected:hover {
+  background: var(--vw-color-accent-100);
+}
+
+/* Cell */
+.nst-table-td {
+  padding: var(--nst-table-cell-py) var(--nst-table-cell-px);
+  font-family: var(--fontFamily);
+  font-size: var(--nst-table-cell-fs);
+  font-weight: 400;
+  line-height: var(--nst-table-cell-lh);
+  color: var(--vw-color-neutral-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Primary/value cell — darker text */
+.nst-table-td--primary {
+  color: var(--vw-color-neutral-800);
+}
+
+/* Kebab (⋮) action trigger */
+.nst-table-kebab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vw-color-neutral-400);
+  cursor: pointer;
+  transition: color 100ms;
+  /* Glyph size for the ⋮ character, NOT type. Deliberately a literal:
+     mapping an icon onto a --vw-font-* token would file it in the wrong
+     family. Check 7 flags it; this comment is the answer. */
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.nst-table-kebab:hover {
+  color: var(--vw-color-neutral-800);
+}
+
+/* Row action drop-menu */
+.nst-table-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 140px;
+  background: var(--vw-color-white);
+  border-radius: 10px;
+  border: 1px solid var(--vw-color-neutral-200);
+  box-shadow: 0 2px 2px -1px rgba(10,13,18,.04),
+              0 4px 6px -2px rgba(10,13,18,.03),
+              0 12px 16px -4px rgba(10,13,18,.08);
+  padding: 4px;
+  z-index: 50;
+}
+
+.nst-table-menu-item {
+  width: 100%;
+  border: none;
+  text-align: left;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: var(--fontFamily);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--vw-color-neutral-800);
+  cursor: pointer;
+  transition: background 100ms;
+}
+
+.nst-table-menu-item:hover {
+  background: var(--vw-color-neutral-100);
+}
+
+.nst-table-menu-item--danger {
+  color: var(--vw-color-red-500);
+}
+
+/* ============================================================
+   Semantic <table> variant — .nst-table
+   Use when the data IS tabular and must stay accessible: real
+   <table>/<thead>/<th>/<td> keeps row/column semantics for screen
+   readers, which the grid-of-divs variant above does not provide.
+   Same visual language; no grid-template-columns bookkeeping.
+
+     <div class="nst-table-wrap"><table class="nst-table"> <thead><tr><th>…  <tbody><tr><td>…</table></div>
+
+   Rows and cells take NO class here. This example used to read
+   <tr class="nst-table-row">, which is the grid variant's class and
+   carries display:grid — it stacks every cell vertically. It sat 73
+   lines above the note that forbids exactly that, so a reader going
+   top to bottom met the mistake first and the correction second.
+   A consuming team hit it. The rules at the end of this section now
+   neutralise the class on a native table element, so the same slip is
+   inert rather than catastrophic.
+
+   Prefer this for data grids. Use .nst-table-card/-head/-row (grid)
+   only when columns must be resized or virtualised.
+
+   Always wrap in .nst-table-wrap. th/td use white-space: nowrap, so a table
+   with enough columns (or content) can exceed its container's width — the
+   wrapper is what lets it scroll horizontally in place instead of pushing
+   the whole page wider. Deliberately NOT solved by giving .nst-table itself
+   overflow-x/display:block: that would touch the box type of the <table>
+   element itself, which is exactly what this variant exists to keep intact
+   for screen readers (see the note above) — the wrapper keeps the table's
+   own display: table untouched and puts the scroll behavior one level up
+   instead. Found via a real consuming app: a vendor scorecard table
+   overflowed the whole page at ordinary laptop widths.
+   ============================================================ */
+
+.nst-table-wrap {
+  overflow-x: auto;
+}
+
+.nst-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--vw-color-white);
+  border: 1px solid var(--vw-color-neutral-200);
+  border-radius: var(--vw-radius-md);
+  overflow: hidden;
+  font-family: var(--fontFamily);
+}
+
+/* Inside a card the card owns the surface — otherwise you get a border inside a
+   border and two mismatched radii. This is what makes the canonical structure
+   (one card holding toolbar + table) possible for the semantic variant, which
+   cannot nest a <div> toolbar inside its own <table>. */
+.nst-table-card > .nst-table-wrap > .nst-table,
+.nst-table-card > .nst-table {
+  border: 0;
+  border-radius: 0;
+}
+
+.nst-table th {
+  text-align: left;
+  padding: var(--nst-table-cell-py) var(--nst-table-cell-px);
+  background: var(--vw-color-neutral-50);
+  border-bottom: 1px solid var(--vw-color-neutral-200);
+  font-size: var(--vw-font-label-sm);
+  font-weight: 500;
+  line-height: var(--nst-table-cell-lh);
+  color: var(--vw-color-neutral-500);
+  white-space: nowrap;
+}
+
+.nst-table td {
+  padding: var(--nst-table-cell-py) var(--nst-table-cell-px);
+  border-bottom: 1px solid var(--vw-color-neutral-100);
+  font-size: var(--nst-table-cell-fs);
+  line-height: var(--nst-table-cell-lh);
+  color: var(--vw-color-neutral-600);
+  vertical-align: middle;
+  /* Matches .nst-table th above. Without this, td fell back to
+     white-space: normal and long cell text wrapped to three or four
+     lines instead of extending the table for .nst-table-wrap to
+     scroll — the exact opposite of what this variant documents.
+     Missed because table-semantic.html's cell content is all short
+     enough never to wrap; it only surfaced on real data. */
+  white-space: nowrap;
+}
+
+.nst-table td.nst-table-td--primary { color: var(--vw-color-neutral-800); }
+.nst-table tr:last-child td { border-bottom: 0; }
+
+/* Rows need no class. Do NOT reuse .nst-table-row here — that is the grid
+   variant and carries display:grid, which would destroy <tr> layout. */
+.nst-table tbody tr { transition: background 100ms; }
+.nst-table tbody tr:hover td { background: var(--vw-color-neutral-50); }
+.nst-table tbody tr.is-clickable { cursor: pointer; }
+.nst-table tbody tr.is-selected td {
+  /* accent, not blue-50: themes redefine --vw-color-accent-*, so a
+     hardcoded blue painted selected rows blue on the black and green
+     themes while every other accent on the page followed the theme.
+     The grid variant already used accent-50 here; this variant did not. */
+  background: var(--vw-color-accent-50);
+}
+
+/* ── The two variants cannot collide ────────────────────────────
+
+   A grid-variant class on a native table element is always a mistake.
+   .nst-table-row carries display:grid, which replaces <tr>'s
+   table-row: measured on preview/table-semantic.html, a four-column
+   row went from one shared cell top to four, and from 46px tall to
+   170px — every header and cell stacked vertically.
+
+   The note above forbade it and was not enough, because a comment
+   only works on someone who reads it in order, and the bad example
+   came first. These rules make the slip inert instead: the class
+   becomes a no-op on an element whose display is load-bearing.
+
+   Element-qualified on purpose — <div class="nst-table-row">, which
+   IS the grid variant, matches none of these and is untouched.
+   tr.nst-table-row is specificity (0,1,1) against the bare class's
+   (0,1,0), so it wins regardless of source order. */
+tr.nst-table-head,
+tr.nst-table-row     { display: table-row; }
+th.nst-table-th,
+td.nst-table-td      { display: table-cell; }
+thead.nst-table-head { display: table-header-group; }
+tbody.nst-table-row  { display: table-row-group; }
+
+/* ============================================================
+   Kanban board — .nst-kanban (third table view, alongside the
+   real <table> above and the tile grid in vw-utilities.css)
+
+   Only 4 classes here — .nst-kanban, .nst-kanban-column,
+   .nst-kanban-column-header, .nst-kanban-column-body — because a
+   horizontally-scrolling board of sticky-header columns is a
+   genuinely new layout shape with no existing equivalent. Everything
+   inside a column is NOT new: cards and their contents are built
+   entirely from existing Layer 1/2 classes — .vw-card-section +
+   .vw-card--clickable (card + its own hover/focus state, already
+   registered, not reinvented), .vw-card-title-sm (column title AND
+   card title — same class, not a parallel one), .vw-card-metric-label-sm
+   (field labels), .vw-card-description (field values), .vw-chip--*
+   (priority/severity), .nst-action-menu (card kebab), .vw-flex/
+   .vw-grid/.vw-grid-cols-2/.vw-gap-* (every layout row inside a card).
+   An earlier draft of this component invented card-specific classes
+   for all of that (.nst-kanban-card-field-label etc.) — removed on
+   review: this repo's own "Filling a gap in the utility layer" rule
+   forbids a parallel class family for something existing classes
+   already cover, and none of that card-internal styling was actually
+   new. See preview/table.html for the full real markup.
+
+   Promoted from real cross-source precedent: an independently-built
+   consuming app's working implementation, cross-checked against this
+   design language's own legacy ticket-board UI — same shape (status
+   columns with a count, cards with a title/kebab row, a label-value
+   field grid, small semantic chips for priority/severity) confirmed
+   in both. The legacy reference used a heavy box-shadow and a bold
+   title; neither carried over — flat cards with a hairline border
+   and .vw-card-title-sm's normal weight already match this system's
+   own documented visual language, so the pattern was rebuilt in that
+   language rather than copied as-is.
+
+   Deliberately no color-coded column accent — an earlier draft tried a
+   colored top border per status, dropped as too loud for this system's
+   flat, low-chroma visual language (see DESIGN.md). Column identity
+   comes from the title + count alone; if a status genuinely needs a
+   color cue, use a `.vw-chip--*` on the title instead of a strip.
+
+     <div class="nst-kanban">
+       <div class="nst-kanban-column">
+         <div class="nst-kanban-column-header">
+           <span class="vw-card-title-sm">New</span>
+           <span class="vw-chip vw-chip--neutral-solid">106</span>
+         </div>
+         <div class="nst-kanban-column-body">
+           <div class="vw-card-section vw-card--clickable">...</div>
+         </div>
+       </div>
+     </div>
+   ============================================================ */
+
+.nst-kanban {
+  display: flex;
+  gap: var(--vw-space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--vw-space-sm);
+  align-items: flex-start;
+}
+
+.nst-kanban-column {
+  flex: 0 0 288px;
+  display: flex;
+  flex-direction: column;
+  background: var(--vw-color-gray-50);
+  border-radius: var(--vw-radius-lg);
+  max-height: calc(100vh - 340px);
+  min-height: 220px;
+}
+
+.nst-kanban-column-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vw-space-sm);
+  padding: var(--vw-space-md) var(--vw-space-lg);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+  background: var(--vw-color-gray-50);
+}
+
+.nst-kanban-column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--vw-space-md) var(--vw-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-sm);
+}
+
+/* ============================================================
+   Icon Button
+   Square icon-only button for table toolbars — filter trigger,
+   actions trigger, or the collapsed state of .nst-table-search.
+   ============================================================ */
+
+.nst-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--vw-radius-sm);
+  border: 1px solid var(--vw-color-gray-200);
+  background: var(--vw-color-white);
+  color: var(--vw-color-gray-500);
+  cursor: pointer;
+  transition: border-color 120ms ease-out, color 120ms ease-out, background 120ms ease-out;
+}
+
+.nst-icon-btn:hover {
+  border-color: var(--vw-color-gray-400);
+  color: var(--vw-color-gray-700);
+}
+
+.nst-icon-btn.is-active {
+  border-color: var(--vw-color-accent-500);
+  color: var(--vw-color-accent-500);
+  background: var(--vw-color-accent-50);
+}
+
+/* ============================================================
+   Table Search (collapsible)
+   Closed: icon-only, same footprint as .nst-icon-btn.
+   Toggle the .is-open class from JS (on trigger click) to expand
+   into a bordered input with a clear (×) button. Collapse it again
+   on blur/clear so the toolbar returns to its compact state.
+   ============================================================ */
+
+.nst-table-search {
+  display: inline-flex;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--vw-radius-sm);
+  border: 1px solid var(--vw-color-gray-200);
+  background: var(--vw-color-white);
+  overflow: hidden;
+  transition: width 160ms ease-out, border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.nst-table-search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--vw-color-gray-400);
+  cursor: pointer;
+}
+
+.nst-table-search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  color: var(--vw-color-gray-700);
+  display: none;
+}
+
+.nst-table-search input::placeholder { color: var(--vw-color-gray-400); }
+
+.nst-table-search-clear {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  padding: 0;
+  color: var(--vw-color-gray-400);
+  cursor: pointer;
+}
+
+.nst-table-search.is-open {
+  width: 240px;
+  border-color: var(--vw-color-accent-500);
+  box-shadow: 0 0 0 3px var(--vw-color-accent-100);
+}
+
+.nst-table-search.is-open input { display: block; }
+.nst-table-search.is-open .nst-table-search-clear { display: flex; }
+
+/* ============================================================
+   Action Menu
+   A floating context menu opened by kebab buttons, dropdowns, etc.
+   ============================================================ */
+
+/* Container */
+.nst-action-menu {
+  border-radius: 12px;
+  border: 1px solid var(--vw-color-neutral-200);
+  background: var(--vw-color-white);
+  box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.10);
+  padding: 4px;
+  min-width: 160px;
+  position: absolute;
+  z-index: 100;
+}
+
+/* Item */
+.nst-action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* A menu item should be a <button> — keyboard operable and announced
+     as actionable. Without these resets the browser's default button
+     border renders and every row reads as an outlined button instead of
+     a menu row. It went unnoticed because 29 of our own specimen usages
+     were <div>, which has no default border and is also the wrong
+     element. */
+  width: 100%;
+  border: none;
+  text-align: left;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--vw-color-white);
+  cursor: pointer;
+  transition: background 100ms;
+  color: var(--vw-color-gray-800);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 400;
+  line-height: 20px;
+  user-select: none;
+}
+
+.nst-action-menu-item:hover {
+  background: var(--vw-color-neutral-100);
+}
+
+/* Danger variant */
+.nst-action-menu-item--danger {
+  color: var(--vw-color-red-500);
+}
+
+/* Icon inside item */
+.nst-action-menu-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Divider between item groups */
+.nst-action-menu-divider {
+  height: 1px;
+  background: var(--vw-color-neutral-200);
+  margin: 4px 0;
+}
+
+/* ============================================================
+   Description Field (Textarea)
+   A resizable textarea with character counter.
+   ============================================================ */
+
+/* Wrapper — carries the border/shadow states */
+.nst-textarea-wrap {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  border: 1px solid var(--vw-color-neutral-200);
+  background: var(--vw-color-white);
+  height: 140px;
+  min-height: 80px;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.nst-textarea-wrap:hover                    { border-color: var(--vw-color-gray-400); }
+.nst-textarea-wrap:focus-within             { border-color: var(--vw-color-accent-500); box-shadow: 0 0 0 3px var(--vw-color-accent-100); }
+.nst-textarea-wrap.nst-textarea--error      { border-color: var(--vw-color-red-500); }
+.nst-textarea-wrap.nst-textarea--error:focus-within { box-shadow: 0 0 0 3px var(--vw-color-red-100); }
+.nst-textarea-wrap.nst-textarea--disabled   { background: var(--vw-color-gray-50); border-color: var(--vw-color-neutral-200); }
+
+/* The <textarea> itself */
+.nst-textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 8px 8px 0;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--vw-color-gray-900);
+  background: transparent;
+  min-height: 0;
+  overflow: auto;
+}
+.nst-textarea::placeholder                         { color: var(--vw-color-gray-400); }
+.nst-textarea-wrap.nst-textarea--disabled .nst-textarea { color: var(--vw-color-gray-300); cursor: not-allowed; }
+
+/* Footer row (counter + resize handle) */
+.nst-textarea-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 4px 8px 6px;
+  flex-shrink: 0;
+}
+
+/* Character counter */
+.nst-textarea-counter {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--vw-color-gray-400);
+}
+.nst-textarea-counter.nst-textarea-counter--over   { color: var(--vw-color-red-500); font-weight: 500; }
+.nst-textarea-wrap.nst-textarea--disabled .nst-textarea-counter { color: var(--vw-color-gray-300); }
+
+/* Resize handle */
+.nst-textarea-resize {
+  cursor: se-resize;
+  color: var(--vw-color-gray-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  transition: color 100ms;
+}
+.nst-textarea-resize:hover                         { color: var(--vw-color-gray-500); }
+.nst-textarea-wrap.nst-textarea--disabled .nst-textarea-resize { cursor: not-allowed; pointer-events: none; }
+
+/* ============================================================
+   Date picker — .nst-datepicker
+   Ported from a real production spec (see docs/card-reference.md's
+   provenance note) — single date, single date+time, date range, and
+   date range+time, each with a collapsed/input state and an expanded
+   grid state. Was a "Known registry gaps" entry; promoted here once a
+   precise spec existed to build from, not guessed.
+
+   Structure: header (date text + edit icon) -> nav (prev/next + a
+   clickable month/year label that swaps the grid for a year grid) ->
+   day grid OR year grid -> optional "Set Time" stepper row -> footer
+   (Cancel/Set, reuse .nst-btn).
+   ============================================================ */
+
+.nst-datepicker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 320px;
+  padding: 16px;
+  box-sizing: border-box;
+
+  background: var(--vw-color-white);
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-md);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(16, 24, 40, 0.1));
+  font-family: var(--fontFamily);
+}
+
+.nst-datepicker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--vw-font-label-md);
+  font-weight: 600;
+  color: var(--vw-color-gray-900);
+}
+
+.nst-datepicker-header-edit {
+  display: inline-flex;
+  color: var(--vw-color-gray-400);
+  cursor: pointer;
+}
+.nst-datepicker-header-edit:hover { color: var(--vw-color-gray-600); }
+
+/* Month navigator */
+.nst-datepicker-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nst-datepicker-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  border-radius: var(--vw-radius-sm);
+  color: var(--vw-color-gray-500);
+  cursor: pointer;
+}
+.nst-datepicker-nav-btn:hover { background: var(--vw-color-gray-50); color: var(--vw-color-gray-700); }
+
+.nst-datepicker-nav-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--vw-font-label-md);
+  font-weight: 600;
+  color: var(--vw-color-gray-900);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--vw-radius-sm);
+}
+.nst-datepicker-nav-label:hover { background: var(--vw-color-gray-50); }
+
+/* Day grid */
+.nst-datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 2px;
+}
+
+.nst-datepicker-weekday {
+  text-align: center;
+  font-size: var(--vw-font-label-sm);
+  font-weight: 500;
+  color: var(--vw-color-gray-400);
+  padding: 4px 0 8px;
+}
+
+.nst-datepicker-day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  font-size: 13px;
+  color: var(--vw-color-gray-700);
+  cursor: pointer;
+  border-radius: var(--vw-radius-full);
+  background: none;
+  border: none;
+}
+.nst-datepicker-day:hover { background: var(--vw-color-gray-50); }
+
+.nst-datepicker-day.is-muted { color: var(--vw-color-gray-300); cursor: default; }
+.nst-datepicker-day.is-muted:hover { background: none; }
+
+/* Single selection / "today" marker: solid filled circle */
+.nst-datepicker-day.is-selected {
+  background: var(--vw-color-accent-500);
+  color: var(--vw-color-white);
+  font-weight: 600;
+}
+.nst-datepicker-day.is-selected:hover { background: var(--vw-color-accent-600); }
+
+/* Range endpoints: lighter filled circle */
+.nst-datepicker-day.is-range-start,
+.nst-datepicker-day.is-range-end {
+  background: var(--vw-color-accent-200);
+  color: var(--vw-color-accent-800);
+  font-weight: 600;
+}
+
+/* Days between range endpoints: connected band, not a circle */
+.nst-datepicker-day.is-in-range {
+  border-radius: 0;
+  background: var(--vw-color-accent-50);
+}
+.nst-datepicker-day.is-range-start { border-radius: var(--vw-radius-full) 0 0 var(--vw-radius-full); }
+.nst-datepicker-day.is-range-end   { border-radius: 0 var(--vw-radius-full) var(--vw-radius-full) 0; }
+
+/* Year grid — alternate view when the nav label is clicked */
+.nst-datepicker-year-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nst-datepicker-year {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 13px;
+  color: var(--vw-color-gray-700);
+  cursor: pointer;
+  border-radius: var(--vw-radius-sm);
+  background: none;
+  border: none;
+}
+.nst-datepicker-year:hover { background: var(--vw-color-gray-50); }
+.nst-datepicker-year.is-muted { color: var(--vw-color-gray-300); }
+.nst-datepicker-year.is-selected { background: var(--vw-color-accent-100); color: var(--vw-color-accent-700); font-weight: 600; }
+
+/* Collapsed input state — single date: one field, built on .nst-input-shell */
+.nst-datepicker-field-label {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 500;
+  color: var(--vw-color-gray-500);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.nst-datepicker-range-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* "Set Time" section */
+.nst-datepicker-time {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--vw-color-gray-100);
+}
+
+.nst-datepicker-time-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vw-color-gray-900);
+}
+
+.nst-datepicker-steppers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nst-datepicker-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 72px;
+  padding: 6px 8px;
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  font-size: var(--vw-font-label-md);
+  font-weight: 500;
+  color: var(--vw-color-gray-900);
+}
+
+.nst-datepicker-stepper-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nst-datepicker-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 10px;
+  color: var(--vw-color-gray-400);
+  cursor: pointer;
+}
+.nst-datepicker-stepper-btn:hover { color: var(--vw-color-gray-700); }
+
+/* Footer */
+.nst-datepicker-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+/* ============================================================
+   Overlay + panel — drawer, modal, confirm dialog
+
+   One system, three declared "gaps". Reading the consuming apps
+   made it obvious: their confirm overlay and their drawer overlay
+   are byte-identical except for one property —
+
+     confirm : justify-content: center;
+     drawer  : justify-content: flex-end;
+
+   So this ships as an overlay (the scrim AND the positioning
+   context) plus a panel placed inside it. A centered dialog and a
+   right-anchored drawer differ by one modifier, not by a second
+   component family.
+
+   Promoted from six drawer and two confirm implementations across
+   two independently-built apps, which agreed on: 480px drawers
+   (5 of 6), a gray-900 scrim at 32-45%, a right-anchored full-height
+   flex column, and header / scrollable body / right-aligned footer.
+
+   Two deliberate changes from the references:
+   - the scrim derives from var(--vw-color-gray-900) via color-mix
+     rather than a hand-typed rgba(17, 24, 39, …), which is that
+     token's value retyped in all eight implementations
+   - the slide-in is disabled under prefers-reduced-motion
+
+   Focus trapping, Escape-to-close, aria-modal and returning focus
+   to the trigger are the caller's job — this is styling only.
+
+     <div class="nst-overlay">                        <!-- centered -->
+       <div class="nst-panel nst-panel--dialog"> … </div>
+     </div>
+
+     <div class="nst-overlay nst-overlay--end">       <!-- drawer -->
+       <div class="nst-panel nst-panel--drawer">
+         <div class="nst-panel-header"> … </div>
+         <div class="nst-panel-body"> … </div>
+         <div class="nst-panel-footer"> … </div>
+       </div>
+     </div>
+   ============================================================ */
+
+.nst-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--vw-color-gray-900) 40%, transparent);
+}
+
+/* `display: flex` above beats the browser's `[hidden] { display: none }`, so
+   an overlay written as <div class="nst-overlay" hidden> would render anyway —
+   a silent, confusing failure the caller cannot see in the markup. Same class
+   of trap as .vw-gap-* on a non-flex parent. Handled here so nobody has to
+   rediscover it. */
+.nst-overlay[hidden] {
+  display: none;
+}
+
+/* Right-anchored — the drawer placement. */
+.nst-overlay.nst-overlay--end {
+  justify-content: flex-end;
+}
+
+/* Left-anchored, for a panel that slides from the same edge the
+   rail lives on — the app menu. */
+.nst-overlay.nst-overlay--start {
+  justify-content: flex-start;
+}
+
+.nst-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  background: var(--vw-color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.nst-panel.nst-panel--drawer {
+  width: 30rem;
+  max-width: 92vw;
+  height: 100%;
+  animation: nst-panel-slide-in 180ms ease-out;
+}
+
+/* A left-anchored drawer has to come in from the LEFT. It did not:
+   there was one set of keyframes, written for the right-hand
+   drawer, so a .nst-overlay--start panel started a full width to
+   the right of its resting place and flew across the viewport to
+   land on the opposite edge. Nothing showed it because the app
+   menu, our only --start user, brings its own animation and never
+   matched this rule — and it keeps it: overriding .vw-app-menu
+   here would make it animate differently depending on whether
+   components.css happened to be linked. */
+.nst-overlay--start .nst-panel.nst-panel--drawer {
+  animation: nst-panel-slide-in-start 180ms ease-out;
+}
+
+.nst-panel.nst-panel--dialog {
+  width: 22.5rem;
+  max-width: calc(100vw - var(--vw-space-2xl));
+  border-radius: var(--vw-radius-lg);
+  animation: nst-panel-fade-in 150ms ease-out;
+}
+
+.nst-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--vw-space-md);
+  padding: var(--vw-space-lg);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+  flex-shrink: 0;
+}
+
+.nst-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--vw-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-md);
+}
+
+.nst-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--vw-space-sm);
+  padding: var(--vw-space-lg);
+  border-top: 1px solid var(--vw-color-gray-200);
+  flex-shrink: 0;
+}
+
+/* A dialog is short enough that header/footer borders read as clutter. */
+.nst-panel--dialog .nst-panel-header,
+.nst-panel--dialog .nst-panel-footer {
+  border: none;
+}
+
+@keyframes nst-panel-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes nst-panel-slide-in-start {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes nst-panel-fade-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nst-panel.nst-panel--drawer,
+  .nst-panel.nst-panel--dialog {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Anchoring a floating menu to its trigger
+
+   .nst-action-menu has always been `position: absolute` — but an
+   absolutely positioned element needs a positioned ancestor, and we
+   never shipped one. So every consumer had to rediscover the other
+   half of the pattern themselves.
+
+   They did, identically. Four popover families across one app, plus
+   more in another, all landing on exactly:
+
+     position: absolute; top: calc(100% + 6px); right: 0;
+
+   while ALSO using .nst-action-menu 50 times elsewhere — they used
+   ours where a bare menu sufficed and hand-rolled whenever it had to
+   sit under a trigger. That is a missing half, not a missing
+   component.
+
+   Wrap the trigger in .nst-anchor, put the placement modifier on the
+   menu:
+
+     <div class="nst-anchor">
+       <button class="nst-icon-btn">⋮</button>
+       <div class="nst-action-menu nst-action-menu--below-end"> … </div>
+     </div>
+
+   CLIPPING: an absolutely positioned menu is clipped by any ancestor
+   with `overflow: hidden` — which .nst-table-card and .nst-table-td
+   both set for column truncation. Inside a real grid table the menu
+   still has to be portalled outside the row; anchoring does not solve
+   that. See the Table row-actions entry in COMPONENTS.md.
+   ============================================================ */
+
+.nst-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Below the trigger, right edges aligned — the placement all four
+   consuming implementations chose. */
+.nst-action-menu.nst-action-menu--below-end {
+  top: calc(100% + var(--vw-space-xxs));
+  right: 0;
+}
+
+.nst-action-menu.nst-action-menu--below-start {
+  top: calc(100% + var(--vw-space-xxs));
+  left: 0;
+}
+
+/* For a trigger near the bottom of the viewport. */
+.nst-action-menu.nst-action-menu--above-end {
+  bottom: calc(100% + var(--vw-space-xxs));
+  right: 0;
+}
+
+.nst-action-menu.nst-action-menu--above-start {
+  bottom: calc(100% + var(--vw-space-xxs));
+  left: 0;
+}
+
+/* ============================================================
+   Segmented control — .vw-segmented
+
+   Promoted from both consuming apps, both on their Settings page,
+   both for a density preference. What they built settles the
+   design more firmly than usual, because neither invented a
+   button: both composed .nst-btn .nst-btn--sm and added only a
+   container class plus a selected state.
+
+     App A              a settings-page segmented control
+                        inline-flex, gap 4px, role="group",
+                        aria-pressed, active = gray-900 filled
+     App B              a settings segmented control
+                        inline-flex, 1px border, 8px radius,
+                        overflow hidden, buttons joined by
+                        border-left, role="radiogroup",
+                        aria-checked
+
+   So this is a CONTAINER, not a new control. The buttons stay
+   .nst-btn — meaning size, focus ring, disabled state and theming
+   all come free and cannot drift from the rest of the buttons.
+
+   NOT a tabs variant, despite looking like one. Tabs switch views
+   and use role="tablist"/aria-selected; this picks a value and
+   used role="group"+aria-pressed or role="radiogroup"+aria-checked
+   in both apps. It is a form control, and it is filed as one.
+
+   Selected state is honoured from .is-active, aria-pressed="true"
+   AND aria-checked="true" — so both apps' existing markup works
+   unchanged after re-vendoring, and correct ARIA styles itself.
+
+   Active is gray-900, not the accent. One app reached for
+   .nst-btn--filled (accent), the other set gray-900
+   explicitly. Neutral wins for the same reason it won on tabs:
+   a selected segment is a selection, not a primary action, and
+   --filled already means "the main thing to click".
+
+   Lives here rather than in a bundled vw-*.css, which is the one
+   sane exception to "new vw-* goes in the bundle": this composes
+   .nst-btn, so shipping it without components.css would hand you
+   a container with nothing valid to put in it. It belongs beside
+   its dependency.
+
+     <div class="vw-segmented" role="group" aria-label="Density">
+       <button class="nst-btn nst-btn--sm" aria-pressed="true">Comfortable</button>
+       <button class="nst-btn nst-btn--sm" aria-pressed="false">Compact</button>
+     </div>
+   ============================================================ */
+
+.vw-segmented {
+  display: inline-flex;
+  gap: var(--vw-space-xs);
+  width: fit-content;
+}
+
+.vw-segmented .nst-btn.is-active,
+.vw-segmented .nst-btn[aria-pressed="true"],
+.vw-segmented .nst-btn[aria-checked="true"] {
+  background: var(--vw-color-gray-900);
+  border-color: var(--vw-color-gray-900);
+  color: var(--vw-color-white);
+}
+
+.vw-segmented .nst-btn:hover:not(:disabled):not(.is-active):not([aria-pressed="true"]):not([aria-checked="true"]) {
+  background: var(--vw-color-gray-50);
+}
+
+/* A disabled segment must not read as active. The selected rule above
+   sets background/colour outright, which outranks .nst-btn's own
+   disabled styling — so a disabled+selected segment rendered at full
+   gray-900 and looked live. Caught in-browser against the guideline's
+   own "Text Disabled" / "Multiple Disabled" examples. */
+.vw-segmented .nst-btn:disabled.is-active,
+.vw-segmented .nst-btn:disabled[aria-pressed="true"],
+.vw-segmented .nst-btn:disabled[aria-checked="true"] {
+  background: var(--vw-color-gray-300);
+  border-color: var(--vw-color-gray-300);
+  color: var(--vw-color-white);
+}
+
+/* Joined — the shape one of them built: one bordered pill, segments
+   divided by hairlines rather than separated by a gap. */
+.vw-segmented--joined {
+  gap: 0;
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: var(--vw-radius-sm);
+  overflow: hidden;
+}
+
+.vw-segmented--joined .nst-btn {
+  border: none;
+  border-radius: 0;
+}
+
+.vw-segmented--joined .nst-btn + .nst-btn {
+  border-left: 1px solid var(--vw-color-slate-200);
+}
+
+/* vertical=true on the guideline's bntv-button-toggle. */
+.vw-segmented--vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.vw-segmented--vertical.vw-segmented--joined .nst-btn + .nst-btn {
+  border-left: 0;
+  border-top: 1px solid var(--vw-color-slate-200);
+}
+
+/* ============================================================
+   Select — .vw-select (native) and the listbox layer
+
+   bntv-select-box is a god component: ~30 inputs covering
+   displayExpression, trackByKey, compareWithFn, four
+   TemplateRefs, Material `appearance` variants, and three theme
+   palettes. Most of that is Angular plumbing or Material
+   surface, and none of it is CSS. What follows covers the parts
+   that are, and nothing else.
+
+   The single most valuable piece is the plain one. Both apps
+   reach for a native <select> 38 times — one writes
+   <select class="nst-input">, and the other hand-rolled two
+   select classes which are byte-identical to each other and
+   near-identical to .nst-input. A native select keeps
+   keyboard behaviour, the mobile wheel picker, form submission
+   and screen-reader semantics for free. It only needs a chevron,
+   because appearance:none removes the platform's own.
+
+   Deliberately NOT covered, so nobody goes looking: the four
+   TemplateRefs, displayExpression/value/uniqueItemKey/trackByKey/
+   compareWithFn (data plumbing), isAddOptionOnEvent,
+   disableInternalSearch, searchOptionsLimit, the Material
+   appearance variants, and theme/color/optiontextTheme — this
+   system has one accent.
+
+     <select class="vw-select">…</select>
+     <select class="vw-select" data-placeholder>…</select>   (nothing chosen)
+   ============================================================ */
+
+.vw-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-height: 36px;
+  /* right padding leaves room for the chevron */
+  padding: 6px 32px 6px 8px;
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  background-color: var(--vw-color-white);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--vw-color-gray-900);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+
+  /* The chevron. A data URI rather than an icon font, because a
+     native <select> cannot contain an element — there is nowhere
+     to put an <i>. gray-400 baked in; the disabled rule swaps it. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%239ca3af' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+/* Compact, for toolbars and the rows-per-page control where a
+   36px field is taller than everything beside it. */
+.vw-select--sm {
+  min-height: 30px;
+  padding: 4px 28px 4px 8px;
+  font-size: var(--vw-font-label-sm);
+  background-position: right 6px center;
+}
+
+.vw-select:hover:not(:disabled) { border-color: var(--vw-color-gray-400); }
+
+.vw-select:focus,
+.vw-select:focus-visible {
+  outline: none;
+  border-color: var(--vw-color-accent-500);
+  box-shadow: 0 0 0 3px var(--vw-color-accent-100);
+}
+
+.vw-select.nst-input--error { border-color: var(--vw-color-red-500); }
+.vw-select.nst-input--error:focus { box-shadow: 0 0 0 3px var(--vw-color-red-100); }
+
+.vw-select:disabled {
+  background-color: var(--vw-color-gray-50);
+  border-color: var(--vw-color-gray-200);
+  color: var(--vw-color-gray-300);
+  cursor: not-allowed;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%23d1d5db' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Nothing chosen yet. A native select cannot style its own
+   selected option from the outside, so the caller marks the
+   element — [data-placeholder] while the empty option is current. */
+.vw-select[data-placeholder] { color: var(--vw-color-gray-400); }
+
+/* ── Listbox layer — only for what native cannot do ──────────
+   Multi-select and in-dropdown search. Native <select multiple>
+   is a scrolling box with ctrl-click, which is the reason every
+   design system replaces it.
+
+   Trigger: .nst-input-shell (it already carries border, focus,
+   error, disabled and .is-active for "owns the open popover").
+   Positioning: .nst-anchor. Selected values: .vw-chip.
+   Per-option tick: .vw-check. Empty results: .vw-empty.
+   None of those are rebuilt here. */
+
+.vw-select-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  max-height: 280px;
+  padding: var(--vw-space-xxs);
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Search stays put while the list scrolls under it. */
+.vw-select-search {
+  flex-shrink: 0;
+  padding: var(--vw-space-xxs) var(--vw-space-xxs) var(--vw-space-sm);
+  border-bottom: 1px solid var(--vw-color-gray-100);
+  margin-bottom: var(--vw-space-xxs);
+}
+
+.vw-select-list {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.vw-select-option {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+  width: 100%;
+  padding: var(--vw-space-xs) var(--vw-space-sm);
+  border: none;
+  border-radius: var(--vw-radius-xs);
+  background: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  line-height: 20px;
+  color: var(--vw-color-gray-800);
+  text-align: left;
+  cursor: pointer;
+}
+
+.vw-select-option:hover:not(:disabled),
+.vw-select-option.is-focused { background: var(--vw-color-gray-50); }
+
+.vw-select-option.is-selected {
+  background: var(--vw-color-accent-50);
+  color: var(--vw-color-gray-900);
+  font-weight: 500;
+}
+
+.vw-select-option:disabled {
+  color: var(--vw-color-gray-300);
+  cursor: not-allowed;
+}
+
+/* isDefaultOption — the "Select all" row, held apart from the
+   options it controls. */
+.vw-select-option--all {
+  border-bottom: 1px solid var(--vw-color-gray-100);
+  border-radius: 0;
+  margin-bottom: var(--vw-space-xxs);
+  font-weight: 500;
+}
+
+/* customMultiselect: chosen values as chips in the trigger. */
+.vw-select-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vw-space-xxs);
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-select { transition: none; }
+}

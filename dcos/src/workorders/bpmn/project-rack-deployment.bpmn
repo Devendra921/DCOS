@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_rack_deployment" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_rack_deployment">
+    <bpmn:participant id="Participant_project_rack_deployment" name="PRJ-03 · Rack deployment" processRef="project-rack-deployment" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-rack-deployment" name="Rack deployment" isExecutable="true">
+    <bpmn:documentation>Deploys a set of racks into a live hall: rack elevations and the power budget are approved (re-planned if power or space is short), racks and kit are ordered and received, then rack-and-stack, cabling and power, and burn-in run as work orders under change (most are standard changes). Failed burn-in results go back to installation; operations accepts the racks and the capacity is released.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_rack_deployment">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_capacity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>replan</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>order</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>receive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_delayed_expedite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>expedite</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_install</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_install</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_cabling</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_cabling</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_burnin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_burnin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>validate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_tests</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>handover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>release</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Deployment approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve rack elevations and power budget">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="design-review" />
+        <zeebe:assignmentDefinition candidateGroups="Capacity Planner" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:incoming>Flow_replan_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_g_capacity</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_capacity" name="Power and space confirmed?" default="Flow_g_capacity_order">
+      <bpmn:incoming>Flow_design_g_capacity</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_capacity_order</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_capacity_replan</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="replan" name="Re-plan placement">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Capacity Planner" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_capacity_replan</bpmn:incoming>
+      <bpmn:outgoing>Flow_replan_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="order" name="Order racks and kit">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="commercial-approval" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_capacity_order</bpmn:incoming>
+      <bpmn:outgoing>Flow_order_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="receive" name="Receive and stage kit">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="receive-delivery" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P5D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_order_receive</bpmn:incoming>
+      <bpmn:incoming>Flow_expedite_receive</bpmn:incoming>
+      <bpmn:outgoing>Flow_receive_raise_install</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_delayed_expedite" name="Delivery delayed" attachedToRef="receive" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_delayed_expedite_expedite</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_delayed_expedite" messageRef="Message_b_delayed_expedite" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="expedite" name="Expedite with the vendor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_delayed_expedite_expedite</bpmn:incoming>
+      <bpmn:outgoing>Flow_expedite_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_install" name="Raise rack and stack work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_receive_raise_install</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_install_wait_install</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_install" name="Rack and stack work closed">
+      <bpmn:incoming>Flow_raise_install_wait_install</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_install_raise_cabling</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_install" messageRef="Message_wait_install" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_cabling" name="Raise cabling and power work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_install_raise_cabling</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_cabling_wait_cabling</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_cabling" name="Cabling and power work closed">
+      <bpmn:incoming>Flow_raise_cabling_wait_cabling</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_cabling_raise_burnin</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_cabling" messageRef="Message_wait_cabling" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_burnin" name="Raise burn-in work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_cabling_raise_burnin</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_burnin_wait_burnin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_burnin" name="Burn-in work closed">
+      <bpmn:incoming>Flow_raise_burnin_wait_burnin</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_burnin_validate</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_burnin" messageRef="Message_wait_burnin" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="validate" name="Validate burn-in results">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acceptance-tests" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_burnin_validate</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_validate</bpmn:incoming>
+      <bpmn:outgoing>Flow_validate_g_tests</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_tests" name="Tests passed?" default="Flow_g_tests_handover">
+      <bpmn:incoming>Flow_validate_g_tests</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_tests_handover</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_tests_fix</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix" name="Fix failed nodes">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="fix-findings" />
+        <zeebe:assignmentDefinition candidateGroups="Field Technician" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_tests_fix</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_validate</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="handover" name="Accept racks into operations">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="handover" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_tests_handover</bpmn:incoming>
+      <bpmn:outgoing>Flow_handover_release</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="release" name="Release capacity">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.release-capacity" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_handover_release</bpmn:incoming>
+      <bpmn:outgoing>Flow_release_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="Racks in service">
+      <bpmn:incoming>Flow_release_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_g_capacity" sourceRef="design" targetRef="g_capacity" />
+    <bpmn:sequenceFlow id="Flow_g_capacity_order" name="confirmed" sourceRef="g_capacity" targetRef="order">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_capacity_replan" name="short" sourceRef="g_capacity" targetRef="replan">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_replan_design" sourceRef="replan" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_order_receive" sourceRef="order" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_receive_raise_install" sourceRef="receive" targetRef="raise_install" />
+    <bpmn:sequenceFlow id="Flow_raise_install_wait_install" sourceRef="raise_install" targetRef="wait_install" />
+    <bpmn:sequenceFlow id="Flow_wait_install_raise_cabling" sourceRef="wait_install" targetRef="raise_cabling" />
+    <bpmn:sequenceFlow id="Flow_raise_cabling_wait_cabling" sourceRef="raise_cabling" targetRef="wait_cabling" />
+    <bpmn:sequenceFlow id="Flow_wait_cabling_raise_burnin" sourceRef="wait_cabling" targetRef="raise_burnin" />
+    <bpmn:sequenceFlow id="Flow_raise_burnin_wait_burnin" sourceRef="raise_burnin" targetRef="wait_burnin" />
+    <bpmn:sequenceFlow id="Flow_wait_burnin_validate" sourceRef="wait_burnin" targetRef="validate" />
+    <bpmn:sequenceFlow id="Flow_validate_g_tests" sourceRef="validate" targetRef="g_tests" />
+    <bpmn:sequenceFlow id="Flow_expedite_receive" sourceRef="expedite" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_g_tests_handover" name="passed" sourceRef="g_tests" targetRef="handover">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_tests_fix" name="failed nodes" sourceRef="g_tests" targetRef="fix">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_validate" sourceRef="fix" targetRef="validate" />
+    <bpmn:sequenceFlow id="Flow_handover_release" sourceRef="handover" targetRef="release" />
+    <bpmn:sequenceFlow id="Flow_release_end" sourceRef="release" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_delayed_expedite_expedite" sourceRef="b_delayed_expedite" targetRef="expedite" />
+  </bpmn:process>
+  <bpmn:message id="Message_b_delayed_expedite" name="delivery-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_install" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_install&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_cabling" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_cabling&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_burnin" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_burnin&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_rack_deployment">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_rack_deployment" bpmnElement="Collaboration_project_rack_deployment">
+      <bpmndi:BPMNShape id="Participant_project_rack_deployment_di" bpmnElement="Participant_project_rack_deployment" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2810" height="1065" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2780" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="995" width="2780" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_capacity_di" bpmnElement="g_capacity">
+        <dc:Bounds x="605" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="replan_di" bpmnElement="replan">
+        <dc:Bounds x="740" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="order_di" bpmnElement="order">
+        <dc:Bounds x="740" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receive_di" bpmnElement="receive">
+        <dc:Bounds x="910" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_delayed_expedite_di" bpmnElement="b_delayed_expedite">
+        <dc:Bounds x="982" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="expedite_di" bpmnElement="expedite">
+        <dc:Bounds x="1080" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_install_di" bpmnElement="raise_install">
+        <dc:Bounds x="1080" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_install_di" bpmnElement="wait_install">
+        <dc:Bounds x="1292" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_cabling_di" bpmnElement="raise_cabling">
+        <dc:Bounds x="1420" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_cabling_di" bpmnElement="wait_cabling">
+        <dc:Bounds x="1632" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_burnin_di" bpmnElement="raise_burnin">
+        <dc:Bounds x="1760" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_burnin_di" bpmnElement="wait_burnin">
+        <dc:Bounds x="1972" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="validate_di" bpmnElement="validate">
+        <dc:Bounds x="2100" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_tests_di" bpmnElement="g_tests">
+        <dc:Bounds x="2305" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_di" bpmnElement="fix">
+        <dc:Bounds x="2440" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handover_di" bpmnElement="handover">
+        <dc:Bounds x="2440" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="release_di" bpmnElement="release">
+        <dc:Bounds x="2610" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2822" y="1052" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="305" />
+        <di:waypoint x="400" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_g_capacity_di" bpmnElement="Flow_design_g_capacity">
+        <di:waypoint x="520" y="305" />
+        <di:waypoint x="605" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_capacity_order_di" bpmnElement="Flow_g_capacity_order">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="560" />
+        <di:waypoint x="740" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_capacity_replan_di" bpmnElement="Flow_g_capacity_replan">
+        <di:waypoint x="655" y="305" />
+        <di:waypoint x="715" y="305" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="740" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_replan_design_di" bpmnElement="Flow_replan_design">
+        <di:waypoint x="800" y="450" />
+        <di:waypoint x="800" y="362" />
+        <di:waypoint x="460" y="362" />
+        <di:waypoint x="460" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_order_receive_di" bpmnElement="Flow_order_receive">
+        <di:waypoint x="860" y="560" />
+        <di:waypoint x="910" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_receive_raise_install_di" bpmnElement="Flow_receive_raise_install">
+        <di:waypoint x="1030" y="560" />
+        <di:waypoint x="1055" y="560" />
+        <di:waypoint x="1055" y="815" />
+        <di:waypoint x="1080" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_install_wait_install_di" bpmnElement="Flow_raise_install_wait_install">
+        <di:waypoint x="1200" y="815" />
+        <di:waypoint x="1292" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_install_raise_cabling_di" bpmnElement="Flow_wait_install_raise_cabling">
+        <di:waypoint x="1328" y="815" />
+        <di:waypoint x="1420" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_cabling_wait_cabling_di" bpmnElement="Flow_raise_cabling_wait_cabling">
+        <di:waypoint x="1540" y="815" />
+        <di:waypoint x="1632" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_cabling_raise_burnin_di" bpmnElement="Flow_wait_cabling_raise_burnin">
+        <di:waypoint x="1668" y="815" />
+        <di:waypoint x="1760" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_burnin_wait_burnin_di" bpmnElement="Flow_raise_burnin_wait_burnin">
+        <di:waypoint x="1880" y="815" />
+        <di:waypoint x="1972" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_burnin_validate_di" bpmnElement="Flow_wait_burnin_validate">
+        <di:waypoint x="2008" y="815" />
+        <di:waypoint x="2075" y="815" />
+        <di:waypoint x="2075" y="1070" />
+        <di:waypoint x="2100" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_validate_g_tests_di" bpmnElement="Flow_validate_g_tests">
+        <di:waypoint x="2220" y="1070" />
+        <di:waypoint x="2305" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_expedite_receive_di" bpmnElement="Flow_expedite_receive">
+        <di:waypoint x="1140" y="705" />
+        <di:waypoint x="1140" y="617" />
+        <di:waypoint x="970" y="617" />
+        <di:waypoint x="970" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_tests_handover_di" bpmnElement="Flow_g_tests_handover">
+        <di:waypoint x="2355" y="1070" />
+        <di:waypoint x="2440" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_tests_fix_di" bpmnElement="Flow_g_tests_fix">
+        <di:waypoint x="2355" y="1070" />
+        <di:waypoint x="2415" y="1070" />
+        <di:waypoint x="2415" y="920" />
+        <di:waypoint x="2440" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_validate_di" bpmnElement="Flow_fix_validate">
+        <di:waypoint x="2500" y="960" />
+        <di:waypoint x="2500" y="1127" />
+        <di:waypoint x="2160" y="1127" />
+        <di:waypoint x="2160" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_handover_release_di" bpmnElement="Flow_handover_release">
+        <di:waypoint x="2560" y="1070" />
+        <di:waypoint x="2610" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_release_end_di" bpmnElement="Flow_release_end">
+        <di:waypoint x="2730" y="1070" />
+        <di:waypoint x="2822" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_delayed_expedite_expedite_di" bpmnElement="Flow_b_delayed_expedite_expedite">
+        <di:waypoint x="1000" y="618" />
+        <di:waypoint x="1000" y="628" />
+        <di:waypoint x="1055" y="628" />
+        <di:waypoint x="1055" y="665" />
+        <di:waypoint x="1080" y="665" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

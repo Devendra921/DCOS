@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_work_type_skill" name="Work type skill" namespace="http://dcos.example.com/dmn" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="work-type-skill" name="Work type → skill &amp; permit">
+    <description>Resolves the skill a technician must hold and the permit the work order needs before it can be assigned. Hit policy UNIQUE — one row per work-order type.</description>
+    <decisionTable id="DecisionTable_work_type_skill" hitPolicy="UNIQUE">
+      <input id="Input_workType" label="Work type">
+        <inputExpression id="InputExpression_workType" typeRef="string">
+          <text>workType</text>
+        </inputExpression>
+        <inputValues id="InputValues_workType"><text>"RackInstall","Cabling","PowerConnect","DeviceDeploy"</text></inputValues>
+      </input>
+      <output id="Output_skill" label="Required skill" name="skill" typeRef="string" />
+      <output id="Output_permit" label="Permit" name="permit" typeRef="string" />
+      <rule id="Rule_ws_1">
+        <inputEntry id="UnaryTests_ws_1_1"><text>"RackInstall"</text></inputEntry>
+        <outputEntry id="LiteralExpression_ws_1_1"><text>"Rigging &amp; rack assembly"</text></outputEntry>
+        <outputEntry id="LiteralExpression_ws_1_2"><text>"Lifting / manual handling"</text></outputEntry>
+      </rule>
+      <rule id="Rule_ws_2">
+        <inputEntry id="UnaryTests_ws_2_1"><text>"Cabling"</text></inputEntry>
+        <outputEntry id="LiteralExpression_ws_2_1"><text>"Structured cabling (fibre &amp; copper)"</text></outputEntry>
+        <outputEntry id="LiteralExpression_ws_2_2"><text>"None"</text></outputEntry>
+      </rule>
+      <rule id="Rule_ws_3">
+        <inputEntry id="UnaryTests_ws_3_1"><text>"PowerConnect"</text></inputEntry>
+        <outputEntry id="LiteralExpression_ws_3_1"><text>"Licensed electrician"</text></outputEntry>
+        <outputEntry id="LiteralExpression_ws_3_2"><text>"Electrical work permit (LOTO)"</text></outputEntry>
+      </rule>
+      <rule id="Rule_ws_4">
+        <inputEntry id="UnaryTests_ws_4_1"><text>"DeviceDeploy"</text></inputEntry>
+        <outputEntry id="LiteralExpression_ws_4_1"><text>"Device install &amp; bring-up"</text></outputEntry>
+        <outputEntry id="LiteralExpression_ws_4_2"><text>"Change window ticket"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_work_type_skill">
+      <dmndi:DMNShape id="DMNShape_work_type_skill" dmnElementRef="work-type-skill">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

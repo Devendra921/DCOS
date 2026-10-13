@@ -1,0 +1,227 @@
+/**
+ * Capacity Forecaster — app-specific layout and aliases only.
+ *
+ *   import "./vw-global.scss";  (new_variables + new_classes v1.2 — React port)
+ *   import "./cf-global.css";   (CF layout + heading aliases)
+ *
+ * Source SCSS (Angular originals): src/styles/source/
+ */
+@import "./uig-palette.css";
+@import "./cf-tokens.css";
+
+/* Heading aliases → VW typography tokens */
+.cf-heading-md {
+  font-size: var(--vw-font-heading-md, 1rem);
+  font-weight: 500;
+  line-height: var(--vw-line-heading-md, 1.75);
+  color: var(--vw-color-gray-900);
+}
+
+.cf-heading-sm {
+  font-size: var(--vw-font-heading-sm, 0.875rem);
+  font-weight: 500;
+  line-height: var(--vw-line-heading-sm, 1.5);
+  color: var(--vw-color-gray-900);
+}
+
+.cf-description {
+  font-size: var(--vw-font-description, 0.875rem);
+  font-weight: 400;
+  line-height: var(--vw-line-description, 1.25);
+  color: var(--vw-color-gray-500);
+}
+
+.cf-text-warning {
+  color: var(--vw-color-warning);
+}
+
+.cf-text-success {
+  color: var(--vw-color-success);
+}
+
+.cf-text-critical {
+  color: var(--vw-color-danger);
+}
+
+/* ── Layout / surfaces (CF-only) ─────────────────────────────────── */
+.cf-model-fit-split {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--cf-layout-gap);
+}
+
+.cf-model-fit-main {
+  flex: 6 1 0%;
+  min-width: 0;
+}
+
+.cf-model-fit-diag {
+  flex: 4 1 0%;
+  min-width: 0;
+}
+
+.cf-model-accuracy-split {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--cf-layout-gap);
+}
+
+.cf-model-accuracy-main {
+  flex: 6 1 0%;
+  min-width: 0;
+}
+
+.cf-model-accuracy-scatter {
+  flex: 4 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cf-scatter-fit {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.cf-scatter-fit__chart {
+  flex: 1;
+  min-height: 280px;
+  width: 100%;
+}
+
+.cf-forecast-split {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--cf-layout-gap);
+}
+
+.cf-forecast-chart {
+  flex: 7 1 0%;
+  min-width: 0;
+}
+
+.cf-forecast-whatif {
+  flex: 3 1 0%;
+  min-width: 0;
+}
+
+.cf-resource-strip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--cf-layout-gap);
+}
+
+.cf-resource-strip > button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.cf-resource-card--active.cf-resource-card--cpu {
+  background-color: #fffbfa;
+  border-color: #fda29b;
+}
+.cf-resource-card--active.cf-resource-card--cpu .vw-card-title-sm {
+  color: #dc2626;
+}
+
+.cf-resource-card--active.cf-resource-card--memory {
+  background-color: #fbfeff;
+  border-color: #94cfec;
+}
+.cf-resource-card--active.cf-resource-card--memory .vw-card-title-sm {
+  color: #1d4ed8;
+}
+
+.cf-resource-card--active.cf-resource-card--storage {
+  background-color: #fcfdfc;
+  border-color: #81c784;
+}
+.cf-resource-card--active.cf-resource-card--storage .vw-card-title-sm {
+  color: #2e7d32;
+}
+
+.cf-resource-card--active.cf-resource-card--network {
+  background-color: #fffdf3;
+  border-color: #ffce6d;
+}
+.cf-resource-card--active.cf-resource-card--network .vw-card-title-sm {
+  color: #d97706;
+}
+
+.cf-resource-card--active.cf-resource-card--gpu {
+  background-color: #fef7fb;
+  border-color: #db2777;
+}
+.cf-resource-card--active.cf-resource-card--gpu .vw-card-title-sm {
+  color: #db2777;
+}
+
+@media (min-width: 1024px) {
+  .cf-model-fit-split {
+    flex-direction: row;
+  }
+
+  .cf-model-accuracy-split {
+    flex-direction: row;
+  }
+
+  .cf-forecast-split {
+    flex-direction: row;
+  }
+
+  .cf-resource-strip {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Tab bar (CF-specific; uses cf-tokens) */
+.cf-tab-bar-btn {
+  color: var(--cf-tab-inactive-color);
+  border-bottom-color: transparent;
+  background: transparent;
+}
+
+.cf-tab-bar-btn:not(.cf-tab-bar-btn--active):hover {
+  color: var(--cf-tab-inactive-color);
+  border-bottom-color: transparent;
+  background: transparent;
+}
+
+.cf-tab-bar-btn--active {
+  color: var(--cf-tab-active-color);
+  border-bottom-color: var(--cf-tab-active-underline);
+}
+
+.cf-tab-bar-btn--active:hover {
+  color: var(--cf-tab-active-color);
+  background: transparent;
+}
+
+/* Range input (forecast sliders) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--cf-range-track-bg);
+  border-radius: 999px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cf-range-thumb-bg);
+  cursor: pointer;
+  border: 2px solid var(--cf-range-thumb-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}

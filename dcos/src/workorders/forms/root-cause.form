@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "root-cause",
+  "type": "default",
+  "components": [
+    { "id": "Text_rca_intro", "type": "text", "text": "### Root cause\nRecord what caused the incident, what made it worse and the actions that stop it happening again. Say whether the fix needs a disruptive step; a disruptive step is approved before it runs." },
+    { "id": "Field_causeCategory", "type": "select", "key": "causeCategory", "label": "Cause category", "values": [{"label": "Power", "value": "power"}, {"label": "Cooling", "value": "cooling"}, {"label": "Network", "value": "network"}, {"label": "Hardware failure", "value": "hardware"}, {"label": "Software or firmware", "value": "software"}, {"label": "Human error", "value": "human"}, {"label": "Process gap", "value": "process"}, {"label": "Supplier or third party", "value": "supplier"}, {"label": "Environment (weather, water, fire)", "value": "environment"}, {"label": "Not known yet", "value": "unknown"}], "validate": {"required": true} },
+    { "id": "Field_rootCause", "type": "textarea", "key": "rootCause", "label": "Root cause", "validate": {"required": true} },
+    { "id": "Field_contributingFactors", "type": "textarea", "key": "contributingFactors", "label": "Contributing factors (optional)" },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Evidence (optional)", "multiple": true, "accept": "image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip", "description": "Logs, alarm exports, photos or readings." },
+    { "id": "List_correctiveActions", "type": "dynamiclist", "path": "correctiveActions", "label": "Corrective actions", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_ca_action", "type": "textfield", "key": "action", "label": "Action", "validate": {"required": true}, "layout": {"row": "Row_ca", "columns": 8} },
+      { "id": "Field_ca_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_ca", "columns": 4} },
+      { "id": "Field_ca_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_ca", "columns": 4} }
+    ] },
+    { "id": "Field_fixType", "type": "radio", "key": "fixType", "label": "Does the fix need a disruptive step?", "values": [{"label": "No, it can be done without risk to service", "value": "non-disruptive"}, {"label": "Yes, it needs an outage or puts service at risk", "value": "disruptive"}], "validate": {"required": true} },
+    { "id": "Field_disruptiveStep", "type": "textarea", "key": "disruptiveStep", "label": "Describe the disruptive step", "description": "What will be done, the risk and how long service is exposed.", "validate": {"required": true}, "conditional": {"hide": "=not(fixType = \"disruptive\")"} },
+    { "id": "Expr_disruptive", "type": "expression", "key": "disruptive", "expression": "=fixType = \"disruptive\"", "computeOn": "change" }
+  ]
+}

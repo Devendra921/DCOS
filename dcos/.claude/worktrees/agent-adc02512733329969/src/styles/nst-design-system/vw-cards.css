@@ -1,0 +1,3273 @@
+/* ============================================================
+   NST Design System — vw-card classes
+   Ported from core-mixin.scss (gx-theme) per guidelines vw-cards page.
+   Requires: colors.css, spacing.css, typography-tokens.css
+   ============================================================ */
+
+/* ── Card containers ─────────────────────────────────────── */
+
+.vw-card-section {
+  background-color: var(--vw-color-white);
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: var(--vw-radius-lg);
+  padding: var(--vw-space-lg);
+}
+
+.vw-card-parent {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--vw-color-white);
+  border: 1px solid var(--vw-color-slate-300);
+  border-radius: var(--vw-radius-lg);
+  padding: var(--vw-space-lg);
+  gap: var(--vw-space-sm);
+}
+
+.vw-card-child {
+  padding: var(--vw-space-sm);
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: var(--vw-radius-sm);
+  background-color: var(--vw-color-white);
+}
+
+.vw-card-child-shaded {
+  padding: var(--vw-space-sm);
+  border: 1px solid var(--vw-color-slate-200);
+  border-radius: var(--vw-radius-sm);
+  background-color: var(--vw-color-slate-50);
+}
+
+.vw-card-footer-divider {
+  border-top: 1px solid var(--vw-color-slate-200);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.vw-card--clickable {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, outline-color 0.2s ease;
+}
+
+.vw-card--clickable:hover {
+  box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  border-color: var(--vw-color-slate-400);
+}
+
+.vw-card--clickable:focus-visible {
+  outline: 2px solid var(--vw-color-slate-400);
+  outline-offset: 2px;
+}
+
+/* ── Status accent strip ─────────────────────────────────── */
+/* For cards that must carry a status colour WITHOUT tinting the whole
+   surface (data-dense boards where a tinted card would be too loud). Pair
+   .vw-card--accent on the host with a .vw-card-accent child as the first node.
+   The strip is absolutely positioned and reserves no space itself — add
+   ~3px extra top padding on the host (e.g. `padding-top: calc(var(--vw-space-lg) + 3px)`)
+   so card content doesn't sit underneath it:
+
+     <div class="vw-card-section vw-card--accent" style="padding-top: calc(var(--vw-space-lg) + 3px);">
+       <div class="vw-card-accent" style="background:var(--vw-color-emerald-500);"></div>
+       ...card content...
+     </div> */
+
+.vw-card--accent {
+  position: relative;
+  overflow: hidden;
+}
+
+.vw-card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--vw-radius-lg) var(--vw-radius-lg) 0 0;
+}
+
+/* ── Semantic card variants ──────────────────────────────── */
+
+.vw-card--success {
+  background-color: var(--vw-color-emerald-25);
+  border-color: var(--vw-color-emerald-200);
+}
+
+.vw-card--error {
+  background-color: var(--vw-color-red-25);
+  border-color: var(--vw-color-red-200);
+}
+
+.vw-card--warning {
+  background-color: var(--vw-color-amber-25);
+  border-color: var(--vw-color-amber-200);
+}
+
+.vw-card--info {
+  background-color: var(--vw-color-sky-25);
+  border-color: var(--vw-color-sky-200);
+}
+
+.vw-card--fuchsia {
+  background-color: var(--vw-color-fuchsia-25);
+  border-color: var(--vw-color-fuchsia-300);
+}
+
+.vw-card--purple {
+  background-color: var(--vw-color-purple-25);
+  border-color: var(--vw-color-purple-300);
+}
+
+.vw-card--cyan {
+  background-color: var(--vw-color-cyan-25);
+  border-color: var(--vw-color-cyan-300);
+}
+
+.vw-card--yellow {
+  background-color: var(--vw-color-yellow-25);
+  border-color: var(--vw-color-yellow-300);
+}
+
+.vw-card--orange {
+  background-color: var(--vw-color-orange-25);
+  border-color: var(--vw-color-orange-300);
+}
+
+/* ── Card typography ─────────────────────────────────────── */
+
+.vw-card-title {
+  font-size: var(--vw-font-heading-md);
+  font-weight: 500;
+  line-height: var(--vw-line-heading-md);
+  color: var(--vw-color-gray-800);
+}
+
+.vw-card-title-lg {
+  font-size: var(--vw-font-heading-lg);
+  font-weight: 500;
+  line-height: var(--vw-line-heading-lg);
+  color: var(--vw-color-gray-800);
+}
+
+.vw-card-title-sm {
+  font-size: var(--vw-font-heading-sm);
+  font-weight: 500;
+  line-height: var(--vw-line-heading-sm);
+  color: var(--vw-color-gray-800);
+}
+
+.vw-card-description {
+  font-size: var(--vw-font-description);
+  line-height: var(--vw-line-description);
+  font-weight: 400;
+  color: var(--vw-color-gray-500);
+}
+
+.vw-card-activity-label {
+  font-size: var(--vw-font-label-md);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--vw-color-gray-800);
+}
+
+.vw-card-activity-value {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--vw-color-gray-500);
+}
+
+.vw-label {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--vw-color-gray-500);
+}
+
+.vw-value {
+  font-size: var(--vw-font-description);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--vw-color-gray-900);
+}
+
+.vw-sub-title {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--vw-color-gray-600);
+}
+
+.vw-footer-meta {
+  font-size: var(--vw-font-label-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--vw-color-gray-500);
+}
+
+/* ── Page typography ─────────────────────────────────────── */
+
+.vw-page-title {
+  font-size: var(--vw-font-heading-xl);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--vw-color-slate-800);
+}
+
+.vw-page-description {
+  font-size: var(--vw-font-description);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--vw-color-slate-700);
+}
+
+.vw-page-container {
+  padding: var(--vw-page-gap);
+  gap: var(--vw-page-gap);
+  background: transparent;
+}
+
+/* ── Metric numerals ─────────────────────────────────────── */
+
+.vw-card-metric-xxxl,
+.vw-card-metric-xxl,
+.vw-card-metric-xl,
+.vw-card-metric-lg,
+.vw-card-metric-md,
+.vw-card-metric-sm,
+.vw-card-metric-xs,
+.vw-card-metric-xxs,
+.vw-card-metric-xxxs {
+  font-weight: 300;
+  line-height: 1;
+  color: var(--vw-color-gray-950, var(--vw-color-gray-900));
+}
+
+.vw-card-metric-xxxl { font-size: var(--vw-font-value-xxxl); }
+.vw-card-metric-xxl  { font-size: var(--vw-font-value-xxl); }
+.vw-card-metric-xl   { font-size: var(--vw-font-value-xl); }
+.vw-card-metric-lg   { font-size: var(--vw-font-value-lg); }
+.vw-card-metric-md   { font-size: var(--vw-font-value-md); }
+.vw-card-metric-sm   { font-size: var(--vw-font-value-sm); }
+.vw-card-metric-xs   { font-size: var(--vw-font-value-xs); }
+.vw-card-metric-xxs  { font-size: var(--vw-font-value-xxs); }
+.vw-card-metric-xxxs { font-size: var(--vw-font-value-xxxs); }
+
+.vw-card-metric-label,
+.vw-card-metric-label-sub,
+.vw-card-metric-label-sm {
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--vw-color-gray-500);
+}
+
+.vw-card-metric-label    { font-size: var(--vw-font-label-md); }
+.vw-card-metric-label-sub,
+.vw-card-metric-label-sm { font-size: var(--vw-font-label-sm); }
+
+/* ── Variance / trend ────────────────────────────────────── */
+/* is-positive/is-negative/is-neutral is TONE (does this mean something good,
+   bad, or neither) — deliberately independent from the optional
+   .vw-card-variance-icon's direction (did the number go up or down). A
+   rising count can still be bad (more On-Hold vendors), so tone is always
+   the caller's call, never inferred from the icon:
+
+     <div class="vw-card-variance is-negative">
+       <i class="ph ph-caret-up vw-card-variance-icon"></i>
+       +2 On-Hold vendors
+     </div>
+
+   Icon is optional — omit it for a plain colored value, as in the original
+   spec. Uses Phosphor Icons (see "Icons" in COMPONENTS.md) — ph-caret-up/
+   ph-caret-down are two distinct glyphs, not one rotated via CSS. */
+
+.vw-card-variance {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--vw-font-legend);
+  font-weight: 500;
+  line-height: var(--vw-line-legend);
+}
+
+.vw-card-variance-icon {
+  flex-shrink: 0;
+  /* Glyph size for the caret icon, NOT type — see the note on
+     .nst-table-kebab in components.css. */
+  font-size: 12px;
+}
+
+.vw-card-variance.is-positive { color: var(--vw-color-green-600); }
+.vw-card-variance.is-negative { color: var(--vw-color-red-600); }
+.vw-card-variance.is-neutral  { color: var(--vw-color-gray-500); }
+
+/* ── Card icons ──────────────────────────────────────────── */
+
+.vw-card-icon-sm,
+.vw-card-icon-md,
+.vw-card-icon-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--vw-radius-sm);
+}
+
+.vw-card-icon-sm { width: 2rem;   height: 2rem; }
+.vw-card-icon-md { width: 2.5rem; height: 2.5rem; }
+.vw-card-icon-lg { width: 3rem;   height: 3rem; }
+
+/* ============================================================
+   Skeleton / shimmer — loading placeholder
+
+   Promoted from two independently-built consuming apps that
+   arrived at byte-identical values: the same 90deg gradient, the
+   same 400% background-size, the same 1.4s ease infinite sweep.
+   When two teams converge on a number without talking, that is
+   the shape — not one team's taste.
+
+   Two backdrops, because a skeleton has to sit on something:
+   .vw-skeleton is tuned for the page canvas; add --on-surface
+   inside a white .vw-card-section, where the gray pair reads as
+   a dirty smudge. Both apps had discovered this and defined two
+   gradients; only one of them named the distinction.
+
+   Deliberate change from both references: they used the page's own
+   gray-100 as the BASE and swept darker, so the placeholder was
+   visible only while animating. Stop the animation — which is
+   exactly what prefers-reduced-motion does — and it vanishes into
+   the background. Here the base is the darker tone and the sweep
+   is the lighter highlight, so it reads as a placeholder at rest
+   and still shimmers in motion.
+
+   Respects prefers-reduced-motion — neither hand-rolled version
+   did, which is a fair part of why this belongs in the registry.
+
+     <div class="vw-skeleton vw-skeleton-line"></div>
+     <div class="vw-skeleton vw-skeleton-line" style="width:60%"></div>
+     <div class="vw-skeleton vw-skeleton-block"></div>
+     <div class="vw-card-section">
+       <div class="vw-skeleton vw-skeleton--on-surface vw-skeleton-line"></div>
+     </div>
+   ============================================================ */
+
+.vw-skeleton {
+  background-color: var(--vw-color-gray-200);
+  background-image: linear-gradient(
+    90deg,
+    var(--vw-color-gray-200) 25%,
+    var(--vw-color-gray-100) 37%,
+    var(--vw-color-gray-200) 63%
+  );
+  background-size: 400% 100%;
+  animation: vw-skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--vw-radius-xs);
+}
+
+/* Inside a white card the canvas pair is too heavy — lighten one step. */
+.vw-skeleton.vw-skeleton--on-surface {
+  background-color: var(--vw-color-gray-100);
+  background-image: linear-gradient(
+    90deg,
+    var(--vw-color-gray-100) 25%,
+    var(--vw-color-white) 37%,
+    var(--vw-color-gray-100) 63%
+  );
+}
+
+/* A line of text. Stack several for a paragraph; set an inline
+   width on the last one so the block doesn't read as a solid bar. */
+.vw-skeleton-line {
+  height: 0.875rem;
+}
+
+.vw-skeleton-line + .vw-skeleton-line {
+  margin-top: var(--vw-space-sm);
+}
+
+/* A card, chart, or form-sized area awaiting content. */
+.vw-skeleton-block {
+  min-height: 7.5rem;
+  border-radius: var(--vw-radius-lg);
+}
+
+@keyframes vw-skeleton-shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-skeleton {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Avatar — initials in a circle
+
+   Promoted from 13 near-identical definitions across two
+   independently-built consuming apps. What they agreed on:
+   24px (10 of 13), gray-200 ground (10), weight 600 (10), a full
+   circle (11), and 10px initials (11, written as either 10px or
+   0.65rem). --lg covers the 28/32px they used for the app-shell
+   user avatar.
+
+   Initials only, deliberately. All 13 render text — not one holds
+   an image — so there is no img sizing or overflow handling here.
+   Add it when something actually needs it.
+
+   The caller supplies the initials already uppercased (every app
+   did it in JS), so there is no text-transform either.
+
+   For a tinted avatar — one app tinted by semantic tone — set the
+   two colors inline from tokens rather than adding a class:
+     style="background: var(--vw-color-blue-100);
+            color: var(--vw-color-blue-600)"
+
+     <span class="vw-avatar">AM</span>
+     <span class="vw-avatar vw-avatar--lg">AM</span>
+   ============================================================ */
+
+.vw-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-gray-200);
+  color: var(--vw-color-gray-700);
+  font-family: var(--fontFamily);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+}
+
+.vw-avatar.vw-avatar--lg {
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--vw-font-label-sm);
+}
+
+/* ============================================================
+   Tabs — .vw-tabs / .vw-tab
+
+   Promoted from 11 hand-rolled implementations across THREE
+   independently-built apps. preview/tabs.html had existed the
+   whole time; it was not usable, which is the actual reason
+   they all rebuilt it:
+
+     - it is authored on the Figma/atomic layer (--color-ink-*,
+       --color-surface) and forces `* { font-family: Inter }`,
+       while every app that wanted tabs is a Poppins dashboard
+       on --vw-color-*. Nothing in it could be copied across.
+     - it hardcodes 14px / 8px / 24px rather than tokens.
+     - it carries no ARIA at all.
+
+   So the apps took its SHAPE and rebuilt everything else — and
+   independently agreed on the result. Where they agreed, that is
+   what ships here; where they disagreed with the old specimen,
+   they win:
+
+     active colour   gray-900   (all of them; specimen said
+                                 accent-500 — three teams chose
+                                 neutral over themeable accent,
+                                 matching this system's flat,
+                                 low-chroma language)
+     underline       2px solid transparent -> gray-900
+     label           --vw-font-label-md, weight 600 when active
+     icon gap        6px in all three; 8px here, the nearest real
+                     token (--vw-space-* jumps 4 -> 8)
+
+   TWO shapes ship, by demand: horizontal underline (8 of the 11)
+   and vertical filter list (3 of 11). The old specimen's
+   segmented pill `.seg` had ZERO uses across all three apps and
+   is deliberately NOT promoted — same rule that kept the stacked
+   avatar group out.
+
+   Selection is honoured from EITHER .is-active or
+   aria-selected="true", so correct ARIA markup styles itself and
+   the two cannot disagree.
+
+     <div class="vw-tabs" role="tablist" aria-label="Sections">
+       <button role="tab" aria-selected="true"  aria-controls="p1" id="t1"
+               class="vw-tab">Overview</button>
+       <button role="tab" aria-selected="false" aria-controls="p2" id="t2"
+               class="vw-tab" tabindex="-1">Activity</button>
+     </div>
+     <div role="tabpanel" id="p1" aria-labelledby="t1">…</div>
+
+   Roving tabindex + arrow-key navigation is the caller's job —
+   this is styling only, exactly as .nst-overlay is.
+   ============================================================ */
+
+.vw-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-2xl);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+}
+
+.vw-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  padding: var(--vw-space-sm) var(--vw-space-xxs);
+  /* sit the 2px underline ON the container hairline, not below it */
+  margin-bottom: -1px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--vw-color-gray-500);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.vw-tab:hover:not(:disabled):not(.is-active):not([aria-selected="true"]) {
+  color: var(--vw-color-gray-700);
+}
+
+.vw-tab.is-active,
+.vw-tab[aria-selected="true"] {
+  color: var(--vw-color-gray-900);
+  border-bottom-color: var(--vw-color-gray-900);
+  font-weight: 600;
+}
+
+.vw-tab:disabled,
+.vw-tab[aria-disabled="true"] {
+  color: var(--vw-color-gray-300);
+  cursor: not-allowed;
+}
+
+.vw-tab:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+  border-radius: var(--vw-radius-xs);
+}
+
+/* ── Vertical filter list — the second shape, 3 of 11 ────────
+   A left rail of filter categories, as used beside a filter
+   drawer. Both apps that built it landed on the same treatment:
+   full-width rows, 2px left border, gray-100 behind the active
+   one. */
+.vw-tabs--vertical {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 0;
+}
+
+.vw-tabs--vertical .vw-tab {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: var(--vw-space-sm) var(--vw-space-md);
+  margin-bottom: 0;
+  border-bottom: 0;
+  border-left: 2px solid transparent;
+}
+
+.vw-tabs--vertical .vw-tab.is-active,
+.vw-tabs--vertical .vw-tab[aria-selected="true"] {
+  border-left-color: var(--vw-color-gray-900);
+  background: var(--vw-color-gray-100);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-tab { transition: none; }
+}
+
+/* ============================================================
+   Empty / error state — .vw-empty
+
+   Promoted from 14 hand-rolled families across both consuming
+   apps — the strongest single signal in the whole audit, ahead
+   of skeleton and avatar when those were promoted. Every one of
+   the 14 was the same thing:
+
+     flex column · centred both axes · gap · centred text ·
+     muted colour · a large muted icon above the message
+
+   Empty and error are ONE component, not two. Both apps used
+   the same class for "no results", "access denied", "nothing
+   selected" and "failed to load" — only the icon, wording and
+   whether there is an action button change. Hence --error
+   tinting the icon rather than a separate family.
+
+   Values are the mode of what they built:
+     gap      --vw-space-sm   (8px; 4 of 9 measured, the rest 10-12)
+     padding  --vw-space-xl   (20px; the compact 4) and
+              --vw-empty--page for the 48-64px full-page cluster
+     icon     gray-300, 2rem  (both apps chose gray-300; sizes
+                               ran 24-32px)
+
+   Deliberately only TWO new classes. The title, description and
+   action reuse what already ships — same rule the kanban follows:
+
+     <div class="vw-empty">
+       <i class="ph ph-folder-open vw-empty-icon"></i>
+       <div class="vw-card-title">No requirements yet</div>
+       <div class="vw-card-description">Create one to get started.</div>
+       <button class="nst-btn nst-btn--sm">New requirement</button>
+     </div>
+
+   Error variant — same markup, red icon, usually with a retry:
+
+     <i class="ph ph-warning-circle vw-empty-icon vw-empty-icon--error"></i>
+   ============================================================ */
+
+.vw-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vw-space-sm);
+  padding: var(--vw-space-xl);
+  text-align: center;
+  color: var(--vw-color-gray-500);
+}
+
+/* Full-page / full-card empty state. Both apps used a noticeably
+   more generous block (48-64px vertical) when the empty state WAS
+   the page rather than sitting inside a card or column. */
+.vw-empty--page {
+  padding: var(--vw-space-4xl) var(--vw-space-2xl);
+}
+
+.vw-empty-icon {
+  /* A glyph size, not type — deliberately not on the --vw-font-*
+     scale, which describes text. Both apps landed on gray-300. */
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--vw-color-gray-300);
+}
+
+.vw-empty-icon--error {
+  color: var(--vw-color-red-400);
+}
+
+/* ============================================================
+   Progress bar — .vw-progress
+
+   Promoted from 25 hand-rolled classes across 5 files in BOTH
+   consuming apps. The track is the strongest convergence yet
+   seen — three separate implementations wrote it identically:
+
+     height 6px · border-radius 999px · gray-200 · overflow hidden
+
+   ...and the fill likewise: height 100%, same radius, a width
+   transition. The anatomy they all reached independently is
+   track / fill / label, with success|warning|error tones on the
+   fill. That is what ships.
+
+   ONE thing they disagreed on: the default fill colour. One app
+   used blue-500 (#3b82f6), the other used green-500 —
+   green because a sprint burn-up reads as "good", blue because
+   equipment progress is neutral. Neither is the other's default,
+   so this is a call rather than an extraction:
+
+     default = --vw-color-accent-500
+
+   Accent is what "activity/progress" means in this system, and
+   unlike either literal it follows data-theme, so a progress bar
+   turns black on the black theme like every other accent. Where
+   the meaning genuinely IS semantic, the tone modifiers cover it
+   — that green is .vw-progress-fill--success.
+
+   Sizes: 6px base (3 of 4 implementations), --lg 8px (the
+   fourth). Transition 200ms, the mode of 200/200/500.
+
+     <div class="vw-progress" role="progressbar"
+          aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
+       <div class="vw-progress-track">
+         <div class="vw-progress-fill" style="width: 72%"></div>
+       </div>
+       <span class="vw-progress-label">72%</span>
+     </div>
+
+   The percentage is set as an inline width — that is a value,
+   not a style choice, and is the one inline style this component
+   expects. --stacked puts the label under the bar instead of
+   beside it (the shape one of them used).
+   ============================================================ */
+
+.vw-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+  min-width: 96px;
+}
+
+.vw-progress--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--vw-space-xxs);
+}
+
+.vw-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-gray-200);
+  overflow: hidden;
+}
+
+.vw-progress--lg .vw-progress-track { height: 8px; }
+
+.vw-progress-fill {
+  height: 100%;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-accent-500);
+  transition: width 200ms ease-out;
+}
+
+.vw-progress-fill--success { background: var(--vw-color-green-500); }
+.vw-progress-fill--warning { background: var(--vw-color-orange-500); }
+.vw-progress-fill--error   { background: var(--vw-color-red-500); }
+
+.vw-progress-label {
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  font-weight: 500;
+  color: var(--vw-color-gray-700);
+}
+
+/* flex:1 on the track grows its WIDTH in the default row container, but in
+   a column container it grows the HEIGHT instead — and flex-basis:0 then
+   collapses the 6px track to zero, rendering an invisible bar. Reset it so
+   the explicit height wins. Caught in-browser; the hand-rolled stacked
+   version used width:100% with no flex, which is why theirs worked. */
+.vw-progress--stacked .vw-progress-track {
+  flex: none;
+  width: 100%;
+}
+
+.vw-progress--stacked .vw-progress-label { align-self: flex-end; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-progress-fill { transition: none; }
+}
+
+/* ============================================================
+   Checkbox & radio — .vw-check / .vw-radio
+
+   Scoped from the published guideline
+   (.../guidelines/checkbox), not from what any app happened to
+   need. A form primitive's state surface is defined by the
+   platform and the spec; trimming it to observed usage just
+   guarantees the next project hand-rolls the missing state.
+
+   The guideline documents bntv-check-box as an Angular API
+   rather than CSS, so it binds the STATES, not the values:
+   checked · unchecked · indeterminate · disabled ·
+   disabled+checked · required marker · label before/after ·
+   a description/sub-heading variant. All are covered here.
+
+   Built on a real <input>, with appearance:none and the box
+   drawn on the input itself. That keeps every native behaviour
+   free and un-droppable — keyboard, focus order, form
+   submission, label association, :indeterminate (set it in JS:
+   el.indeterminate = true), and screen-reader state. A div with
+   role="checkbox" would have to reimplement all of it, and
+   usually reimplements it wrong.
+
+   Radio is the same control with a round box and a dot, because
+   it differs from a checkbox only in shape and arity — one class
+   family, not two.
+
+     <label class="vw-check-field">
+       <input type="checkbox" class="vw-check">
+       <span class="vw-check-text">
+         <span class="vw-check-label">Accept terms</span>
+         <span class="vw-check-helper">Required to continue.</span>
+       </span>
+     </label>
+
+   Theme mapping: the guideline offers primary | accent | warn.
+   This system has one accent, so the default IS accent and
+   follows data-theme; `warn` maps to .vw-check--error, which is
+   a validation state rather than a colour choice. There is no
+   invented "primary vs accent" distinction, because we do not
+   have two.
+   ============================================================ */
+
+.vw-check,
+.vw-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  display: inline-grid;
+  place-content: center;
+  border: 1.5px solid var(--vw-color-gray-400);
+  background: var(--vw-color-white);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.vw-check { border-radius: var(--vw-radius-xs); }
+.vw-radio { border-radius: var(--vw-radius-full); }
+
+/* ── Checked / indeterminate ───────────────────────────────── */
+
+.vw-check:checked,
+.vw-check:indeterminate,
+.vw-radio:checked {
+  background: var(--vw-color-accent-500);
+  border-color: var(--vw-color-accent-500);
+}
+
+/* Checkmark drawn with borders rather than an SVG or data URI —
+   no extra request, no encoding, and it scales with the box. */
+.vw-check:checked::before {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid var(--vw-color-white);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+/* Indeterminate is a distinct state, not "checked with a dash":
+   the browser sets it independently of :checked, which is why
+   "select all" in a table can show partial selection at all. */
+.vw-check:indeterminate::before {
+  content: "";
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--vw-color-white);
+}
+
+.vw-radio:checked::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-white);
+}
+
+/* ── States ───────────────────────────────────────────────── */
+
+.vw-check:hover:not(:disabled):not(:checked):not(:indeterminate),
+.vw-radio:hover:not(:disabled):not(:checked) {
+  border-color: var(--vw-color-gray-500);
+  background: var(--vw-color-gray-50);
+}
+
+.vw-check:focus-visible,
+.vw-radio:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+}
+
+.vw-check:disabled,
+.vw-radio:disabled {
+  cursor: not-allowed;
+  border-color: var(--vw-color-gray-200);
+  background: var(--vw-color-gray-100);
+}
+
+.vw-check:disabled:checked,
+.vw-check:disabled:indeterminate,
+.vw-radio:disabled:checked {
+  background: var(--vw-color-gray-300);
+  border-color: var(--vw-color-gray-300);
+}
+
+/* The guideline's `warn` theme. A validation state, not a palette
+   choice — pair it with aria-invalid on the input. */
+.vw-check--error,
+.vw-radio--error { border-color: var(--vw-color-red-500); }
+
+.vw-check--error:checked,
+.vw-check--error:indeterminate,
+.vw-radio--error:checked {
+  background: var(--vw-color-red-500);
+  border-color: var(--vw-color-red-500);
+}
+
+/* ── Field row: control + label (+ helper) ─────────────────── */
+
+.vw-check-field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vw-space-sm);
+  cursor: pointer;
+}
+
+/* textPosition="before" in the guideline. */
+.vw-check-field--before { flex-direction: row-reverse; justify-content: flex-end; }
+
+.vw-check-field:has(:disabled) { cursor: not-allowed; }
+
+.vw-check-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vw-check-label {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  line-height: 16px;
+  color: var(--vw-color-gray-800);
+}
+
+.vw-check-field:has(:disabled) .vw-check-label,
+.vw-check-field:has(:disabled) .vw-check-helper { color: var(--vw-color-gray-400); }
+
+/* showRequiredMarker in the guideline. */
+.vw-check-label--required::after {
+  content: " *";
+  color: var(--vw-color-red-500);
+}
+
+/* The guideline's sub-heading / extended-checkbox description,
+   clamped at its documented 2 lines. */
+.vw-check-helper {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: var(--vw-line-description, 1.5);
+  color: var(--vw-color-gray-500);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ── Groups ───────────────────────────────────────────────── */
+
+.vw-check-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-sm);
+}
+
+.vw-check-group--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--vw-space-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-check,
+  .vw-radio { transition: none; }
+}
+
+/* ============================================================
+   Slide toggle / switch — .vw-switch
+
+   The guideline's "Toggle" page is THREE components, and only
+   this one was missing:
+
+     bntv-slide-toggle     -> .vw-switch            (here)
+     bntv-extended-toggle  -> .vw-switch inside the
+                              .vw-check-field scaffolding
+     bntv-button-toggle    -> .vw-segmented         (already
+                              shipped — text / icon / icon+label
+                              / multiple / vertical / flat |
+                              stroked all map onto it)
+
+   Built on <input type="checkbox" role="switch">. A slide toggle
+   IS a checkbox semantically — two states, form-submitted, space
+   to operate — which is also why it reuses .vw-check-field,
+   .vw-check-text, .vw-check-label and .vw-check-helper rather
+   than growing a parallel set of label classes.
+
+   Track 40x22, knob 18, 2px inset, 150ms — the dimensions a
+   consuming app arrived at. Colour follows the guideline's
+   stated default (theme: 'accent'), consistent with .vw-check;
+   note that is a deliberate difference from .vw-tabs and
+   .vw-segmented, which are neutral because a *selection* is not
+   a value. Here the "on" state is the value.
+
+   textPosition in the guideline defaults to 'before' for a slide
+   toggle (unlike checkbox, which defaults to 'after'), so reach
+   for .vw-check-field--before on settings rows. --top is also
+   supported.
+
+   styleType 'box' | 'inlineBox' is container decoration, not a
+   control state — wrap the row in .vw-card-section or leave it
+   bare. Deliberately not a class here rather than silently
+   dropped.
+
+     <label class="vw-check-field vw-check-field--before">
+       <input type="checkbox" role="switch" class="vw-switch">
+       <span class="vw-check-text">
+         <span class="vw-check-label">Email notifications</span>
+       </span>
+     </label>
+   ============================================================ */
+
+.vw-switch {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  position: relative;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border: none;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-gray-300);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.vw-switch::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-white);
+  transition: transform 150ms ease;
+}
+
+.vw-switch:checked { background: var(--vw-color-accent-500); }
+.vw-switch:checked::before { transform: translateX(18px); }
+
+.vw-switch:hover:not(:disabled):not(:checked) { background: var(--vw-color-gray-400); }
+
+.vw-switch:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+}
+
+.vw-switch:disabled {
+  cursor: not-allowed;
+  background: var(--vw-color-gray-200);
+}
+
+.vw-switch:disabled::before { background: var(--vw-color-gray-100); }
+.vw-switch:disabled:checked { background: var(--vw-color-gray-300); }
+
+/* The guideline's `warn` theme — a validation state, pair with
+   aria-invalid. */
+.vw-switch--error:checked { background: var(--vw-color-red-500); }
+.vw-switch--error:not(:checked) { background: var(--vw-color-red-200); }
+
+/* textPosition="top" — label above the control. */
+.vw-check-field--top {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--vw-space-xxs);
+}
+
+/* A settings row: label left, control hard right. The shape both
+   apps built for every preference toggle they shipped. */
+.vw-check-field--spread {
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-switch,
+  .vw-switch::before { transition: none; }
+}
+
+/* ============================================================
+   Colour swatch & picker — .vw-color-swatch / .vw-color-picker
+
+   The guideline's Color Picker page describes ONE control with
+   feature flags, not a family: border, showColorCode, showInput,
+   showIcon, labelPosition, plus pickerBoxConfig for the box's
+   own size and radius. All of those are presentation, and all of
+   them are covered here.
+
+   What the page does NOT describe is the picking surface — the
+   hue/saturation canvas. bntv-color-picker wraps a third-party
+   one. A CSS-only design system cannot ship that, and should not
+   try: <input type="color"> gives the whole picker for free,
+   OS-native, keyboard-operable, with no library. Same reasoning
+   as .vw-check — style the box, let the platform do the control.
+
+   .vw-color-swatch is deliberately usable on BOTH an
+   <input type="color"> and a plain <span> with an inline
+   background. The read-only case is the legend swatch beside a
+   chart or status list, which both consuming apps hand-rolled
+   separately (.sipt-gantt-legend__swatch,
+   .site-status-legend__swatch, .inv-readiness-swatch). One class,
+   two jobs, because they are the same box.
+
+     <input type="color" class="vw-color-swatch" value="#1C81EF">
+     <span class="vw-color-swatch" style="background:#1C81EF"></span>
+
+   Label position reuses .vw-check-field --top / --before, the
+   same scaffolding as checkbox and switch.
+   ============================================================ */
+
+.vw-color-swatch {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-xs);
+  background-color: transparent;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* The native swatch fills the box edge-to-edge; without these the
+   browser insets it and paints its own border inside ours. */
+.vw-color-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.vw-color-swatch::-webkit-color-swatch { border: none; border-radius: 3px; }
+.vw-color-swatch::-moz-color-swatch { border: none; border-radius: 3px; }
+
+/* pickerBoxConfig — size is configurable in the guideline. */
+.vw-color-swatch--sm { width: 16px; height: 16px; }
+.vw-color-swatch--lg { width: 36px; height: 36px; }
+
+/* A read-only legend key is not interactive, and should not
+   pretend to be. */
+span.vw-color-swatch,
+.vw-color-swatch[readonly],
+.vw-color-swatch--static { cursor: default; }
+
+.vw-color-swatch:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+}
+
+.vw-color-swatch:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── The control: swatch + optional code + optional input ──── */
+
+.vw-color-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+}
+
+/* border=true in the guideline — a border around the whole
+   control rather than just the swatch. */
+.vw-color-picker--border {
+  padding: var(--vw-space-xs);
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-white);
+}
+
+/* showColorCode=true. Tabular figures so the hex does not jitter
+   as the value changes. */
+.vw-color-code {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  color: var(--vw-color-gray-600);
+}
+
+/* showInput=true uses the real .nst-input from components.css —
+   there is no second text field here. This only sizes it. */
+.vw-color-picker .nst-input { width: 9ch; text-transform: uppercase; }
+
+/* ── Legend: a row of read-only swatches with labels ───────── */
+
+.vw-color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vw-space-md) var(--vw-space-lg);
+}
+
+.vw-color-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  color: var(--vw-color-gray-600);
+}
+
+/* ============================================================
+   Tooltip — .vw-tooltip
+
+   A real gap with real demand: two apps hand-rolled one, and
+   between them they fall back to the native `title` attribute
+   29 times. `title` is the worst available option — you cannot
+   style it, the delay is ~1s and not adjustable, it never
+   appears on touch, and screen-reader support for it is
+   inconsistent. 29 uses is 29 places the UI silently degrades.
+
+   preview/tooltip.html sketched this correctly but was unusable
+   for the same reason the old tabs specimen was: it is built on
+   --color-tooltip-bg from colors_and_type.css, the Inter/Figma
+   layer, which a dashboard page never loads. The shape below is
+   that sketch, moved onto bundled tokens.
+
+   CSS-only. Shown on hover AND focus-within, so a keyboard user
+   tabbing to the trigger gets it too — the single most commonly
+   dropped half of a tooltip.
+
+     <span class="vw-tooltip-wrap">
+       <button class="nst-btn nst-btn--icon nst-btn--xs"
+               aria-describedby="t1"><i class="ph ph-info"></i></button>
+       <span class="vw-tooltip" id="t1" role="tooltip">Why this matters</span>
+     </span>
+
+   role="tooltip" + aria-describedby on the trigger is the
+   caller's job and is what makes it reach a screen reader at
+   all. Hover alone reaches nobody who is not using a mouse.
+   ============================================================ */
+
+.vw-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.vw-tooltip {
+  position: absolute;
+  z-index: 200;
+  max-width: 260px;
+  width: max-content;
+  padding: var(--vw-space-sm) var(--vw-space-md);
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-gray-900);
+  color: var(--vw-color-white);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: 1.5;
+  font-weight: 400;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+/* The arrow is the bubble's own corner, rotated — one element,
+   and it inherits the background so a theme change cannot leave
+   the arrow behind. */
+.vw-tooltip::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.vw-tooltip-wrap:hover > .vw-tooltip,
+.vw-tooltip-wrap:focus-within > .vw-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ── Placements. Default is top. ───────────────────────────── */
+
+.vw-tooltip,
+.vw-tooltip--top {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.vw-tooltip::after,
+.vw-tooltip--top::after { top: 100%; left: 50%; margin: -4px 0 0 -4px; }
+
+.vw-tooltip--bottom {
+  bottom: auto;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.vw-tooltip--bottom::after { top: -4px; left: 50%; margin: 0 0 0 -4px; }
+
+.vw-tooltip--left {
+  bottom: auto;
+  top: 50%;
+  left: auto;
+  right: calc(100% + 8px);
+  transform: translateY(-50%);
+}
+.vw-tooltip--left::after { top: 50%; left: 100%; margin: -4px 0 0 -4px; }
+
+.vw-tooltip--right {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+}
+.vw-tooltip--right::after { top: 50%; left: -4px; margin: -4px 0 0 0; }
+
+/* Short labels that should never wrap. */
+.vw-tooltip--nowrap { max-width: none; white-space: nowrap; }
+
+/* The guideline's lableinfoIconMessage: an info icon beside a
+   field label, explaining it without cluttering the form. */
+.vw-input-label-info {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--vw-space-xxs);
+  color: var(--vw-color-gray-400);
+  cursor: help;
+  line-height: 1;
+}
+
+.vw-input-label-info:hover { color: var(--vw-color-gray-600); }
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-tooltip { transition: none; }
+}
+
+/* ============================================================
+   Inline edit — .vw-inline-edit
+
+   Four comment panels across one consuming app implement
+   edit-in-place, and all four swap a text node for .nst-textarea
+   plus Save/Cancel .nst-btn pairs. The only things they had to
+   invent were the wrapper and the affordance that tells you the
+   text is editable at all — which is exactly what ships here.
+
+   (Two list pages also hold an `editing` state, but those open a
+   drawer. Not inline edit, and not counted.)
+
+   The guideline is almost entirely behavioural — editableOn
+   CLICK | DB_CLICK | ICON_CLICK, saveOn OUTSIDE_CLICK |
+   ICON_CLICK | VALUE_CHANGE, and onSave/onCancel/onEditing
+   events. None of that is CSS. What CSS owes it is two states
+   and a visible hint, per the guideline's own usage notes:
+   "provide visual feedback when entering edit mode" and "always
+   allow users to cancel".
+
+   The display value is a <button>, not a <div> with a click
+   handler. It has to be reachable by keyboard — an inline edit
+   only a mouse can open is a field only a mouse user can change.
+
+   Note the negative margin: the hover box is inset by exactly
+   its own padding, so the text sits in the same place whether
+   the affordance is showing or not. Without it every hover
+   nudges the line and the page twitches as the pointer moves.
+
+     <div class="vw-inline-edit">
+       <button class="vw-inline-edit-value" type="button">
+         Sprint 24 <i class="ph ph-pencil-simple vw-inline-edit-icon"></i>
+       </button>
+     </div>
+
+   Editing state — the caller swaps in:
+
+     <div class="vw-inline-edit">
+       <textarea class="nst-textarea"></textarea>
+       <div class="vw-inline-edit-actions">
+         <button class="nst-btn nst-btn--filled nst-btn--sm">Save</button>
+         <button class="nst-btn nst-btn--sm">Cancel</button>
+       </div>
+     </div>
+
+   The edit state uses .nst-input / .nst-textarea from
+   components.css. The display state stands alone.
+   ============================================================ */
+
+.vw-inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-sm);
+  width: 100%;
+}
+
+.vw-inline-edit-value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  align-self: flex-start;
+  max-width: 100%;
+  /* inset by exactly the padding, so showing the hover box does
+     not move the text */
+  padding: var(--vw-space-xxs) var(--vw-space-xs);
+  margin: calc(var(--vw-space-xxs) * -1) calc(var(--vw-space-xs) * -1);
+  border: 1px solid transparent;
+  border-radius: var(--vw-radius-xs);
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: text;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.vw-inline-edit-value:hover:not(:disabled) {
+  background: var(--vw-color-gray-50);
+  border-color: var(--vw-color-gray-200);
+}
+
+.vw-inline-edit-value:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 1px;
+  background: var(--vw-color-gray-50);
+}
+
+/* editable=false */
+.vw-inline-edit-value:disabled {
+  cursor: default;
+  background: none;
+  border-color: transparent;
+}
+
+/* The pencil for editableOn=ICON_CLICK, and a hover hint
+   otherwise. Hidden until hover or keyboard focus so a page of
+   editable fields is not a page of pencils. */
+.vw-inline-edit-icon {
+  flex-shrink: 0;
+  color: var(--vw-color-gray-400);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.vw-inline-edit-value:hover .vw-inline-edit-icon,
+.vw-inline-edit-value:focus-visible .vw-inline-edit-icon {
+  opacity: 1;
+}
+
+.vw-inline-edit-value:disabled .vw-inline-edit-icon { display: none; }
+
+/* No value yet — still has to be a target worth clicking. */
+.vw-inline-edit-value--empty { color: var(--vw-color-gray-400); }
+
+.vw-inline-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-inline-edit-value,
+  .vw-inline-edit-icon { transition: none; }
+}
+
+/* ============================================================
+   Rating — .vw-rating
+
+   Two shapes, because showing a rating and collecting one are
+   different problems:
+
+     read-only   a row of spans, .is-filled on the first N.
+                 Needs role="img" + aria-label, because a row of
+                 identical glyphs says nothing on its own.
+     input       .vw-rating--input with real radios. Keyboard
+                 navigation, form submission and screen-reader
+                 state come free; hover preview is pure CSS.
+
+   Colour comes from the published guideline, which specifies
+   color: var(--accentColor500) for filled and
+   var(--bgColor400) for empty. That maps to --vw-color-accent-500
+   and --vw-color-gray-300 here.
+
+   This corrects a note that stood in COMPONENTS.md's gap list:
+   it claimed filled stars were GOLD and suggested falling back to
+   --vw-color-amber-400. The legacy component uses the accent, so
+   a rating themes with everything else rather than sitting apart
+   from it. Gold was an assumption from the common convention; the
+   guideline says otherwise.
+
+   Use the FILL weight throughout (<i class="ph-fill ph-star">) and
+   change only its colour. Swapping ph-star for ph-fill ph-star
+   between empty and filled would need a second class per star,
+   which makes the CSS-only hover preview below impossible.
+
+   This is the first component to need Phosphor's `fill` weight,
+   so it needs its own stylesheet link — see assets/icons.md.
+
+     <span class="vw-rating" role="img" aria-label="3 out of 5">
+       <i class="ph-fill ph-star vw-rating-star is-filled"></i>
+       ... x3 ...
+       <i class="ph-fill ph-star vw-rating-star"></i>
+     </span>
+   ============================================================ */
+
+.vw-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 1.2em;          /* the guideline's default fontSize */
+  line-height: 1;
+}
+
+.vw-rating--sm { font-size: 1em; }
+.vw-rating--lg { font-size: 1.75em; }
+
+.vw-rating-star {
+  color: var(--vw-color-gray-300);
+  transition: color 120ms ease;
+}
+
+.vw-rating-star.is-filled { color: var(--vw-color-accent-500); }
+
+/* ── Interactive: real radios, reversed so a plain sibling
+   selector can light every star up to the hovered one ──────── */
+
+.vw-rating--input {
+  /* reversed in the DOM (5 first), so ~ reaches the LOWER stars */
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.vw-rating--input input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.vw-rating--input label {
+  display: inline-flex;
+  color: var(--vw-color-gray-300);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+/* checked star and everything below it */
+.vw-rating--input input:checked ~ label,
+/* hover preview */
+.vw-rating--input label:hover,
+.vw-rating--input label:hover ~ label {
+  color: var(--vw-color-accent-500);
+}
+
+/* Keyboard focus has to be visible too — a rating you can only
+   set by pointer is a rating half your users cannot set. */
+.vw-rating--input input:focus-visible + label {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+  border-radius: var(--vw-radius-xs);
+}
+
+/* disable=true */
+.vw-rating--disabled .vw-rating-star.is-filled,
+.vw-rating--input:has(input:disabled) input:checked ~ label {
+  color: var(--vw-color-gray-400);
+}
+
+.vw-rating--disabled,
+.vw-rating--input:has(input:disabled) label {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-rating-star,
+  .vw-rating--input label { transition: none; }
+}
+
+/* ============================================================
+   Alert / banner / toast — .vw-alert and .vw-toast
+
+   One family, two placements. An inline alert and a toast are
+   the same object — tone, icon, title, message, optional action,
+   optional dismiss — differing only in whether it sits in the
+   flow or floats above it. Shipping them as two families would
+   guarantee they drift, and both are on the same request list.
+
+     .vw-alert   in the flow: form validation, a page banner
+     .vw-toast   floating: .vw-alert plus a shadow and a max
+                 width, stacked inside .vw-toast-region
+
+   Evidence: six separately-built pages in one consuming app
+   hand-rolled this — four inline-error classes and two
+   validation-banner classes — all converging on the same
+   padding, 8px radius, tinted background and tone-coloured
+   text. (The other app has a class that looks like one by name
+   but is a stats strip with counts and a progress bar. Checked,
+   not counted.)
+
+   The guideline's Snackbar page adds what the apps had not
+   needed yet: four tones, an optional title, an optional icon,
+   and a `solid` variant alongside the tinted default. Positions
+   come from its verticalPosition/horizontalPosition.
+
+   Tones reuse the card families (emerald/red/amber/sky) so an
+   alert, a semantic card and a chip agree about what "warning"
+   looks like.
+
+     <div class="vw-alert vw-alert--error" role="alert">
+       <i class="ph ph-warning-circle vw-alert-icon"></i>
+       <div class="vw-alert-body">
+         <div class="vw-alert-title">Could not save</div>
+         <div class="vw-alert-message">Three fields need attention.</div>
+       </div>
+       <button class="vw-alert-dismiss" aria-label="Dismiss">…</button>
+     </div>
+
+   role="alert" for errors that interrupt, role="status" for
+   quieter confirmations — the caller's call, and the difference
+   between a screen reader announcing it now or not at all.
+   ============================================================ */
+
+.vw-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vw-space-md);
+  padding: var(--vw-space-md) var(--vw-space-lg);
+  border: 1px solid transparent;
+  border-radius: var(--vw-radius-sm);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+  line-height: 1.5;
+}
+
+.vw-alert-icon {
+  flex-shrink: 0;
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.vw-alert-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vw-alert-title { font-weight: 600; }
+
+.vw-alert-message { color: inherit; opacity: 0.85; }
+
+.vw-alert-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+  margin-top: var(--vw-space-xs);
+}
+
+.vw-alert-dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--vw-radius-xs);
+  background: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.vw-alert-dismiss:hover { opacity: 1; background: rgb(0 0 0 / 0.05); }
+
+/* ── Tones — the same families the cards and chips use ─────── */
+
+.vw-alert--success { background: var(--vw-color-emerald-25); border-color: var(--vw-color-emerald-200); color: var(--vw-color-emerald-800); }
+.vw-alert--error   { background: var(--vw-color-red-25);     border-color: var(--vw-color-red-200);     color: var(--vw-color-red-800); }
+.vw-alert--warning { background: var(--vw-color-amber-25);   border-color: var(--vw-color-amber-200);   color: var(--vw-color-amber-800); }
+.vw-alert--info    { background: var(--vw-color-sky-25);     border-color: var(--vw-color-sky-200);     color: var(--vw-color-sky-800); }
+.vw-alert--neutral { background: var(--vw-color-gray-50);    border-color: var(--vw-color-gray-200);    color: var(--vw-color-gray-800); }
+
+/* snackbarType: 'solid' */
+.vw-alert--solid { color: var(--vw-color-white); border-color: transparent; }
+.vw-alert--solid.vw-alert--success { background: var(--vw-color-emerald-600); }
+.vw-alert--solid.vw-alert--error   { background: var(--vw-color-red-600); }
+.vw-alert--solid.vw-alert--warning { background: var(--vw-color-amber-600); }
+.vw-alert--solid.vw-alert--info    { background: var(--vw-color-sky-600); }
+.vw-alert--solid.vw-alert--neutral { background: var(--vw-color-gray-800); }
+.vw-alert--solid .vw-alert-dismiss:hover { background: rgb(255 255 255 / 0.15); }
+
+/* ── Toast: the same alert, floating ───────────────────────── */
+
+.vw-toast {
+  max-width: 420px;
+  box-shadow: var(--shadow-sm);
+  pointer-events: auto;
+}
+
+/* Not tinted-transparent when floating over arbitrary content. */
+.vw-toast:not(.vw-alert--solid) { background-color: var(--vw-color-white); }
+.vw-toast.vw-alert--success { border-color: var(--vw-color-emerald-200); }
+.vw-toast.vw-alert--error   { border-color: var(--vw-color-red-200); }
+.vw-toast.vw-alert--warning { border-color: var(--vw-color-amber-200); }
+.vw-toast.vw-alert--info    { border-color: var(--vw-color-sky-200); }
+
+/* The stack. pointer-events:none so the region never blocks the
+   page it floats over; each toast re-enables its own. */
+.vw-toast-region {
+  position: fixed;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-sm);
+  padding: var(--vw-space-lg);
+  pointer-events: none;
+}
+
+/* verticalPosition x horizontalPosition */
+.vw-toast-region--top    { top: 0; }
+.vw-toast-region--bottom { bottom: 0; flex-direction: column-reverse; }
+.vw-toast-region--start  { left: 0; align-items: flex-start; }
+.vw-toast-region--center { left: 50%; transform: translateX(-50%); align-items: center; }
+.vw-toast-region--end    { right: 0; align-items: flex-end; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .vw-toast { animation: vw-toast-in 160ms ease-out; }
+  @keyframes vw-toast-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .vw-toast-region--bottom .vw-toast { animation-name: vw-toast-in-up; }
+  @keyframes vw-toast-in-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+}
+
+/* ============================================================
+   App shell — .vw-shell
+
+   Built from the product's own reference screens. The one
+   hand-rolled implementation (a consuming app's app-shell, 39
+   classes) uses a DARK rail with a left-border accent; the
+   product shell is the reverse — light rail, active item as a
+   dark pill. The screenshots are the design.
+
+   INTERACTION, which is the part that is easy to get wrong:
+   the rail sits collapsed at icon width and expands on hover,
+   collapsing again on mouse-out. That is the legacy behaviour.
+   It is NOT a click-to-pin toggle, and the nine-dot icon in the
+   header is an application switcher, not a collapse control.
+
+   Because it expands on hover, it OVERLAYS the page rather than
+   pushing it. A rail that reflows the whole layout every time the
+   pointer crosses it is unusable — the content would jump under
+   the cursor.
+
+   Two things follow from hover-expand:
+
+   - :focus-within expands it too. A keyboard user never hovers,
+     so without that the labels are unreachable for them.
+   - Labels are always in the DOM and merely clipped by the rail's
+     overflow, never display:none. They stay in the accessibility
+     tree at all times, so a screen reader reads real names rather
+     than needing an aria-label on every item.
+
+   .vw-shell--expanded pins it open. Hover does not exist on
+   touch, so a touch or preference-driven build needs a way to
+   hold it.
+
+   Three zones: header (app switcher / home), primary nav that
+   scrolls, and a pinned footer for utility links and the user.
+   The footer must not scroll away — the account row is the one
+   thing a user always needs to reach.
+   ============================================================ */
+
+.vw-shell {
+  --vw-shell-rail-w: 240px;
+  --vw-shell-rail-w-collapsed: 60px;
+  /* The icon column: what is left of the collapsed rail once the
+     scroll box's padding and a row's own padding are taken off. Named
+     once because four rules used to re-derive it by hand, and when the
+     footer's padding changed, three of them were still right and one
+     put the user's avatar 8px off the midline. */
+  --vw-shell-icon-col: calc(
+    var(--vw-shell-rail-w-collapsed) - 2 * (var(--vw-space-sm) + var(--vw-space-md))
+  );
+
+  position: relative;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--vw-color-gray-100);
+}
+
+/* Absolutely positioned so expanding overlays the page instead of
+   reflowing it. .vw-shell-main is offset by the collapsed width. */
+.vw-shell-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: var(--vw-shell-rail-w-collapsed);
+  background: var(--vw-color-white);
+  border-right: 1px solid var(--vw-color-gray-200);
+  overflow: hidden;
+  transition: width 160ms ease, box-shadow 160ms ease;
+}
+
+.vw-shell-rail:hover,
+.vw-shell-rail:focus-within,
+.vw-shell--expanded .vw-shell-rail {
+  width: var(--vw-shell-rail-w);
+  box-shadow: var(--shadow-sm);
+}
+
+.vw-shell-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin-left: var(--vw-shell-rail-w-collapsed);
+}
+
+.vw-shell-rail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-md);
+  flex-shrink: 0;
+  height: 60px;
+  padding: 0 var(--vw-space-md);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+}
+
+.vw-shell-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-xxs);
+  padding: var(--vw-space-sm);
+  min-height: 0;
+}
+
+.vw-shell-rail > .vw-shell-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.vw-shell-rail-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--vw-color-gray-200);
+  /* Same box as .vw-shell-nav, so a utility item renders identically
+     whether it sits straight in the footer or inside a nested nav. It
+     did not, and the difference was 8px of horizontal padding: the
+     footer's icons sat off the rail's midline while every icon above
+     them sat on it. The specimen never showed it, because the specimen
+     happens to nest a second .vw-shell-nav here — one markup was right
+     by accident and the other was quietly wrong. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-xxs);
+  padding: var(--vw-space-sm);
+}
+
+/* …and the nested form must not then pay the padding twice. */
+.vw-shell-rail-footer .vw-shell-nav { padding: 0; }
+
+.vw-shell-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-md);
+  flex-shrink: 0;
+  /* fixed height so items do not shift as the rail widens */
+  min-height: 44px;
+  width: 100%;
+  padding: var(--vw-space-md);
+  /* icon column + this gap + padding == the collapsed width */
+  border: none;
+  border-radius: var(--vw-radius-full);
+  background: none;
+  color: var(--vw-color-gray-700);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  line-height: 20px;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.vw-shell-nav-item:hover:not(.is-active):not([aria-current="page"]) {
+  background: var(--vw-color-gray-50);
+}
+
+.vw-shell-nav-item.is-active,
+.vw-shell-nav-item[aria-current="page"] {
+  background: var(--vw-color-gray-900);
+  color: var(--vw-color-white);
+  font-weight: 500;
+}
+
+.vw-shell-nav-item:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: -2px;
+}
+
+/* Icon alignment, collapsed.
+
+   Two rules decide every number below: the icon sits on the rail's
+   midline, and the label begins exactly AT the fold. Get either
+   wrong and the collapsed rail shows a column of icons that do not
+   line up, or the first letter of each label clipped mid-glyph.
+
+   The three rows have DIFFERENT surrounding padding — the nav has
+   its own padding on top of each item's, the header has neither,
+   the user row carries an avatar rather than a glyph — so each
+   needs its own figure. Computing one width from the rail and
+   reusing it everywhere is what misaligned them.
+
+   With C = collapsed width, P = item padding, N = nav padding:
+     nav    icon  C - 2(N+P)     gap  C - N - P - icon
+     header first C - 2P         gap  P
+     user   avatar offset (C - 2P - 24)/2, gap C - P - offset - 24
+*/
+
+.vw-shell-nav-icon {
+  flex-shrink: 0;
+  width: var(--vw-shell-icon-col);
+  font-size: 1.25rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.vw-shell-nav-item {
+  gap: calc(
+    var(--vw-shell-rail-w-collapsed) - var(--vw-space-sm) - var(--vw-space-md)
+    - var(--vw-shell-icon-col)
+  );
+}
+
+.vw-shell-rail .vw-shell-rail-header {
+  gap: var(--vw-space-md);
+}
+
+.vw-shell-rail .vw-shell-rail-header > :first-child {
+  flex-shrink: 0;
+  /* beats .nst-btn--icon.nst-btn--sm's own fixed width */
+  width: calc(var(--vw-shell-rail-w-collapsed) - 2 * var(--vw-space-md));
+  min-width: calc(var(--vw-shell-rail-w-collapsed) - 2 * var(--vw-space-md));
+  height: calc(var(--vw-shell-rail-w-collapsed) - 2 * var(--vw-space-md));
+  /* the app-switcher glyph carries real weight in the product —
+     it is the way out of this app, not a minor control */
+  font-size: 1.5rem;
+}
+
+.vw-shell-rail .vw-shell-user {
+  gap: calc(
+    var(--vw-shell-rail-w-collapsed) - var(--vw-space-sm) - var(--vw-space-md) - 24px
+    - ((var(--vw-shell-icon-col) - 24px) / 2)
+  );
+}
+
+/* The avatar stays round — centred in the column by margin rather
+   than stretched to fill it. */
+.vw-shell-rail .vw-shell-user > .vw-avatar {
+  flex-shrink: 0;
+  margin-left: calc((var(--vw-shell-icon-col) - 24px) / 2);
+}
+
+
+/* Clipped by the rail's overflow when collapsed — never
+   display:none, so it stays in the accessibility tree. */
+.vw-shell-nav-label,
+.vw-shell-rail-title,
+.vw-shell-user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vw-shell-rail-title {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  color: var(--vw-color-gray-500);
+}
+
+/* ── User row: pinned to the bottom, opens a flyout ───────── */
+
+.vw-shell-user {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-md);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--vw-space-md);
+  border: none;
+  border-top: 1px solid var(--vw-color-gray-200);
+  background: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  color: var(--vw-color-gray-800);
+  text-align: left;
+  cursor: pointer;
+}
+
+.vw-shell-user:hover { background: var(--vw-color-gray-50); }
+.vw-shell-user-name { flex: 1; }
+.vw-shell-user-caret { flex-shrink: 0; color: var(--vw-color-gray-400); }
+
+/* ── Main column ──────────────────────────────────────────── */
+
+.vw-shell-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-lg);
+  flex-shrink: 0;
+  height: 60px;
+  padding: 0 var(--vw-space-2xl);
+  background: var(--vw-color-white);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+}
+
+.vw-shell-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   Breadcrumb — .vw-breadcrumb
+
+   Four pages of one consuming app hand-rolled this as their own
+   breadcrumb link/sep/current classes, all four identical. It also sits in the shell topbar, so the two
+   ship together.
+
+   Uses <nav aria-label="Breadcrumb"> + an <ol>, and marks the
+   last crumb aria-current="page". Separators are generated in
+   CSS so they are never read aloud as content — a screen reader
+   announcing "Agent slash Insights" is the usual bug here.
+   ============================================================ */
+
+.vw-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  line-height: 20px;
+  min-width: 0;
+}
+
+.vw-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  min-width: 0;
+}
+
+.vw-breadcrumb-item + .vw-breadcrumb-item::before {
+  content: "";
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--vw-color-gray-300);
+  border-bottom: 1.5px solid var(--vw-color-gray-300);
+  transform: rotate(-45deg);
+}
+
+.vw-breadcrumb-link {
+  color: var(--vw-color-gray-500);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vw-breadcrumb-link:hover { color: var(--vw-color-gray-800); text-decoration: underline; }
+
+.vw-breadcrumb-item[aria-current="page"] .vw-breadcrumb-link,
+.vw-breadcrumb-current {
+  color: var(--vw-color-gray-900);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-shell-rail,
+  .vw-shell-nav-item { transition: none; }
+}
+
+/* ============================================================
+   App menu — .vw-app-menu
+
+   The panel behind the rail's nine-dot switcher. Called
+   "app-menu" in the legacy platform. It is a full-height
+   left-anchored sheet listing every application, grouped into
+   colour-coded sections, each section a grid of module cards.
+
+   It is a real component rather than a page because the module
+   list is the same wherever it is opened from — it is the way
+   between applications, not part of any one of them.
+
+   Sections are colour-coded but the colours carry no semantic
+   meaning: "Plan to Build" is orange because it is not "Resource
+   Manager", not because orange means anything. So the tone is a
+   single custom property per section rather than success/error/
+   warning modifiers, which would imply a meaning that is not
+   there:
+
+     <section class="vw-app-menu-section"
+              style="--vw-app-menu-tone: var(--vw-color-amber-400)">
+
+   Both the header bar and the card icons derive from that one
+   value, so a section cannot end up half-recoloured.
+
+   The body scrolls; the header does not. There are more sections
+   than fit on any screen, and the search and close controls have
+   to stay reachable from the bottom of the list.
+
+     <div class="nst-overlay nst-overlay--start">
+       <div class="vw-app-menu">
+         <header class="vw-app-menu-header">…</header>
+         <div class="vw-app-menu-body">
+           <section class="vw-app-menu-section" style="--vw-app-menu-tone: …">
+             <h2 class="vw-app-menu-section-title">Intelligence Hub</h2>
+             <div class="vw-app-menu-grid">
+               <a class="vw-app-menu-card is-current">
+                 <span class="vw-app-menu-card-icon"><i class="ph …"></i></span>
+                 <span class="vw-app-menu-card-body">
+                   <span class="vw-app-menu-card-title">NOC</span>
+                   <span class="vw-app-menu-card-desc">…</span>
+                 </span>
+               </a>
+             </div>
+           </section>
+         </div>
+       </div>
+     </div>
+   ============================================================ */
+
+.vw-app-menu {
+  display: flex;
+  flex-direction: column;
+  width: 64rem;
+  max-width: 96vw;
+  height: 100%;
+  background: var(--vw-color-white);
+  animation: vw-app-menu-in 180ms ease-out;
+}
+
+.vw-app-menu-header {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-lg);
+  flex-shrink: 0;
+  height: 72px;
+  padding: 0 var(--vw-space-2xl);
+  border-bottom: 1px solid var(--vw-color-gray-200);
+}
+
+.vw-app-menu-title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-heading-lg);
+  font-weight: 500;
+  color: var(--vw-color-gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The list is longer than any screen; the header stays put so
+   search and close remain reachable from the bottom of it. */
+.vw-app-menu-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--vw-space-lg) var(--vw-space-2xl) var(--vw-space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-2xl);
+}
+
+.vw-app-menu-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.vw-app-menu-section-title {
+  margin: 0;
+  padding: var(--vw-space-lg) var(--vw-space-xl);
+  border-left: 4px solid var(--vw-app-menu-tone, var(--vw-color-gray-300));
+  border-radius: var(--vw-radius-xs) var(--vw-radius-xs) 0 0;
+  /* one property drives the bar and the wash, so a section cannot
+     end up half-recoloured */
+  background: color-mix(in srgb, var(--vw-app-menu-tone, var(--vw-color-gray-300)) 14%, white);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vw-color-gray-800);
+}
+
+.vw-app-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--vw-space-lg);
+  padding: var(--vw-space-lg);
+  border: 1px solid var(--vw-color-gray-200);
+  border-top: 0;
+  border-radius: 0 0 var(--vw-radius-sm) var(--vw-radius-sm);
+}
+
+.vw-app-menu-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vw-space-md);
+  /* start, not stretch: a short row must not inflate its cards to
+     fill the gap left by a missing one */
+  align-self: start;
+  padding: var(--vw-space-lg);
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-white);
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.vw-app-menu-card:hover {
+  border-color: var(--vw-color-gray-400);
+  box-shadow: var(--shadow-sm);
+}
+
+.vw-app-menu-card:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+}
+
+/* The application you are already in. */
+.vw-app-menu-card.is-current,
+.vw-app-menu-card[aria-current="true"] {
+  border-color: var(--vw-color-gray-900);
+}
+
+.vw-app-menu-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--vw-radius-full);
+  background: color-mix(in srgb, var(--vw-app-menu-tone, var(--vw-color-gray-300)) 22%, white);
+  color: color-mix(in srgb, var(--vw-app-menu-tone, var(--vw-color-gray-300)) 80%, black);
+  font-size: 1.125rem;
+}
+
+.vw-app-menu-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vw-app-menu-card-title {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 500;
+  color: var(--vw-color-gray-900);
+}
+
+.vw-app-menu-card-desc {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  line-height: 1.45;
+  color: var(--vw-color-gray-500);
+  /* two lines then ellipsis, so an unusually long description
+     cannot make one card taller than its row */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+@keyframes vw-app-menu-in {
+  from { transform: translateX(-2%); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-app-menu { animation: none; }
+  .vw-app-menu-card { transition: none; }
+}
+
+/* ============================================================
+   Pagination — .vw-pagination
+
+   No published guideline and only one hand-rolled precedent
+   (a space-between bar with a page list on the right), so this
+   is designed rather than extracted. The other app's table
+   already computes from/to/total, which says what it actually
+   needs.
+
+   Three decisions worth stating, because a paginator is mostly
+   judgement:
+
+   1. The summary is not optional and comes first. "1-25 of 248"
+      answers the only question a page control cannot: how much
+      is there. A row of numbers with no total tells you nothing
+      about whether you are near the end.
+
+   2. Every square control is ONE class — numbers and arrows
+      alike. Sizing arrows separately is what makes paginators
+      look ragged, and a uniform row is easier to hit.
+
+   3. Rows-per-page belongs here, not in the toolbar. Changing it
+      changes the page you are on, so it sits with the thing it
+      affects.
+
+   --compact drops the numbers and keeps summary plus prev/next,
+   for a narrow table or a card footer. It is not a mobile
+   afterthought: with 40 pages the numbers are noise anyway.
+
+     <nav class="vw-pagination" aria-label="Pagination">
+       <span class="vw-pagination-summary">1-25 of 248</span>
+       <div class="vw-pagination-controls">
+         <label class="vw-pagination-size">Rows
+           <select class="vw-select vw-select--sm">…</select>
+         </label>
+         <ul class="vw-pagination-pages">
+           <li><button class="vw-pagination-page" aria-label="Previous page">…</button></li>
+           <li><button class="vw-pagination-page" aria-current="page">1</button></li>
+           <li><span class="vw-pagination-ellipsis" aria-hidden="true">…</span></li>
+         </ul>
+       </div>
+     </nav>
+
+   Which pages to show, and where the ellipses fall, is the
+   caller's — that is arithmetic, not styling.
+   ============================================================ */
+
+.vw-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--vw-space-md);
+  padding: var(--vw-space-md) var(--vw-space-lg);
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  color: var(--vw-color-gray-500);
+}
+
+/* Inside a table card it is the card's own footer, so it needs a
+   divider rather than floating free. */
+.nst-table-card > .vw-pagination,
+.nst-table-wrap + .vw-pagination {
+  border-top: 1px solid var(--vw-color-neutral-200);
+}
+
+.vw-pagination-summary {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.vw-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-lg);
+}
+
+.vw-pagination-size {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vw-space-sm);
+  white-space: nowrap;
+}
+
+.vw-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vw-pagination-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* min-width rather than width, so a three-digit page number
+     grows instead of overflowing, while single digits stay square */
+  min-width: 30px;
+  height: 30px;
+  padding: 0 var(--vw-space-xs);
+  border: 1px solid transparent;
+  border-radius: var(--vw-radius-xs);
+  background: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-variant-numeric: tabular-nums;
+  color: var(--vw-color-gray-700);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.vw-pagination-page:hover:not(:disabled):not([aria-current="page"]) {
+  background: var(--vw-color-gray-100);
+}
+
+.vw-pagination-page[aria-current="page"],
+.vw-pagination-page.is-active {
+  background: var(--vw-color-gray-900);
+  border-color: var(--vw-color-gray-900);
+  color: var(--vw-color-white);
+  font-weight: 500;
+}
+
+.vw-pagination-page:disabled {
+  color: var(--vw-color-gray-300);
+  cursor: not-allowed;
+}
+
+.vw-pagination-page:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 1px;
+}
+
+.vw-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  color: var(--vw-color-gray-400);
+  user-select: none;
+}
+
+/* Summary + prev/next only. */
+.vw-pagination--compact .vw-pagination-pages > li:not(:first-child):not(:last-child) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-pagination-page { transition: none; }
+}
+
+/* ============================================================
+   Progress — the rest of it, and the overlay loader
+
+   .vw-progress shipped as line + determinate only, built from
+   what two apps had hand-rolled. The published guideline is
+   wider: bntv-progress-bar carries type line | spinner | circle
+   and mode determinate | indeterminate | buffer. So "Spinner" on
+   the request list is not a separate component at all — it is
+   type: 'spinner' on this one, which is why it ships here rather
+   than as .vw-loading-thing sitting apart from its family.
+
+   Four additions:
+     --indeterminate   line, progress unknown
+     -buffer           a second fill behind the first (buffer mode)
+     -circle           determinate ring with a centred label
+     .vw-spinner       the circular indeterminate one
+
+   And .vw-loader, the guideline's separate Overlay Loader page:
+   a spinner plus optional message and description, covering its
+   container or the page.
+
+   On reduced motion these SLOW DOWN rather than stop. A halted
+   spinner does not read as "motion suppressed", it reads as
+   "this app has hung" — the opposite of what the indicator is
+   for. The determinate bar's width transition is removed as
+   usual, because that one carries no meaning when still.
+   ============================================================ */
+
+/* ── Line, indeterminate ──────────────────────────────────── */
+
+.vw-progress--indeterminate .vw-progress-fill {
+  width: 40% !important;   /* the caller has no value to give */
+  animation: vw-progress-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes vw-progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+/* ── Buffer: how much is loaded behind how much is played ─── */
+
+.vw-progress-buffer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: var(--vw-radius-full);
+  background: var(--vw-color-gray-300);
+}
+
+.vw-progress--buffer .vw-progress-track { position: relative; }
+.vw-progress--buffer .vw-progress-fill { position: relative; z-index: 1; }
+
+/* ── Circle: determinate, with the value in the middle ────── */
+
+.vw-progress-circle {
+  --vw-progress-value: 0;
+  --vw-progress-size: 72px;
+  --vw-progress-stroke: 8px;
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--vw-progress-size);
+  height: var(--vw-progress-size);
+  border-radius: var(--vw-radius-full);
+  /* one conic sweep, masked to a ring — no SVG, and stroke width
+     stays a single number rather than two paths to keep in step */
+  background: conic-gradient(
+    var(--vw-progress-circle-color, var(--vw-color-accent-500))
+      calc(var(--vw-progress-value) * 1%),
+    var(--vw-color-gray-200) 0
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--vw-progress-stroke)),
+    black calc(100% - var(--vw-progress-stroke) + 1px)
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--vw-progress-stroke)),
+    black calc(100% - var(--vw-progress-stroke) + 1px)
+  );
+}
+
+.vw-progress-circle--success { --vw-progress-circle-color: var(--vw-color-green-500); }
+.vw-progress-circle--warning { --vw-progress-circle-color: var(--vw-color-orange-500); }
+.vw-progress-circle--error   { --vw-progress-circle-color: var(--vw-color-red-500); }
+
+/* The label cannot live inside the ring — the mask would eat it —
+   so it is a sibling, centred over the top. */
+.vw-progress-circle-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.vw-progress-circle-label {
+  position: absolute;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--vw-color-gray-900);
+}
+
+/* ── Spinner ──────────────────────────────────────────────── */
+
+.vw-spinner {
+  --vw-spinner-size: 24px;
+  --vw-spinner-stroke: 2px;
+
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--vw-spinner-size);
+  height: var(--vw-spinner-size);
+  border: var(--vw-spinner-stroke) solid var(--vw-color-gray-200);
+  border-top-color: var(--vw-spinner-color, var(--vw-color-accent-500));
+  border-radius: var(--vw-radius-full);
+  animation: vw-spin 700ms linear infinite;
+}
+
+.vw-spinner--sm { --vw-spinner-size: 16px; --vw-spinner-stroke: 2px; }
+.vw-spinner--lg { --vw-spinner-size: 48px; --vw-spinner-stroke: 4px; }
+
+/* On a filled button the track has to read against the fill. */
+.vw-spinner--on-accent {
+  border-color: color-mix(in srgb, var(--vw-color-white) 35%, transparent);
+  border-top-color: var(--vw-color-white);
+}
+
+@keyframes vw-spin { to { transform: rotate(360deg); } }
+
+/* ── Overlay loader ───────────────────────────────────────── */
+
+.vw-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vw-space-md);
+  /* transparent by default, as the guideline has it — the caller
+     sets a scrim only when the content behind must be masked */
+  background: var(--vw-loader-bg, transparent);
+  text-align: center;
+}
+
+/* position: 'fixed' — the whole page rather than one container. */
+.vw-loader--page { position: fixed; z-index: 250; }
+
+.vw-loader-message {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  font-weight: 500;
+  color: var(--vw-color-gray-800);
+}
+
+.vw-loader-description {
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  color: var(--vw-color-gray-500);
+  max-width: 34ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Slowed, not stopped: a halted spinner reads as a hung app. */
+  .vw-spinner { animation-duration: 2.4s; }
+  .vw-progress--indeterminate .vw-progress-fill { animation-duration: 4s; }
+}
+
+/* ============================================================
+   Accordion / expansion panel — .vw-accordion
+
+   Built on <details>/<summary>. The platform gives open/close,
+   keyboard operation, focus handling and the expanded state to
+   screen readers with no script at all — and <details name="…">
+   gives the guideline's multi="false" (one open at a time) for
+   free where it is supported.
+
+   The classes also work on a <button aria-expanded> + <div> pair
+   for a controlled accordion, which is what the guideline's
+   controlled="true" needs: the chevron rotates off [open] OR
+   aria-expanded, so either markup is styled correctly.
+
+   From the guideline:
+     displayMode 'default' | 'flat'  -> separate cards, or one
+                                        joined block (--flat)
+     togglePosition 'before'|'after' -> --toggle-before
+     hideToggle                      -> --no-toggle
+     filled                          -> panel --filled
+     bodyPadding false               -> body --flush
+     actionsTemplate                 -> .vw-accordion-actions
+
+   Header actions sit OUTSIDE the summary's own hit area is the
+   one thing to watch: a button nested in a <summary> still
+   toggles the panel when clicked. The specimen shows the
+   stopPropagation that avoids it, because "clicking Delete also
+   collapsed the row" is an easy bug to ship.
+
+     <div class="vw-accordion">
+       <details class="vw-accordion-panel" name="a" open>
+         <summary class="vw-accordion-header">
+           <span class="vw-accordion-title">Panel 1</span>
+           <i class="ph ph-caret-down vw-accordion-icon"></i>
+         </summary>
+         <div class="vw-accordion-body">…</div>
+       </details>
+     </div>
+   ============================================================ */
+
+.vw-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-sm);
+}
+
+/* displayMode: 'flat' — one joined block rather than separate cards */
+.vw-accordion--flat {
+  gap: 0;
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  overflow: hidden;
+}
+
+.vw-accordion-panel {
+  border: 1px solid var(--vw-color-gray-200);
+  border-radius: var(--vw-radius-sm);
+  background: var(--vw-color-white);
+}
+
+.vw-accordion--flat .vw-accordion-panel {
+  border: 0;
+  border-radius: 0;
+}
+
+.vw-accordion--flat .vw-accordion-panel + .vw-accordion-panel {
+  border-top: 1px solid var(--vw-color-gray-200);
+}
+
+.vw-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-md);
+  width: 100%;
+  padding: var(--vw-space-md) var(--vw-space-lg);
+  border: none;
+  background: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-md);
+  color: var(--vw-color-gray-800);
+  text-align: left;
+  cursor: pointer;
+  /* the browser's own disclosure triangle, in both engines */
+  list-style: none;
+}
+
+.vw-accordion-header::-webkit-details-marker { display: none; }
+.vw-accordion-header::marker { content: ""; }
+
+.vw-accordion-header:hover { background: var(--vw-color-gray-50); }
+
+.vw-accordion-header:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: -2px;
+}
+
+.vw-accordion-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.vw-accordion-subtitle {
+  color: var(--vw-color-gray-500);
+  font-weight: 400;
+}
+
+.vw-accordion-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  flex-shrink: 0;
+}
+
+.vw-accordion-icon {
+  flex-shrink: 0;
+  color: var(--vw-color-gray-500);
+  transition: transform 160ms ease;
+}
+
+/* Rotates off the native [open] OR an explicit aria-expanded, so
+   both the <details> and the controlled markup are covered. */
+[open] > .vw-accordion-header .vw-accordion-icon,
+.vw-accordion-header[aria-expanded="true"] .vw-accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* togglePosition: 'before' */
+.vw-accordion--toggle-before .vw-accordion-icon { order: -1; }
+
+/* hideToggle */
+.vw-accordion--no-toggle .vw-accordion-icon { display: none; }
+
+/* filled */
+.vw-accordion-panel--filled > .vw-accordion-header { background: var(--vw-color-gray-50); }
+.vw-accordion-panel--filled > .vw-accordion-header:hover { background: var(--vw-color-gray-100); }
+
+.vw-accordion-body {
+  padding: 0 var(--vw-space-lg) var(--vw-space-lg);
+  color: var(--vw-color-gray-700);
+  font-size: var(--vw-font-description);
+  line-height: 1.5;
+}
+
+/* bodyPadding: false */
+.vw-accordion-body--flush { padding: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-accordion-icon { transition: none; }
+}
+
+/* ============================================================
+   Tree — .vw-tree
+
+   Hierarchical rows with expand/collapse. Styled to work on
+   EITHER markup, because the right one depends on what the tree
+   is for and a design system should not force that choice:
+
+     nested <details>   zero script, announced as disclosure
+                        widgets. Right for a disclosure hierarchy
+                        — a filter tree, a nested settings list.
+     role="tree" with   the full WAI-ARIA tree pattern, which
+     aria-expanded      needs roving tabindex and arrow keys from
+                        the caller. Right for a navigable file or
+                        topology tree, where users expect arrow
+                        keys to work.
+
+   The toggle rotates off [open] OR aria-expanded, so both are
+   styled without a second set of classes.
+
+   Indentation is one custom property on the root, applied to
+   each nested group. The guideline's treeNodePaddingIndent
+   defaults to 40px, which at depth five spends 200px of width on
+   nothing; 20px is the default here and --vw-tree-indent takes
+   40 if you want it.
+
+   Leaf rows keep a .vw-tree-toggle with --leaf on it rather than
+   omitting the element. Dropping it shifts every leaf label left
+   by the toggle's width, and a tree whose labels do not line up
+   reads as broken depth.
+
+     <ul class="vw-tree" role="tree">
+       <li role="treeitem" aria-expanded="true">
+         <div class="vw-tree-node">
+           <i class="ph ph-caret-right vw-tree-toggle"></i>
+           <i class="ph ph-folder vw-tree-icon"></i>
+           <span class="vw-tree-label">Documents</span>
+         </div>
+         <ul class="vw-tree-group" role="group"> … </ul>
+       </li>
+     </ul>
+   ============================================================ */
+
+.vw-tree {
+  --vw-tree-indent: 20px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-description);
+}
+
+.vw-tree ul,
+.vw-tree-group {
+  margin: 0;
+  padding-left: var(--vw-tree-indent);
+  list-style: none;
+}
+
+.vw-tree li { list-style: none; }
+
+.vw-tree-node {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  width: 100%;
+  min-height: 32px;
+  padding: var(--vw-space-xxs) var(--vw-space-xs);
+  border: none;
+  border-radius: var(--vw-radius-xs);
+  background: none;
+  color: var(--vw-color-gray-800);
+  text-align: left;
+  cursor: pointer;
+  /* a <summary> must lose the native triangle */
+  list-style: none;
+}
+
+.vw-tree-node::-webkit-details-marker { display: none; }
+.vw-tree-node::marker { content: ""; }
+
+.vw-tree-node:hover:not(.is-selected):not([aria-selected="true"]) {
+  background: var(--vw-color-gray-50);
+}
+
+.vw-tree-node.is-selected,
+.vw-tree-node[aria-selected="true"],
+[aria-selected="true"] > .vw-tree-node {
+  background: var(--vw-color-accent-50);
+  color: var(--vw-color-gray-900);
+  font-weight: 500;
+}
+
+.vw-tree-node:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: -2px;
+}
+
+.vw-tree-toggle {
+  flex-shrink: 0;
+  width: 16px;
+  color: var(--vw-color-gray-400);
+  text-align: center;
+  transition: transform 140ms ease;
+}
+
+/* Rotates from any of the three markups: <details>, an aria-expanded
+   list item, or an aria-expanded table row. */
+[open] > .vw-tree-node > .vw-tree-toggle,
+[aria-expanded="true"] > .vw-tree-node > .vw-tree-toggle,
+.vw-tree-node[aria-expanded="true"] > .vw-tree-toggle,
+tr[aria-expanded="true"] .vw-tree-toggle {
+  transform: rotate(90deg);
+}
+
+/* A leaf keeps the slot so its label lines up with its siblings'. */
+.vw-tree-toggle--leaf { visibility: hidden; }
+
+/* hideToggleButton */
+.vw-tree--no-toggle .vw-tree-toggle { display: none; }
+
+.vw-tree-icon {
+  flex-shrink: 0;
+  color: var(--vw-color-gray-500);
+  font-size: 1rem;
+}
+
+.vw-tree-node.is-selected .vw-tree-icon,
+[aria-selected="true"] > .vw-tree-node .vw-tree-icon {
+  color: var(--vw-color-accent-600);
+}
+
+.vw-tree-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A count or status sitting to the right of the label. */
+.vw-tree-meta {
+  flex-shrink: 0;
+  color: var(--vw-color-gray-400);
+  font-size: var(--vw-font-label-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* loadMore — a row, not a button floating below the tree, so it
+   stays at the depth of the nodes it will add. */
+.vw-tree-more {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  min-height: 32px;
+  padding: var(--vw-space-xxs) var(--vw-space-xs);
+  padding-left: calc(var(--vw-space-xs) + 16px + var(--vw-space-xs));
+  border: none;
+  background: none;
+  font-family: var(--fontFamily);
+  font-size: var(--vw-font-label-sm);
+  color: var(--vw-color-accent-600);
+  cursor: pointer;
+}
+
+.vw-tree-more:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-tree-toggle { transition: none; }
+}
+
+/* ── The same tree, inside a table ────────────────────────────
+   A hierarchical table is a tree in a different container, not a
+   different component — so it reuses .vw-tree-toggle and
+   --leaf rather than growing a parallel set of table-specific
+   classes that would drift from them.
+
+   Only the indent is new. It goes on a wrapper inside the first
+   cell rather than as padding on the <td>, because padding on a
+   cell fights the table's own column sizing and a border-collapse
+   table will not honour it consistently.
+
+   <tr> cannot nest, so depth is declared rather than structural:
+   the row carries aria-level and --vw-row-level, and the caller
+   shows or hides descendants when a row toggles. That is also
+   why the correct role here is treegrid, not tree.
+
+     <tr role="row" aria-level="2" aria-expanded="false"
+         style="--vw-row-level: 2">
+       <td>
+         <div class="vw-tree-cell">
+           <button class="vw-tree-toggle">…</button>
+           <span>Bryan Hawkins</span>
+         </div>
+       </td>
+     </tr>
+   ──────────────────────────────────────────────────────────── */
+
+.vw-tree-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xs);
+  min-width: 0;
+  padding-left: calc(var(--vw-row-level, 0) * var(--vw-tree-indent, 20px));
+}
+
+.vw-tree-cell > .vw-tree-toggle {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.vw-tree-cell > .vw-tree-toggle:focus-visible {
+  outline: 2px solid var(--vw-color-accent-500);
+  outline-offset: 2px;
+  border-radius: var(--vw-radius-xs);
+}
+
+/* A collapsed row's descendants are hidden by the caller; this is
+   just the hook so it need not reach for an inline style. */
+.nst-table tr.is-collapsed,
+.nst-table-row.is-collapsed { display: none; }
+
+/* ============================================================
+   Heatmap — .vw-heatmap
+
+   Two layouts, one component, because they differ only in how
+   the cells are tracked:
+
+     --calendar   contribution grid. Weeks run left to right as
+                  columns, weekdays top to bottom as rows. Months
+                  label the head, weekdays the gutter.
+     --matrix     correlation / density grid. A fixed number of
+                  columns, row keys in the gutter, column keys in
+                  the head, and cells big enough to carry a value.
+
+   ── Intensity is ONE custom property ────────────────────────
+
+   A cell's colour comes from `--vw-heat` (0 to 1) mixed against
+   `--vw-heatmap-tone`. There are deliberately no step classes
+   (`--level-3`, `--high`) because:
+
+     · the matrix case is continuous — a correlation of .63 is
+       not one of five buckets, and quantising it throws away
+       the thing the chart exists to show;
+     · a step class and a tone class can disagree, and half a
+       heatmap recoloured is worse than a wrong one. This is the
+       same reason .vw-app-menu-section sets one property.
+
+   The caller quantises if it wants GitHub's five levels — that
+   is arithmetic on the data, not a styling decision.
+
+     <div class="vw-heatmap-cell" style="--vw-heat: .62"></div>
+
+   ── Diverging scales (correlation) ──────────────────────────
+
+   `--vw-heat` is a MAGNITUDE, never negative: color-mix has no
+   meaning for a negative percentage. For a signed scale, pass
+   the absolute value and override the tone on the cell, since
+   --vw-heatmap-tone inherits:
+
+     style="--vw-heat: .74; --vw-heatmap-tone: var(--vw-color-red-500)"
+
+   ── What the caller still owns ──────────────────────────────
+
+   Every cell needs its own text — an `aria-label` like
+   "3 deploys on 12 March", or the grid is 365 unlabelled boxes
+   to a screen reader. A VISIBLE tooltip cannot be .vw-tooltip
+   nested in a cell: .vw-heatmap-scroll is `overflow: auto` and
+   would clip it, the same constraint .nst-action-menu carries
+   inside a table card. Portal it, or put the read-out beside
+   the chart.
+   ──────────────────────────────────────────────────────────── */
+
+.vw-heatmap {
+  /* Cell geometry — the only thing the two layouts really argue
+     about, so both read it rather than hard-coding sizes. */
+  --vw-heatmap-cell-size: 12px;
+  --vw-heatmap-gap: 3px;
+  --vw-heatmap-radius: var(--vw-radius-xs);
+  --vw-heatmap-tone: var(--vw-color-accent-500);
+  --vw-heatmap-empty: var(--vw-color-gray-200);
+  /* How far up the tone the deepest cell goes. 100% for a
+     calendar, which carries no text; the matrix pulls this back
+     — see .vw-heatmap--matrix. */
+  --vw-heatmap-max: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--vw-space-md);
+  font-family: var(--fontFamily);
+}
+
+.vw-heatmap-scroll {
+  display: grid;
+  grid-template-columns: auto max-content;
+  grid-template-rows: auto auto;
+  /* Without this the empty gutter track stretches into the free
+     space and shoves the grid to the right edge of its card —
+     which is what a heatmap with no row labels did. */
+  justify-content: start;
+  align-content: start;
+  gap: var(--vw-space-xxs);
+  overflow-x: auto;
+  /* The focus ring on a cell in the first column would be
+     clipped by the scroll box without this. */
+  padding: 2px;
+  margin: -2px;
+}
+
+.vw-heatmap-head   { grid-column: 2; grid-row: 1; }
+.vw-heatmap-gutter { grid-column: 1; grid-row: 2; }
+.vw-heatmap-grid   { grid-column: 2; grid-row: 2; }
+
+.vw-heatmap-head,
+.vw-heatmap-gutter,
+.vw-heatmap-grid {
+  display: grid;
+  gap: var(--vw-heatmap-gap);
+}
+
+.vw-heatmap-label {
+  font-size: var(--vw-font-label-sm);
+  line-height: var(--vw-heatmap-cell-size);
+  color: var(--vw-color-gray-500);
+  white-space: nowrap;
+}
+
+/* ── The cell ───────────────────────────────────────────────
+   Works as a <div>, <span> or <button>. The button form is
+   reset here rather than left to the caller, because a drill-
+   down heatmap on default button chrome is unrecognisable. */
+
+.vw-heatmap-cell {
+  --vw-heat: 0;
+  --vw-heat-bg: color-mix(in srgb,
+    var(--vw-heatmap-tone) calc(var(--vw-heat) * var(--vw-heatmap-max)),
+    var(--vw-heatmap-empty));
+
+  box-sizing: border-box;
+  width: var(--vw-heatmap-cell-size);
+  height: var(--vw-heatmap-cell-size);
+  border: none;
+  padding: 0;
+  border-radius: var(--vw-heatmap-radius);
+  background: var(--vw-heat-bg);
+  color: var(--vw-color-gray-800);
+  font-family: inherit;
+  font-size: var(--vw-font-label-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Ink that flips with the tint, not with a magic number ───
+
+   A cell in the matrix carries a number, and somewhere up the
+   ramp dark ink stops working. A fixed threshold ("white above
+   --vw-heat: .6") cannot be right, because the tint at a given
+   heat depends on the tone — and the tone changes with
+   `data-theme`. Measured: at heat 1, accent-700 is #1d4ed8 and
+   wants white; the green theme's accent-700 is #40ba98, where
+   white scores 2.4:1 and dark ink scores 5.8:1. The same number
+   would be right in one theme and wrong in the next.
+
+   So read the lightness of the colour actually produced and
+   switch on that. `(0.62 - l) * 1000` is a step function after
+   clamping: any tint lighter than oklch L .62 gives dark ink,
+   anything darker gives white, and the band between is too
+   narrow for a cell to land in.
+
+   Fallback is the gray-800 declared above — legible on the
+   light three-quarters of every ramp, which is where cells
+   carrying text mostly sit. */
+@supports (color: oklch(from red l 0 0)) {
+  .vw-heatmap-cell {
+    color: oklch(from var(--vw-heat-bg) clamp(0.28, calc((0.62 - l) * 1000), 1) 0 0);
+  }
+}
+
+button.vw-heatmap-cell,
+.vw-heatmap-cell[tabindex] { cursor: pointer; }
+
+.vw-heatmap-cell:focus-visible {
+  outline: 2px solid var(--vw-color-gray-900);
+  outline-offset: 1px;
+}
+
+/* A day outside the range being charted — the leading days of
+   the first week and the trailing days of the last. Kept in the
+   grid so the weekday rows stay aligned. */
+.vw-heatmap-cell--blank { background: none; }
+
+/* ── Calendar: weeks as columns, 7 weekday rows ─────────────── */
+
+.vw-heatmap--calendar .vw-heatmap-grid {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--vw-heatmap-cell-size));
+  grid-auto-columns: var(--vw-heatmap-cell-size);
+}
+
+.vw-heatmap--calendar .vw-heatmap-head {
+  grid-auto-flow: column;
+  grid-auto-columns: var(--vw-heatmap-cell-size);
+}
+
+.vw-heatmap--calendar .vw-heatmap-gutter {
+  grid-template-rows: repeat(7, var(--vw-heatmap-cell-size));
+  justify-items: end;
+  padding-right: var(--vw-space-xxs);
+}
+
+/* ── Matrix: a fixed column count, cells big enough to read ── */
+
+.vw-heatmap--matrix {
+  --vw-heatmap-cell-size: 44px;
+  --vw-heatmap-gap: 2px;
+  --vw-heatmap-radius: 2px;
+  /* Matrix cells carry a number, so the ramp stops short of the
+     full tone. Measured, on the default accent: at 100% the
+     deepest cell gives 3.9:1 against the best available ink,
+     which is the arithmetic ceiling for a single-hue ramp with
+     black-or-white text — neither choice does better. Stopping
+     at 80% puts the whole ramp at 4.6:1 or above and costs
+     almost nothing, because the exact shade of the darkest cell
+     is not what a reader takes from a matrix; the number is. */
+  --vw-heatmap-max: 80%;
+}
+
+.vw-heatmap--matrix .vw-heatmap-cell { font-weight: 500; }
+
+.vw-heatmap--matrix .vw-heatmap-grid,
+.vw-heatmap--matrix .vw-heatmap-head {
+  grid-template-columns: repeat(var(--vw-heatmap-cols, 1), var(--vw-heatmap-cell-size));
+}
+
+.vw-heatmap--matrix .vw-heatmap-gutter {
+  grid-auto-rows: var(--vw-heatmap-cell-size);
+  justify-items: end;
+  align-items: center;
+  padding-right: var(--vw-space-xs);
+}
+
+.vw-heatmap--matrix .vw-heatmap-head .vw-heatmap-label {
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Column keys long enough to collide — the ordinary case for a
+   correlation matrix. Vertical rather than rotated 45°, because
+   a rotated run of text needs its own height arithmetic and this
+   does not. */
+.vw-heatmap-head--vertical .vw-heatmap-label {
+  writing-mode: vertical-rl;
+  line-height: var(--vw-heatmap-cell-size);
+  justify-self: center;
+  text-align: right;
+  height: var(--vw-heatmap-head-h, 72px);
+}
+
+/* ── Legend ─────────────────────────────────────────────────
+   The keys are real .vw-heatmap-cell elements, not a parallel
+   swatch class, so a legend cannot drift from the grid it
+   describes. .vw-color-legend is the other legend in this
+   system — for named, categorical keys; this one is a ramp. */
+
+.vw-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--vw-space-xxs);
+  font-size: var(--vw-font-label-sm);
+  color: var(--vw-color-gray-500);
+}
+
+.vw-heatmap-legend > .vw-heatmap-cell { flex: none; }
+
+.vw-heatmap-legend-label { margin: 0 var(--vw-space-xxs); }

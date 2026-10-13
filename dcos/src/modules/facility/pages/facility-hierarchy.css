@@ -1,0 +1,17 @@
+.fh-path { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--vw-color-slate-200); }
+.fh-path-step { display: inline-flex; align-items: center; gap: 4px; }
+.fh-arrow { color: var(--vw-color-slate-400); font-size: 12px; }
+.fh-path-chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 500; line-height: 18px; }
+
+.fh-tree.ant-tree { background: transparent; font-family: inherit; }
+.fh-tree .ant-tree-treenode { padding: 1px 0; align-items: center; }
+.fh-tree .ant-tree-switcher { display: grid; place-items: center; color: var(--vw-color-slate-400); }
+.fh-tree .ant-tree-node-content-wrapper { border-radius: 8px; padding: 2px 8px; transition: background .12s; }
+.fh-tree .ant-tree-node-content-wrapper:hover { background: var(--vw-color-slate-50); }
+.fh-tree .ant-tree-node-selected { background: var(--primaryColor50) !important; }
+.fh-tree .ant-tree-indent-unit { width: 22px; }
+.fh-node { display: inline-flex; align-items: center; gap: 10px; min-height: 28px; }
+.fh-ico { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; flex-shrink: 0; }
+.fh-name { font-size: 13.5px; font-weight: 500; color: var(--vw-color-gray-900); }
+.fh-meta { display: inline-flex; gap: 6px; }
+.fh-hit .fh-name { background: var(--vw-color-amber-100); border-radius: 4px; padding: 0 3px; }

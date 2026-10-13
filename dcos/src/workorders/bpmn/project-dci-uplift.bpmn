@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_dci_uplift" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_dci_uplift">
+    <bpmn:participant id="Participant_project_dci_uplift" name="PRJ-13 · DCI and WAN uplift" processRef="project-dci-uplift" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-dci-uplift" name="DCI and WAN uplift" isExecutable="true">
+    <bpmn:documentation>Adds capacity between two sites: the path and diversity design is approved, carrier orders are placed, cross-connects (LOA/CFA) run as work orders, carriers hand the circuits over (a slipped date is chased), optics and line cards are installed and turned up, acceptance tests per path must pass, traffic is cut over in a change window and the old circuits are ceased and their optics recovered.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_dci_uplift">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Network_design" name="Network design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>acceptance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_tests</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>orders</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>handover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_carrier_late</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>chase_carrier</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_xconnect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_xconnect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_turnup</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_turnup</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_path</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_cutover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_cutover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_cease</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_cease</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Uplift approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve path and diversity design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="design-review" />
+        <zeebe:assignmentDefinition candidateGroups="Network Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P2D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_orders</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="orders" name="Place carrier orders">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_design_orders</bpmn:incoming>
+      <bpmn:outgoing>Flow_orders_raise_xconnect</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_xconnect" name="Raise cross-connect work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_orders_raise_xconnect</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_xconnect_wait_xconnect</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_xconnect" name="Cross-connect work closed">
+      <bpmn:incoming>Flow_raise_xconnect_wait_xconnect</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_xconnect_handover</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_xconnect" messageRef="Message_wait_xconnect" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="handover" name="Receive circuit handover">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P20D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_xconnect_handover</bpmn:incoming>
+      <bpmn:incoming>Flow_chase_carrier_handover</bpmn:incoming>
+      <bpmn:outgoing>Flow_handover_raise_turnup</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_carrier_late" name="Carrier date slipped" attachedToRef="handover" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_carrier_late_chase_carrier</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_carrier_late" messageRef="Message_b_carrier_late" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="chase_carrier" name="Chase the carrier">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="chase-up" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_carrier_late_chase_carrier</bpmn:incoming>
+      <bpmn:outgoing>Flow_chase_carrier_handover</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_turnup" name="Raise optics and turn-up work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_handover_raise_turnup</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_turnup_wait_turnup</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_turnup" name="Optics and turn-up work closed">
+      <bpmn:incoming>Flow_raise_turnup_wait_turnup</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_turnup_acceptance</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_turnup" messageRef="Message_wait_turnup" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="acceptance" name="Acceptance tests per path">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acceptance-tests" />
+        <zeebe:assignmentDefinition candidateGroups="Network Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P3D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_turnup_acceptance</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_path_acceptance</bpmn:incoming>
+      <bpmn:outgoing>Flow_acceptance_g_tests</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_tests" name="Tests passed?" default="Flow_g_tests_raise_cutover">
+      <bpmn:incoming>Flow_acceptance_g_tests</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_tests_raise_cutover</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_tests_fix_path</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_path" name="Fix the failing path">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="fix-findings" />
+        <zeebe:assignmentDefinition candidateGroups="Field Technician" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_tests_fix_path</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_path_acceptance</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_cutover" name="Raise traffic cut-over work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_tests_raise_cutover</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_cutover_wait_cutover</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_cutover" name="Traffic cut-over work closed">
+      <bpmn:incoming>Flow_raise_cutover_wait_cutover</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_cutover_raise_cease</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_cutover" messageRef="Message_wait_cutover" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_cease" name="Raise circuit cease and optics recovery work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_cutover_raise_cease</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_cease_wait_cease</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_cease" name="Circuit cease and optics recovery work closed">
+      <bpmn:incoming>Flow_raise_cease_wait_cease</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_cease_end</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_cease" messageRef="Message_wait_cease" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="end" name="Uplift in service">
+      <bpmn:incoming>Flow_wait_cease_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_orders" sourceRef="design" targetRef="orders" />
+    <bpmn:sequenceFlow id="Flow_orders_raise_xconnect" sourceRef="orders" targetRef="raise_xconnect" />
+    <bpmn:sequenceFlow id="Flow_raise_xconnect_wait_xconnect" sourceRef="raise_xconnect" targetRef="wait_xconnect" />
+    <bpmn:sequenceFlow id="Flow_wait_xconnect_handover" sourceRef="wait_xconnect" targetRef="handover" />
+    <bpmn:sequenceFlow id="Flow_handover_raise_turnup" sourceRef="handover" targetRef="raise_turnup" />
+    <bpmn:sequenceFlow id="Flow_raise_turnup_wait_turnup" sourceRef="raise_turnup" targetRef="wait_turnup" />
+    <bpmn:sequenceFlow id="Flow_wait_turnup_acceptance" sourceRef="wait_turnup" targetRef="acceptance" />
+    <bpmn:sequenceFlow id="Flow_acceptance_g_tests" sourceRef="acceptance" targetRef="g_tests" />
+    <bpmn:sequenceFlow id="Flow_chase_carrier_handover" sourceRef="chase_carrier" targetRef="handover" />
+    <bpmn:sequenceFlow id="Flow_g_tests_raise_cutover" name="passed" sourceRef="g_tests" targetRef="raise_cutover">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_tests_fix_path" name="failed" sourceRef="g_tests" targetRef="fix_path">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_path_acceptance" sourceRef="fix_path" targetRef="acceptance" />
+    <bpmn:sequenceFlow id="Flow_raise_cutover_wait_cutover" sourceRef="raise_cutover" targetRef="wait_cutover" />
+    <bpmn:sequenceFlow id="Flow_wait_cutover_raise_cease" sourceRef="wait_cutover" targetRef="raise_cease" />
+    <bpmn:sequenceFlow id="Flow_raise_cease_wait_cease" sourceRef="raise_cease" targetRef="wait_cease" />
+    <bpmn:sequenceFlow id="Flow_wait_cease_end" sourceRef="wait_cease" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_carrier_late_chase_carrier" sourceRef="b_carrier_late" targetRef="chase_carrier" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_xconnect" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_xconnect&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_b_carrier_late" name="carrier-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_turnup" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_turnup&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_cutover" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_cutover&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_cease" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_cease&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_dci_uplift">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_dci_uplift" bpmnElement="Collaboration_project_dci_uplift">
+      <bpmndi:BPMNShape id="Participant_project_dci_uplift_di" bpmnElement="Participant_project_dci_uplift" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2640" height="960" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2610" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Network_design_di" bpmnElement="Lane_Network_design" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2610" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="380" width="2610" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="635" width="2610" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="890" width="2610" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="orders_di" bpmnElement="orders">
+        <dc:Bounds x="570" y="415" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_xconnect_di" bpmnElement="raise_xconnect">
+        <dc:Bounds x="740" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_xconnect_di" bpmnElement="wait_xconnect">
+        <dc:Bounds x="952" y="692" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handover_di" bpmnElement="handover">
+        <dc:Bounds x="1080" y="415" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_carrier_late_di" bpmnElement="b_carrier_late">
+        <dc:Bounds x="1152" y="477" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="chase_carrier_di" bpmnElement="chase_carrier">
+        <dc:Bounds x="1250" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_turnup_di" bpmnElement="raise_turnup">
+        <dc:Bounds x="1250" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_turnup_di" bpmnElement="wait_turnup">
+        <dc:Bounds x="1462" y="692" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="acceptance_di" bpmnElement="acceptance">
+        <dc:Bounds x="1590" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_tests_di" bpmnElement="g_tests">
+        <dc:Bounds x="1795" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_path_di" bpmnElement="fix_path">
+        <dc:Bounds x="1930" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_cutover_di" bpmnElement="raise_cutover">
+        <dc:Bounds x="1930" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_cutover_di" bpmnElement="wait_cutover">
+        <dc:Bounds x="2142" y="692" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_cease_di" bpmnElement="raise_cease">
+        <dc:Bounds x="2270" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_cease_di" bpmnElement="wait_cease">
+        <dc:Bounds x="2482" y="692" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2652" y="947" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="305" />
+        <di:waypoint x="400" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_orders_di" bpmnElement="Flow_design_orders">
+        <di:waypoint x="520" y="305" />
+        <di:waypoint x="545" y="305" />
+        <di:waypoint x="545" y="455" />
+        <di:waypoint x="570" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_orders_raise_xconnect_di" bpmnElement="Flow_orders_raise_xconnect">
+        <di:waypoint x="690" y="455" />
+        <di:waypoint x="715" y="455" />
+        <di:waypoint x="715" y="710" />
+        <di:waypoint x="740" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_xconnect_wait_xconnect_di" bpmnElement="Flow_raise_xconnect_wait_xconnect">
+        <di:waypoint x="860" y="710" />
+        <di:waypoint x="952" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_xconnect_handover_di" bpmnElement="Flow_wait_xconnect_handover">
+        <di:waypoint x="988" y="710" />
+        <di:waypoint x="1055" y="710" />
+        <di:waypoint x="1055" y="455" />
+        <di:waypoint x="1080" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_handover_raise_turnup_di" bpmnElement="Flow_handover_raise_turnup">
+        <di:waypoint x="1200" y="455" />
+        <di:waypoint x="1225" y="455" />
+        <di:waypoint x="1225" y="710" />
+        <di:waypoint x="1250" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_turnup_wait_turnup_di" bpmnElement="Flow_raise_turnup_wait_turnup">
+        <di:waypoint x="1370" y="710" />
+        <di:waypoint x="1462" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_turnup_acceptance_di" bpmnElement="Flow_wait_turnup_acceptance">
+        <di:waypoint x="1498" y="710" />
+        <di:waypoint x="1565" y="710" />
+        <di:waypoint x="1565" y="305" />
+        <di:waypoint x="1590" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_acceptance_g_tests_di" bpmnElement="Flow_acceptance_g_tests">
+        <di:waypoint x="1710" y="305" />
+        <di:waypoint x="1795" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_chase_carrier_handover_di" bpmnElement="Flow_chase_carrier_handover">
+        <di:waypoint x="1310" y="600" />
+        <di:waypoint x="1310" y="512" />
+        <di:waypoint x="1140" y="512" />
+        <di:waypoint x="1140" y="495" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_tests_raise_cutover_di" bpmnElement="Flow_g_tests_raise_cutover">
+        <di:waypoint x="1845" y="305" />
+        <di:waypoint x="1905" y="305" />
+        <di:waypoint x="1905" y="710" />
+        <di:waypoint x="1930" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_tests_fix_path_di" bpmnElement="Flow_g_tests_fix_path">
+        <di:waypoint x="1845" y="305" />
+        <di:waypoint x="1905" y="305" />
+        <di:waypoint x="1905" y="815" />
+        <di:waypoint x="1930" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_path_acceptance_di" bpmnElement="Flow_fix_path_acceptance">
+        <di:waypoint x="1990" y="775" />
+        <di:waypoint x="1990" y="245" />
+        <di:waypoint x="1650" y="245" />
+        <di:waypoint x="1650" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_cutover_wait_cutover_di" bpmnElement="Flow_raise_cutover_wait_cutover">
+        <di:waypoint x="2050" y="710" />
+        <di:waypoint x="2142" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_cutover_raise_cease_di" bpmnElement="Flow_wait_cutover_raise_cease">
+        <di:waypoint x="2178" y="710" />
+        <di:waypoint x="2270" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_cease_wait_cease_di" bpmnElement="Flow_raise_cease_wait_cease">
+        <di:waypoint x="2390" y="710" />
+        <di:waypoint x="2482" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_cease_end_di" bpmnElement="Flow_wait_cease_end">
+        <di:waypoint x="2518" y="710" />
+        <di:waypoint x="2585" y="710" />
+        <di:waypoint x="2585" y="965" />
+        <di:waypoint x="2652" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_carrier_late_chase_carrier_di" bpmnElement="Flow_b_carrier_late_chase_carrier">
+        <di:waypoint x="1170" y="513" />
+        <di:waypoint x="1170" y="523" />
+        <di:waypoint x="1225" y="523" />
+        <di:waypoint x="1225" y="560" />
+        <di:waypoint x="1250" y="560" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,331 @@
+/** Status labels always use the canonical VW foreground/background pair. */
+
+import React from 'react';
+
+export type VwChipVariant =
+  | 'accent' | 'success' | 'error' | 'warning' | 'warning-outlined'
+  | 'info' | 'neutral' | 'purple' | 'cyan' | 'orange' | 'pink';
+
+const ANTD_COLOR_TO_VARIANT: Record<string, VwChipVariant> = {
+  success: 'success',
+  green: 'success',
+  warning: 'warning',
+  gold: 'warning',
+  error: 'error',
+  volcano: 'error',
+  red: 'error',
+  processing: 'info',
+  blue: 'info',
+  geekblue: 'purple',
+  purple: 'purple',
+  cyan: 'cyan',
+  orange: 'orange',
+  pink: 'pink',
+  default: 'neutral',
+};
+
+export interface VwChipProps {
+  children: React.ReactNode;
+  /** antd-style named color ("success"/"warning"/"error"/"processing"/"blue"/"purple"/"cyan"/"orange"/"gold"/"volcano"/"geekblue"/"default"), OR a literal hex string. */
+  color?: string;
+  /** Explicit vw-chip variant — takes precedence over `color` if both are given. */
+  variant?: VwChipVariant;
+  /** Solid fill (dark bg, light text) instead of the default light-bg/dark-text pill. */
+  solid?: boolean;
+  icon?: React.ReactNode;
+  style?: React.CSSProperties;
+  onClick?: () => void;
+}
+
+// Legacy callers may pass palette hex values or CSS variables. Resolve a tone,
+// then let the canonical VW class own both foreground and background colors.
+const PALETTE_TONES: Record<string, VwChipVariant> = {
+  '#000000': 'neutral',
+  '#020617': 'neutral',
+  '#022c22': 'success',
+  '#0284c7': 'info',
+  '#030712': 'neutral',
+  '#0369a1': 'info',
+  '#042f2e': 'cyan',
+  '#047857': 'success',
+  '#052e16': 'success',
+  '#059669': 'success',
+  '#064e3b': 'success',
+  '#065f46': 'success',
+  '#06b6d4': 'cyan',
+  '#075985': 'info',
+  '#082f49': 'info',
+  '#083344': 'cyan',
+  '#0891b2': 'cyan',
+  '#09090b': 'neutral',
+  '#0a0a0a': 'neutral',
+  '#0c0a09': 'neutral',
+  '#0c4a6e': 'info',
+  '#0d9488': 'cyan',
+  '#0e7490': 'cyan',
+  '#0ea5e9': 'info',
+  '#0f172a': 'neutral',
+  '#0f766e': 'cyan',
+  '#10b981': 'success',
+  '#111827': 'neutral',
+  '#115e59': 'cyan',
+  '#134e4a': 'cyan',
+  '#14532d': 'success',
+  '#14b8a6': 'cyan',
+  '#155e75': 'cyan',
+  '#15803d': 'success',
+  '#164e63': 'cyan',
+  '#166534': 'success',
+  '#16a34a': 'success',
+  '#171717': 'neutral',
+  '#172554': 'info',
+  '#18181b': 'neutral',
+  '#1a2e05': 'success',
+  '#1c1917': 'neutral',
+  '#1d4ed8': 'info',
+  '#1e293b': 'neutral',
+  '#1e3a8a': 'info',
+  '#1e40af': 'info',
+  '#1f2937': 'neutral',
+  '#22c55e': 'success',
+  '#22d3ee': 'cyan',
+  '#2563eb': 'info',
+  '#262626': 'neutral',
+  '#27272a': 'neutral',
+  '#292524': 'neutral',
+  '#2dd4bf': 'cyan',
+  '#2e1065': 'purple',
+  '#334155': 'neutral',
+  '#34d399': 'success',
+  '#365314': 'success',
+  '#374151': 'neutral',
+  '#38bdf8': 'info',
+  '#3b0764': 'purple',
+  '#3b82f6': 'info',
+  '#3f3f46': 'neutral',
+  '#3f6212': 'success',
+  '#404040': 'neutral',
+  '#422006': 'warning',
+  '#431407': 'orange',
+  '#44403c': 'neutral',
+  '#450a0a': 'error',
+  '#451a03': 'warning',
+  '#475569': 'neutral',
+  '#4a044e': 'pink',
+  '#4ade80': 'success',
+  '#4b5563': 'neutral',
+  '#4c0519': 'error',
+  '#4c1d95': 'purple',
+  '#4d7c0f': 'success',
+  '#500724': 'pink',
+  '#525252': 'neutral',
+  '#52525b': 'neutral',
+  '#57534e': 'neutral',
+  '#581c87': 'purple',
+  '#5b21b6': 'purple',
+  '#5eead4': 'cyan',
+  '#60a5fa': 'info',
+  '#64748b': 'neutral',
+  '#65a30d': 'success',
+  '#67e8f9': 'cyan',
+  '#6b21a8': 'purple',
+  '#6b7280': 'neutral',
+  '#6d28d9': 'purple',
+  '#6ee7b7': 'success',
+  '#701a75': 'pink',
+  '#713f12': 'warning',
+  '#71717a': 'neutral',
+  '#737373': 'neutral',
+  '#78350f': 'warning',
+  '#78716c': 'neutral',
+  '#7c2d12': 'orange',
+  '#7c3aed': 'purple',
+  '#7dd3fc': 'info',
+  '#7e22ce': 'purple',
+  '#7f1d1d': 'error',
+  '#831843': 'pink',
+  '#84cc16': 'success',
+  '#854d0e': 'warning',
+  '#86198f': 'pink',
+  '#86efac': 'success',
+  '#881337': 'error',
+  '#8b5cf6': 'purple',
+  '#92400e': 'warning',
+  '#9333ea': 'purple',
+  '#93c5fd': 'info',
+  '#94a3b8': 'neutral',
+  '#991b1b': 'error',
+  '#99f6e4': 'cyan',
+  '#9a3412': 'orange',
+  '#9ca3af': 'neutral',
+  '#9d174d': 'pink',
+  '#9f1239': 'error',
+  '#a16207': 'warning',
+  '#a1a1aa': 'neutral',
+  '#a21caf': 'pink',
+  '#a3a3a3': 'neutral',
+  '#a3e635': 'success',
+  '#a5f3fc': 'cyan',
+  '#a78bfa': 'purple',
+  '#a7f3d0': 'success',
+  '#a855f7': 'purple',
+  '#a8a29e': 'neutral',
+  '#b45309': 'warning',
+  '#b91c1c': 'error',
+  '#bae6fd': 'info',
+  '#bbf7d0': 'success',
+  '#be123c': 'error',
+  '#be185d': 'pink',
+  '#bef264': 'success',
+  '#bfdbfe': 'info',
+  '#c026d3': 'pink',
+  '#c084fc': 'purple',
+  '#c2410c': 'orange',
+  '#c4b5fd': 'purple',
+  '#ca8a04': 'warning',
+  '#cbd5e1': 'neutral',
+  '#ccfbf1': 'cyan',
+  '#cffafe': 'cyan',
+  '#d1d5db': 'neutral',
+  '#d1fae5': 'success',
+  '#d4d4d4': 'neutral',
+  '#d4d4d8': 'neutral',
+  '#d6d3d1': 'neutral',
+  '#d8b4fe': 'purple',
+  '#d946ef': 'pink',
+  '#d97706': 'warning',
+  '#d9f99d': 'success',
+  '#db2777': 'pink',
+  '#dbeafe': 'info',
+  '#dc2626': 'error',
+  '#dcfce7': 'success',
+  '#ddd6fe': 'purple',
+  '#e0f2fe': 'info',
+  '#e11d48': 'error',
+  '#e2e8f0': 'neutral',
+  '#e4e4e7': 'neutral',
+  '#e5e5e5': 'neutral',
+  '#e5e7eb': 'neutral',
+  '#e7e5e4': 'neutral',
+  '#e879f9': 'pink',
+  '#e9d5ff': 'purple',
+  '#ea580c': 'orange',
+  '#eab308': 'warning',
+  '#ec4899': 'pink',
+  '#ecfccb': 'success',
+  '#ecfdf5': 'success',
+  '#ecfeff': 'cyan',
+  '#ede9fe': 'purple',
+  '#ef4444': 'error',
+  '#eff6ff': 'info',
+  '#f0abfc': 'pink',
+  '#f0f9ff': 'info',
+  '#f0fdf4': 'success',
+  '#f0fdfa': 'cyan',
+  '#f1f5f9': 'neutral',
+  '#f3e8ff': 'purple',
+  '#f3f4f6': 'neutral',
+  '#f43f5e': 'error',
+  '#f472b6': 'pink',
+  '#f4f4f5': 'neutral',
+  '#f59e0b': 'warning',
+  '#f5d0fe': 'pink',
+  '#f5f3ff': 'purple',
+  '#f5f5f4': 'neutral',
+  '#f5f5f5': 'neutral',
+  '#f5feff': 'cyan',
+  '#f7fee7': 'success',
+  '#f7fff9': 'success',
+  '#f7fffb': 'success',
+  '#f7fffe': 'cyan',
+  '#f87171': 'error',
+  '#f8fafc': 'neutral',
+  '#f8fcff': 'info',
+  '#f97316': 'orange',
+  '#f9a8d4': 'pink',
+  '#f9fafb': 'neutral',
+  '#facc15': 'warning',
+  '#fae8ff': 'pink',
+  '#faf5ff': 'purple',
+  '#faf9ff': 'purple',
+  '#fafaf9': 'neutral',
+  '#fafafa': 'neutral',
+  '#fb7185': 'error',
+  '#fb923c': 'orange',
+  '#fbbf24': 'warning',
+  '#fbcfe8': 'pink',
+  '#fbfcfe': 'neutral',
+  '#fbfff3': 'success',
+  '#fca5a5': 'error',
+  '#fcd34d': 'warning',
+  '#fce7f3': 'pink',
+  '#fcfcfb': 'neutral',
+  '#fcfcfc': 'neutral',
+  '#fda4af': 'error',
+  '#fdba74': 'orange',
+  '#fde047': 'warning',
+  '#fde68a': 'warning',
+  '#fdf2f8': 'pink',
+  '#fdf4ff': 'pink',
+  '#fdfaff': 'purple',
+  '#fecaca': 'error',
+  '#fecdd3': 'error',
+  '#fed7aa': 'orange',
+  '#fee2e2': 'error',
+  '#fef08a': 'warning',
+  '#fef2f2': 'error',
+  '#fef3c7': 'warning',
+  '#fef7fb': 'pink',
+  '#fef9c3': 'warning',
+  '#fef9ff': 'pink',
+  '#fefce8': 'warning',
+  '#ffe4e6': 'error',
+  '#ffedd5': 'orange',
+  '#fff1f2': 'error',
+  '#fff7ed': 'orange',
+  '#fff8ee': 'orange',
+  '#fff8f9': 'error',
+  '#fffbeb': 'warning',
+  '#fffcfc': 'error',
+  '#fffef5': 'warning',
+  '#fffef7': 'warning',
+  '#ffffff': 'neutral',
+};
+function resolveTone(color?: string): VwChipVariant {
+  if (!color) return 'neutral';
+  if (ANTD_COLOR_TO_VARIANT[color]) return ANTD_COLOR_TO_VARIANT[color];
+  if (PALETTE_TONES[color.toLowerCase()]) return PALETTE_TONES[color.toLowerCase()];
+  const family = color.match(/--vw-color-(red|rose|green|emerald|teal|lime|yellow|amber|orange|blue|sky|cyan|violet|purple|pink|fuchsia|slate|gray|neutral|zinc|stone)-/)?.[1];
+  const tones: Record<string, VwChipVariant> = {"red": "error", "rose": "error", "green": "success", "emerald": "success", "teal": "cyan", "lime": "success", "yellow": "warning", "amber": "warning", "orange": "orange", "blue": "info", "sky": "info", "cyan": "cyan", "violet": "purple", "purple": "purple", "pink": "pink", "fuchsia": "pink", "slate": "neutral", "gray": "neutral", "neutral": "neutral", "zinc": "neutral", "stone": "neutral"};
+  if (family) return tones[family];
+  // Older modules also supply non-palette hex values. Preserve their hue's
+  // semantic family while still using the exact registered chip colors.
+  if (/^#[0-9a-f]{6}$/i.test(color)) {
+    const rgb = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = rgb;
+    const max = Math.max(...rgb), min = Math.min(...rgb), delta = max - min;
+    if (!delta || delta / max < 0.2) return 'neutral';
+    const rawHue = max === r ? (g - b) / delta : max === g ? (b - r) / delta + 2 : (r - g) / delta + 4;
+    const hue = (rawHue * 60 + 360) % 360;
+    return hue < 15 || hue >= 345 ? 'error' : hue < 45 ? 'orange'
+      : hue < 80 ? 'warning' : hue < 170 ? 'success' : hue < 200 ? 'cyan'
+      : hue < 255 ? 'info' : hue < 290 ? 'purple' : 'pink';
+  }
+  return 'neutral';
+}
+
+export const VwChip: React.FC<VwChipProps> = ({ children, color, variant, solid, icon, style, onClick }) => {
+  const resolved = variant ?? resolveTone(color);
+  const suffix = resolved === 'warning-outlined' ? '' : (solid ? '-solid' : '');
+  const className = ['vw-chip', `vw-chip--${resolved}${suffix}`, onClick ? 'is-clickable' : '']
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <span className={className} onClick={onClick} style={style}>
+      {icon}{children}
+    </span>
+  );
+};
+
+export default VwChip;

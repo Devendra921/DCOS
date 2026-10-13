@@ -1,0 +1,6 @@
+.hfp-crumbs { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; min-width: 0; margin-top: -6px; font-size: 13px; }
+.hfp-crumbs button { border: 0; background: transparent; padding: 4px 6px; border-radius: 6px; font: inherit; color: var(--primaryColor700); cursor: pointer; font-weight: 500; }
+.hfp-crumbs button:hover { background: var(--primaryColor50); }
+.hfp-crumbs span { padding: 4px 6px; color: var(--vw-color-gray-500); }
+.hfp-crumbs span.is-last { color: var(--vw-color-gray-900); font-weight: 600; }
+.hfp-crumbs .hfp-sep { color: var(--vw-color-slate-400); flex-shrink: 0; }

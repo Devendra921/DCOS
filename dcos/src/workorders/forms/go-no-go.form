@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "go-no-go",
+  "type": "default",
+  "components": [
+    { "id": "Text_gng_intro", "type": "text", "text": "### Go / no-go\nConfirm the cut-over is ready, then decide. A go needs a clear rollback trigger. A no-go sends the open issues back to be fixed first." },
+    { "id": "Field_prechecks", "type": "checklist", "key": "prechecks", "label": "Pre-checks done", "values": [{"label": "Change approved and window booked", "value": "change"}, {"label": "Rollback plan agreed and tested", "value": "rollback"}, {"label": "Configuration and data backed up", "value": "backup"}, {"label": "People and site access booked", "value": "people"}, {"label": "Customers and stakeholders told", "value": "comms"}, {"label": "Monitoring in place to watch the cut-over", "value": "monitoring"}] },
+    { "id": "Text_gng_warn", "type": "text", "text": "Not every pre-check is ticked. Say why in the note, or choose no-go.", "conditional": {"hide": "=not(goDecision = \"go\" and (prechecks = null or count(prechecks) < 6))"} },
+    { "id": "Field_goDecision", "type": "radio", "key": "goDecision", "label": "Decision", "values": [{"label": "Go", "value": "go"}, {"label": "No go", "value": "nogo"}], "validate": {"required": true} },
+    { "id": "Field_rollbackTrigger", "type": "textfield", "key": "rollbackTrigger", "label": "When will you roll back?", "description": "The condition that triggers a rollback during the cut-over.", "validate": {"required": true}, "conditional": {"hide": "=not(goDecision = \"go\")"} },
+    { "id": "Field_nogoReason", "type": "textarea", "key": "nogoReason", "label": "Why not", "validate": {"required": true}, "conditional": {"hide": "=not(goDecision = \"nogo\")"} },
+    { "id": "List_openItemsList", "type": "dynamiclist", "path": "openItemsList", "label": "Issues to fix first", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "conditional": {"hide": "=not(goDecision = \"nogo\")"}, "components": [
+      { "id": "Field_oi_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_oi", "columns": 8} },
+      { "id": "Field_oi_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_oi", "columns": 4} },
+      { "id": "Field_oi_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_oi", "columns": 4} }
+    ] },
+    { "id": "Field_note", "type": "textarea", "key": "note", "label": "Note (optional)" },
+    { "id": "Expr_approved", "type": "expression", "key": "approved", "expression": "=if goDecision = null then null else goDecision = \"go\"", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=if goDecision = \"nogo\" then (if openItemsList = null then 0 else count(openItemsList)) else 0", "computeOn": "change" }
+  ]
+}

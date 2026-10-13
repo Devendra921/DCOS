@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_building_fitout" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_building_fitout">
+    <bpmn:participant id="Participant_project_building_fitout" name="PRJ-10 · Building fit-out" processRef="project-building-fitout" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-building-fitout" name="Building fit-out" isExecutable="true">
+    <bpmn:documentation>Fits out white space and support areas: the design and bill of quantities must be issued for construction, the fit-out package is awarded, fire and life-safety approval is in place, partitions and finishes, then containment and raised floor run as contractor work orders under change, the white-space readiness check and snag walk must come back clean, and the client signs the handover.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_building_fitout">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fire</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_fire</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>chase_fire</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>revise_design</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>award</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Contractor" name="Contractor">
+        <bpmn:flowNodeRef>raise_finishes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_finishes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_containment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_containment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>close_snags</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Commissioning" name="Commissioning">
+        <bpmn:flowNodeRef>readiness</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_ready</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>snag_walk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_snags</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>handover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Fit-out approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve design and bill of quantities">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P4D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:incoming>Flow_revise_design_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_g_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_design" name="Issued for construction?" default="Flow_g_design_award">
+      <bpmn:incoming>Flow_design_g_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_design_award</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_design_revise_design</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="revise_design" name="Revise design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_revise_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_revise_design_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="award" name="Award the fit-out package">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_award</bpmn:incoming>
+      <bpmn:outgoing>Flow_award_fire</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="fire" name="Fire and life-safety approval">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_award_fire</bpmn:incoming>
+      <bpmn:incoming>Flow_chase_fire_fire</bpmn:incoming>
+      <bpmn:outgoing>Flow_fire_g_fire</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_fire" name="Fire approval in place?" default="Flow_g_fire_raise_finishes">
+      <bpmn:incoming>Flow_fire_g_fire</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_fire_raise_finishes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_fire_chase_fire</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="chase_fire" name="Revise the fire strategy">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_fire_chase_fire</bpmn:incoming>
+      <bpmn:outgoing>Flow_chase_fire_fire</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_finishes" name="Raise partitions and finishes work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_fire_raise_finishes</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_finishes_wait_finishes</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_finishes" name="Partitions and finishes work closed">
+      <bpmn:incoming>Flow_raise_finishes_wait_finishes</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_finishes_raise_containment</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_finishes" messageRef="Message_wait_finishes" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_containment" name="Raise containment and raised floor work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_finishes_raise_containment</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_containment_wait_containment</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_containment" name="Containment and raised floor work closed">
+      <bpmn:incoming>Flow_raise_containment_wait_containment</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_containment_readiness</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_containment" messageRef="Message_wait_containment" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="readiness" name="White-space readiness check">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P2D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_containment_readiness</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_readiness</bpmn:incoming>
+      <bpmn:outgoing>Flow_readiness_g_ready</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_ready" name="Ready?" default="Flow_g_ready_snag_walk">
+      <bpmn:incoming>Flow_readiness_g_ready</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_ready_snag_walk</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_ready_fix</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix" name="Fix readiness findings">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ready_fix</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_readiness</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="snag_walk" name="Snag walk">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ready_snag_walk</bpmn:incoming>
+      <bpmn:incoming>Flow_close_snags_snag_walk</bpmn:incoming>
+      <bpmn:outgoing>Flow_snag_walk_g_snags</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_snags" name="Snags closed?" default="Flow_g_snags_handover">
+      <bpmn:incoming>Flow_snag_walk_g_snags</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_snags_handover</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_snags_close_snags</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="close_snags" name="Close snags">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_snags_close_snags</bpmn:incoming>
+      <bpmn:outgoing>Flow_close_snags_snag_walk</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="handover" name="Client handover">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_snags_handover</bpmn:incoming>
+      <bpmn:outgoing>Flow_handover_end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="end" name="White space handed over">
+      <bpmn:incoming>Flow_handover_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_g_design" sourceRef="design" targetRef="g_design" />
+    <bpmn:sequenceFlow id="Flow_g_design_award" name="issued" sourceRef="g_design" targetRef="award">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_design_revise_design" name="rejected" sourceRef="g_design" targetRef="revise_design">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_revise_design_design" sourceRef="revise_design" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_award_fire" sourceRef="award" targetRef="fire" />
+    <bpmn:sequenceFlow id="Flow_fire_g_fire" sourceRef="fire" targetRef="g_fire" />
+    <bpmn:sequenceFlow id="Flow_g_fire_raise_finishes" name="approved" sourceRef="g_fire" targetRef="raise_finishes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_fire_chase_fire" name="rejected" sourceRef="g_fire" targetRef="chase_fire">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_chase_fire_fire" sourceRef="chase_fire" targetRef="fire" />
+    <bpmn:sequenceFlow id="Flow_raise_finishes_wait_finishes" sourceRef="raise_finishes" targetRef="wait_finishes" />
+    <bpmn:sequenceFlow id="Flow_wait_finishes_raise_containment" sourceRef="wait_finishes" targetRef="raise_containment" />
+    <bpmn:sequenceFlow id="Flow_raise_containment_wait_containment" sourceRef="raise_containment" targetRef="wait_containment" />
+    <bpmn:sequenceFlow id="Flow_wait_containment_readiness" sourceRef="wait_containment" targetRef="readiness" />
+    <bpmn:sequenceFlow id="Flow_readiness_g_ready" sourceRef="readiness" targetRef="g_ready" />
+    <bpmn:sequenceFlow id="Flow_g_ready_snag_walk" name="ready" sourceRef="g_ready" targetRef="snag_walk">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_ready_fix" name="findings" sourceRef="g_ready" targetRef="fix">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_readiness" sourceRef="fix" targetRef="readiness" />
+    <bpmn:sequenceFlow id="Flow_snag_walk_g_snags" sourceRef="snag_walk" targetRef="g_snags" />
+    <bpmn:sequenceFlow id="Flow_g_snags_handover" name="closed" sourceRef="g_snags" targetRef="handover">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=snags = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_snags_close_snags" name="open snags" sourceRef="g_snags" targetRef="close_snags">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=snags &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_close_snags_snag_walk" sourceRef="close_snags" targetRef="snag_walk" />
+    <bpmn:sequenceFlow id="Flow_handover_end" sourceRef="handover" targetRef="end" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_finishes" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_finishes&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_containment" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_containment&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_building_fitout">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_building_fitout" bpmnElement="Collaboration_project_building_fitout">
+      <bpmndi:BPMNShape id="Participant_project_building_fitout_di" bpmnElement="Participant_project_building_fitout" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2810" height="1215" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="590" width="2780" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Contractor_di" bpmnElement="Lane_Contractor" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="2780" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Commissioning_di" bpmnElement="Lane_Commissioning" isHorizontal="true">
+        <dc:Bounds x="190" y="995" width="2780" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="1145" width="2780" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_design_di" bpmnElement="g_design">
+        <dc:Bounds x="605" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="revise_design_di" bpmnElement="revise_design">
+        <dc:Bounds x="740" y="475" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="award_di" bpmnElement="award">
+        <dc:Bounds x="740" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fire_di" bpmnElement="fire">
+        <dc:Bounds x="910" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_fire_di" bpmnElement="g_fire">
+        <dc:Bounds x="1115" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="chase_fire_di" bpmnElement="chase_fire">
+        <dc:Bounds x="1250" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_finishes_di" bpmnElement="raise_finishes">
+        <dc:Bounds x="1250" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_finishes_di" bpmnElement="wait_finishes">
+        <dc:Bounds x="1462" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_containment_di" bpmnElement="raise_containment">
+        <dc:Bounds x="1590" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_containment_di" bpmnElement="wait_containment">
+        <dc:Bounds x="1802" y="797" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="readiness_di" bpmnElement="readiness">
+        <dc:Bounds x="1930" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ready_di" bpmnElement="g_ready">
+        <dc:Bounds x="2135" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_di" bpmnElement="fix">
+        <dc:Bounds x="2270" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="snag_walk_di" bpmnElement="snag_walk">
+        <dc:Bounds x="2270" y="1030" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_snags_di" bpmnElement="g_snags">
+        <dc:Bounds x="2475" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="close_snags_di" bpmnElement="close_snags">
+        <dc:Bounds x="2610" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handover_di" bpmnElement="handover">
+        <dc:Bounds x="2610" y="1180" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2822" y="1202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="410" />
+        <di:waypoint x="400" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_g_design_di" bpmnElement="Flow_design_g_design">
+        <di:waypoint x="520" y="410" />
+        <di:waypoint x="605" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_award_di" bpmnElement="Flow_g_design_award">
+        <di:waypoint x="655" y="410" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="715" y="665" />
+        <di:waypoint x="740" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_revise_design_di" bpmnElement="Flow_g_design_revise_design">
+        <di:waypoint x="655" y="410" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="715" y="515" />
+        <di:waypoint x="740" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_revise_design_design_di" bpmnElement="Flow_revise_design_design">
+        <di:waypoint x="800" y="555" />
+        <di:waypoint x="800" y="467" />
+        <di:waypoint x="460" y="467" />
+        <di:waypoint x="460" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_award_fire_di" bpmnElement="Flow_award_fire">
+        <di:waypoint x="860" y="665" />
+        <di:waypoint x="885" y="665" />
+        <di:waypoint x="885" y="155" />
+        <di:waypoint x="910" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fire_g_fire_di" bpmnElement="Flow_fire_g_fire">
+        <di:waypoint x="1030" y="155" />
+        <di:waypoint x="1115" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_fire_raise_finishes_di" bpmnElement="Flow_g_fire_raise_finishes">
+        <di:waypoint x="1165" y="155" />
+        <di:waypoint x="1225" y="155" />
+        <di:waypoint x="1225" y="815" />
+        <di:waypoint x="1250" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_fire_chase_fire_di" bpmnElement="Flow_g_fire_chase_fire">
+        <di:waypoint x="1165" y="155" />
+        <di:waypoint x="1225" y="155" />
+        <di:waypoint x="1225" y="260" />
+        <di:waypoint x="1250" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_chase_fire_fire_di" bpmnElement="Flow_chase_fire_fire">
+        <di:waypoint x="1310" y="300" />
+        <di:waypoint x="1310" y="212" />
+        <di:waypoint x="970" y="212" />
+        <di:waypoint x="970" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_finishes_wait_finishes_di" bpmnElement="Flow_raise_finishes_wait_finishes">
+        <di:waypoint x="1370" y="815" />
+        <di:waypoint x="1462" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_finishes_raise_containment_di" bpmnElement="Flow_wait_finishes_raise_containment">
+        <di:waypoint x="1498" y="815" />
+        <di:waypoint x="1590" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_containment_wait_containment_di" bpmnElement="Flow_raise_containment_wait_containment">
+        <di:waypoint x="1710" y="815" />
+        <di:waypoint x="1802" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_containment_readiness_di" bpmnElement="Flow_wait_containment_readiness">
+        <di:waypoint x="1838" y="815" />
+        <di:waypoint x="1905" y="815" />
+        <di:waypoint x="1905" y="1070" />
+        <di:waypoint x="1930" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_readiness_g_ready_di" bpmnElement="Flow_readiness_g_ready">
+        <di:waypoint x="2050" y="1070" />
+        <di:waypoint x="2135" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ready_snag_walk_di" bpmnElement="Flow_g_ready_snag_walk">
+        <di:waypoint x="2185" y="1070" />
+        <di:waypoint x="2270" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ready_fix_di" bpmnElement="Flow_g_ready_fix">
+        <di:waypoint x="2185" y="1070" />
+        <di:waypoint x="2245" y="1070" />
+        <di:waypoint x="2245" y="920" />
+        <di:waypoint x="2270" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_readiness_di" bpmnElement="Flow_fix_readiness">
+        <di:waypoint x="2330" y="960" />
+        <di:waypoint x="2330" y="1127" />
+        <di:waypoint x="1990" y="1127" />
+        <di:waypoint x="1990" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_snag_walk_g_snags_di" bpmnElement="Flow_snag_walk_g_snags">
+        <di:waypoint x="2390" y="1070" />
+        <di:waypoint x="2475" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_snags_handover_di" bpmnElement="Flow_g_snags_handover">
+        <di:waypoint x="2525" y="1070" />
+        <di:waypoint x="2585" y="1070" />
+        <di:waypoint x="2585" y="1220" />
+        <di:waypoint x="2610" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_snags_close_snags_di" bpmnElement="Flow_g_snags_close_snags">
+        <di:waypoint x="2525" y="1070" />
+        <di:waypoint x="2585" y="1070" />
+        <di:waypoint x="2585" y="920" />
+        <di:waypoint x="2610" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_close_snags_snag_walk_di" bpmnElement="Flow_close_snags_snag_walk">
+        <di:waypoint x="2670" y="960" />
+        <di:waypoint x="2670" y="1127" />
+        <di:waypoint x="2330" y="1127" />
+        <di:waypoint x="2330" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_handover_end_di" bpmnElement="Flow_handover_end">
+        <di:waypoint x="2730" y="1220" />
+        <di:waypoint x="2822" y="1220" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

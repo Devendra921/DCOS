@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_decommission" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_decommission">
+    <bpmn:participant id="Participant_project_decommission" name="PRJ-07 · Decommission" processRef="project-decommission" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-decommission" name="Decommission" isExecutable="true">
+    <bpmn:documentation>Retires end-of-life equipment: the inventory is confirmed, service owners confirm their workloads are drained (blockers are resolved first), power-down and disconnect run as work orders under change, security sanitises and certifies the media (re-wiping anything uncertified), removal and disposal run as work orders and the records are updated.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_decommission">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>identify</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>drain</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_clear</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>resolve</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>records</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Installation" name="Installation">
+        <bpmn:flowNodeRef>raise_disconnect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_disconnect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_removal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_removal</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Security" name="Security">
+        <bpmn:flowNodeRef>wipe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_certified</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>rewipe</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Decommission approved">
+      <bpmn:outgoing>Flow_start_identify</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="identify" name="Confirm end-of-life inventory">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT32H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_identify</bpmn:incoming>
+      <bpmn:outgoing>Flow_identify_drain</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="drain" name="Confirm workloads drained">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P2D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_identify_drain</bpmn:incoming>
+      <bpmn:incoming>Flow_resolve_drain</bpmn:incoming>
+      <bpmn:outgoing>Flow_drain_g_clear</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_clear" name="Nothing depends on it?" default="Flow_g_clear_raise_disconnect">
+      <bpmn:incoming>Flow_drain_g_clear</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_clear_raise_disconnect</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_clear_resolve</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="resolve" name="Resolve dependencies">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P2D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_clear_resolve</bpmn:incoming>
+      <bpmn:outgoing>Flow_resolve_drain</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_disconnect" name="Raise power-down and disconnect work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_clear_raise_disconnect</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_disconnect_wait_disconnect</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_disconnect" name="Power-down and disconnect work closed">
+      <bpmn:incoming>Flow_raise_disconnect_wait_disconnect</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_disconnect_wipe</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_disconnect" messageRef="Message_wait_disconnect" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="wipe" name="Sanitise and certify media">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Security Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_disconnect_wipe</bpmn:incoming>
+      <bpmn:incoming>Flow_rewipe_wipe</bpmn:incoming>
+      <bpmn:outgoing>Flow_wipe_g_certified</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_certified" name="All media certified?" default="Flow_g_certified_raise_removal">
+      <bpmn:incoming>Flow_wipe_g_certified</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_certified_raise_removal</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_certified_rewipe</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="rewipe" name="Re-wipe uncertified media">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Security Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT8H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_certified_rewipe</bpmn:incoming>
+      <bpmn:outgoing>Flow_rewipe_wipe</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_removal" name="Raise removal and disposal work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_certified_raise_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_removal_wait_removal</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_removal" name="Removal and disposal work closed">
+      <bpmn:incoming>Flow_raise_removal_wait_removal</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_removal_records</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_removal" messageRef="Message_wait_removal" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="records" name="Update records">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.update-record" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_removal_records</bpmn:incoming>
+      <bpmn:outgoing>Flow_records_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="Decommissioned">
+      <bpmn:incoming>Flow_records_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_identify" sourceRef="start" targetRef="identify" />
+    <bpmn:sequenceFlow id="Flow_identify_drain" sourceRef="identify" targetRef="drain" />
+    <bpmn:sequenceFlow id="Flow_drain_g_clear" sourceRef="drain" targetRef="g_clear" />
+    <bpmn:sequenceFlow id="Flow_g_clear_raise_disconnect" name="clear" sourceRef="g_clear" targetRef="raise_disconnect">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_clear_resolve" name="blocked" sourceRef="g_clear" targetRef="resolve">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_resolve_drain" sourceRef="resolve" targetRef="drain" />
+    <bpmn:sequenceFlow id="Flow_raise_disconnect_wait_disconnect" sourceRef="raise_disconnect" targetRef="wait_disconnect" />
+    <bpmn:sequenceFlow id="Flow_wait_disconnect_wipe" sourceRef="wait_disconnect" targetRef="wipe" />
+    <bpmn:sequenceFlow id="Flow_wipe_g_certified" sourceRef="wipe" targetRef="g_certified" />
+    <bpmn:sequenceFlow id="Flow_g_certified_raise_removal" name="certified" sourceRef="g_certified" targetRef="raise_removal">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_certified_rewipe" name="not certified" sourceRef="g_certified" targetRef="rewipe">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_rewipe_wipe" sourceRef="rewipe" targetRef="wipe" />
+    <bpmn:sequenceFlow id="Flow_raise_removal_wait_removal" sourceRef="raise_removal" targetRef="wait_removal" />
+    <bpmn:sequenceFlow id="Flow_wait_removal_records" sourceRef="wait_removal" targetRef="records" />
+    <bpmn:sequenceFlow id="Flow_records_end" sourceRef="records" targetRef="end" />
+  </bpmn:process>
+  <bpmn:message id="Message_wait_disconnect" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_disconnect&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_removal" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_removal&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_decommission">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_decommission" bpmnElement="Collaboration_project_decommission">
+      <bpmndi:BPMNShape id="Participant_project_decommission_di" bpmnElement="Participant_project_decommission" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2130" height="810" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2100" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="2100" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Installation_di" bpmnElement="Lane_Installation" isHorizontal="true">
+        <dc:Bounds x="190" y="485" width="2100" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Security_di" bpmnElement="Lane_Security" isHorizontal="true">
+        <dc:Bounds x="190" y="635" width="2100" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="identify_di" bpmnElement="identify">
+        <dc:Bounds x="400" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="drain_di" bpmnElement="drain">
+        <dc:Bounds x="570" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_clear_di" bpmnElement="g_clear">
+        <dc:Bounds x="775" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="resolve_di" bpmnElement="resolve">
+        <dc:Bounds x="910" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_disconnect_di" bpmnElement="raise_disconnect">
+        <dc:Bounds x="910" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_disconnect_di" bpmnElement="wait_disconnect">
+        <dc:Bounds x="1122" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wipe_di" bpmnElement="wipe">
+        <dc:Bounds x="1250" y="670" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_certified_di" bpmnElement="g_certified">
+        <dc:Bounds x="1455" y="685" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rewipe_di" bpmnElement="rewipe">
+        <dc:Bounds x="1590" y="775" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_removal_di" bpmnElement="raise_removal">
+        <dc:Bounds x="1590" y="520" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_removal_di" bpmnElement="wait_removal">
+        <dc:Bounds x="1802" y="542" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="records_di" bpmnElement="records">
+        <dc:Bounds x="1930" y="265" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2142" y="287" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_identify_di" bpmnElement="Flow_start_identify">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="400" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_identify_drain_di" bpmnElement="Flow_identify_drain">
+        <di:waypoint x="520" y="155" />
+        <di:waypoint x="545" y="155" />
+        <di:waypoint x="545" y="305" />
+        <di:waypoint x="570" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_drain_g_clear_di" bpmnElement="Flow_drain_g_clear">
+        <di:waypoint x="690" y="305" />
+        <di:waypoint x="775" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_clear_raise_disconnect_di" bpmnElement="Flow_g_clear_raise_disconnect">
+        <di:waypoint x="825" y="305" />
+        <di:waypoint x="885" y="305" />
+        <di:waypoint x="885" y="560" />
+        <di:waypoint x="910" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_clear_resolve_di" bpmnElement="Flow_g_clear_resolve">
+        <di:waypoint x="825" y="305" />
+        <di:waypoint x="885" y="305" />
+        <di:waypoint x="885" y="410" />
+        <di:waypoint x="910" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_resolve_drain_di" bpmnElement="Flow_resolve_drain">
+        <di:waypoint x="970" y="450" />
+        <di:waypoint x="970" y="362" />
+        <di:waypoint x="630" y="362" />
+        <di:waypoint x="630" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_disconnect_wait_disconnect_di" bpmnElement="Flow_raise_disconnect_wait_disconnect">
+        <di:waypoint x="1030" y="560" />
+        <di:waypoint x="1122" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_disconnect_wipe_di" bpmnElement="Flow_wait_disconnect_wipe">
+        <di:waypoint x="1158" y="560" />
+        <di:waypoint x="1225" y="560" />
+        <di:waypoint x="1225" y="710" />
+        <di:waypoint x="1250" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wipe_g_certified_di" bpmnElement="Flow_wipe_g_certified">
+        <di:waypoint x="1370" y="710" />
+        <di:waypoint x="1455" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_certified_raise_removal_di" bpmnElement="Flow_g_certified_raise_removal">
+        <di:waypoint x="1505" y="710" />
+        <di:waypoint x="1565" y="710" />
+        <di:waypoint x="1565" y="560" />
+        <di:waypoint x="1590" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_certified_rewipe_di" bpmnElement="Flow_g_certified_rewipe">
+        <di:waypoint x="1505" y="710" />
+        <di:waypoint x="1565" y="710" />
+        <di:waypoint x="1565" y="815" />
+        <di:waypoint x="1590" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_rewipe_wipe_di" bpmnElement="Flow_rewipe_wipe">
+        <di:waypoint x="1650" y="855" />
+        <di:waypoint x="1650" y="767" />
+        <di:waypoint x="1310" y="767" />
+        <di:waypoint x="1310" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_removal_wait_removal_di" bpmnElement="Flow_raise_removal_wait_removal">
+        <di:waypoint x="1710" y="560" />
+        <di:waypoint x="1802" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_removal_records_di" bpmnElement="Flow_wait_removal_records">
+        <di:waypoint x="1838" y="560" />
+        <di:waypoint x="1905" y="560" />
+        <di:waypoint x="1905" y="305" />
+        <di:waypoint x="1930" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_records_end_di" bpmnElement="Flow_records_end">
+        <di:waypoint x="2050" y="305" />
+        <di:waypoint x="2142" y="305" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,125 @@
+/**
+ * UI Guidelines — Color Palette tokens
+ * Source: https://uig-uidlines.vercel.app/ui-guidelines/guidelines/color-palette
+ *
+ * This file exposes the palette as CSS variables so the app can use them
+ * consistently (both in CSS and inline styles).
+ */
+:root {
+  /* Primary — the app's main brand color, #00A4E0. Scale matches the
+     reference theme's actual primaryColor ladder (note: 600 is identical
+     to 500 in the reference — 700 is the first real hover-darkened step). */
+  --primaryColor10: #f3fafd;
+  --primaryColor50: #e0f4fb;
+  --primaryColor100: #b2e3f4;
+  --primaryColor200: #80d1ee;
+  --primaryColor300: #50bfe7;
+  --primaryColor400: #2db1e4;
+  --primaryColor500: #00a4e0;
+  --primaryColor600: #00a4e0;
+  --primaryColor700: #0084bf;
+  --primaryColor800: #0073ab;
+  --primaryColor900: #00548a;
+  --primaryColor1000: #003d5c;
+  --primaryColorA100: #ffffff;
+  --primaryColorA200: #cddeff;
+  --primaryColorA400: #9abdff;
+  --primaryColorA700: #80adff;
+
+  /* Accent — identical to Primary in the reference theme (same #00A4E0). */
+  --accentColor10: #f3fafd;
+  --accentColor50: #e0f4fb;
+  --accentColor100: #b2e3f4;
+  --accentColor200: #80d1ee;
+  --accentColor300: #50bfe7;
+  --accentColor400: #2db1e4;
+  --accentColor500: #00a4e0;
+  --accentColor600: #00a4e0;
+  --accentColor700: #0084bf;
+  --accentColor800: #0073ab;
+  --accentColor900: #00548a;
+  --accentColor1000: #003d5c;
+
+  /* Warning / Danger scale (as defined in the guideline tokens) */
+  --warnColor10: #FFFBFA;
+  --warnColor50: #FEF3F2;
+  --warnColor100: #FEE4E2;
+  --warnColor200: #FECDCA;
+  --warnColor300: #FDA29B;
+  --warnColor400: #F97066;
+  --warnColor500: #F04438;
+  --warnColor600: #D92D20;
+  --warnColor700: #B42318;
+  --warnColor800: #912018;
+  --warnColor900: #7A271A;
+  --warnColor1000: #55160C;
+
+  /* Semantic aliases used in the guidelines */
+  --vw-color-info: var(--vw-color-blue-600);
+  --vw-color-success: var(--vw-color-green-500);
+  --vw-color-warning: var(--vw-color-amber-600);
+  --vw-color-danger: var(--vw-color-red-500);
+
+  /* Neutral (Gray) */
+  --vw-color-gray-10: #ffffff;
+  --vw-color-gray-50: #f9fafb;
+  --vw-color-gray-100: #f3f4f6;
+  --vw-color-gray-200: #e5e7eb;
+  --vw-color-gray-300: #d1d5db;
+  --vw-color-gray-400: #9ca3af;
+  --vw-color-gray-500: #6b7280;
+  --vw-color-gray-600: #4b5563;
+  --vw-color-gray-700: #374151;
+  --vw-color-gray-800: #1f2937;
+  --vw-color-gray-900: #111827;
+  --vw-color-gray-950: #030712;
+  --vw-color-gray-1000: #000000;
+
+  /* App aliases used by guideline components */
+  --bgColor10: var(--vw-color-gray-10);
+  --color-primary-blue: var(--vw-color-blue-600);
+
+  /* Green */
+  --vw-color-green-25: #f7fff9;
+  --vw-color-green-50: #f0fdf4;
+  --vw-color-green-100: #dcfce7;
+  --vw-color-green-200: #bbf7d0;
+  --vw-color-green-300: #86efac;
+  --vw-color-green-400: #4ade80;
+  --vw-color-green-500: #22c55e;
+  --vw-color-green-600: #16a34a;
+  --vw-color-green-700: #15803d;
+  --vw-color-green-800: #166534;
+  --vw-color-green-900: #14532d;
+  --vw-color-green-950: #052e16;
+
+  /* Amber */
+  --vw-color-amber-25: #fffef7;
+  --vw-color-amber-50: #fffbeb;
+  --vw-color-amber-100: #fef3c7;
+  --vw-color-amber-200: #fde68a;
+  --vw-color-amber-300: #fcd34d;
+  --vw-color-amber-400: #fbbf24;
+  --vw-color-amber-500: #f59e0b;
+  --vw-color-amber-600: #d97706;
+  --vw-color-amber-700: #b45309;
+  --vw-color-amber-800: #92400e;
+  --vw-color-amber-900: #78350f;
+  --vw-color-amber-950: #451a03;
+
+  /* Red */
+  --vw-color-red-25: #fffcfc;
+  --vw-color-red-50: #fef2f2;
+  --vw-color-red-100: #fee2e2;
+  --vw-color-red-200: #fecaca;
+  --vw-color-red-300: #fca5a5;
+  --vw-color-red-400: #f87171;
+  --vw-color-red-500: #ef4444;
+  --vw-color-red-600: #dc2626;
+  --vw-color-red-700: #b91c1c;
+  --vw-color-red-800: #991b1b;
+  --vw-color-red-900: #7f1d1d;
+  --vw-color-red-950: #450a0a;
+  --vw-color-red-active: var(--vw-color-red-600);
+}
+

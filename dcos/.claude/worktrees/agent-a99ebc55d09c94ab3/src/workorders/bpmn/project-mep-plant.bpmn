@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_project_mep_plant" targetNamespace="http://dcos.example.com/workorders" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_project_mep_plant">
+    <bpmn:participant id="Participant_project_mep_plant" name="PRJ-11 · MEP and plant installation" processRef="project-mep-plant" />
+  </bpmn:collaboration>
+  <bpmn:process id="project-mep-plant" name="MEP and plant installation" isExecutable="true">
+    <bpmn:documentation>Installs the power train, cooling and BMS: the MEP design is approved for construction, electrical and HVAC permits are checked, long-lead plant is ordered, the factory acceptance test must pass, plant is received (delays start an expedite), electrical then mechanical installation run as contractor work orders under change, the integrated systems test (L5) must pass and operations takes the plant over.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <zeebe:versionTag value="v1" />
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_project_mep_plant">
+      <bpmn:lane id="Lane_Project_manager" name="Project manager">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>permits</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_permit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>chase_permits</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Design" name="Design">
+        <bpmn:flowNodeRef>design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>revise_design</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Procurement" name="Procurement">
+        <bpmn:flowNodeRef>order</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>vendor_rework</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>receive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_delayed_expedite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>expedite</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Contractor" name="Contractor">
+        <bpmn:flowNodeRef>raise_electrical</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_electrical</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>raise_mechanical</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wait_mechanical</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fix_tests</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Commissioning" name="Commissioning">
+        <bpmn:flowNodeRef>fat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_fat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ist</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_ist</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>handover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="MEP works approved">
+      <bpmn:outgoing>Flow_start_design</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="design" name="Approve MEP design (IFC)">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P6D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_design</bpmn:incoming>
+      <bpmn:incoming>Flow_revise_design_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_design_g_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_design" name="Design approved?" default="Flow_g_design_permits">
+      <bpmn:incoming>Flow_design_g_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_design_permits</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_design_revise_design</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="revise_design" name="Revise design">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_revise_design</bpmn:incoming>
+      <bpmn:outgoing>Flow_revise_design_design</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="permits" name="Check electrical and HVAC permits">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_design_permits</bpmn:incoming>
+      <bpmn:incoming>Flow_chase_permits_permits</bpmn:incoming>
+      <bpmn:outgoing>Flow_permits_g_permit</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_permit" name="Permits approved?" default="Flow_g_permit_order">
+      <bpmn:incoming>Flow_permits_g_permit</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_permit_order</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_permit_chase_permits</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="chase_permits" name="Chase the authority">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acknowledge" />
+        <zeebe:assignmentDefinition candidateGroups="Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_permit_chase_permits</bpmn:incoming>
+      <bpmn:outgoing>Flow_chase_permits_permits</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="order" name="Order long-lead plant">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="approve" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_permit_order</bpmn:incoming>
+      <bpmn:outgoing>Flow_order_fat</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="fat" name="Witness factory acceptance test">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P1D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_order_fat</bpmn:incoming>
+      <bpmn:incoming>Flow_vendor_rework_fat</bpmn:incoming>
+      <bpmn:outgoing>Flow_fat_g_fat</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_fat" name="FAT passed?" default="Flow_g_fat_receive">
+      <bpmn:incoming>Flow_fat_g_fat</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_fat_receive</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_fat_vendor_rework</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="vendor_rework" name="Vendor rework and retest">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT80H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_fat_vendor_rework</bpmn:incoming>
+      <bpmn:outgoing>Flow_vendor_rework_fat</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="receive" name="Receive plant on site">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT320H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_fat_receive</bpmn:incoming>
+      <bpmn:incoming>Flow_expedite_receive</bpmn:incoming>
+      <bpmn:outgoing>Flow_receive_raise_electrical</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="b_delayed_expedite" name="Delivery delayed" attachedToRef="receive" cancelActivity="false">
+      <bpmn:outgoing>Flow_b_delayed_expedite_expedite</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_b_delayed_expedite" messageRef="Message_b_delayed_expedite" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="expedite" name="Expedite with the vendor">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="acknowledge" />
+        <zeebe:assignmentDefinition candidateGroups="Finance Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT16H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b_delayed_expedite_expedite</bpmn:incoming>
+      <bpmn:outgoing>Flow_expedite_receive</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="raise_electrical" name="Raise electrical installation work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_receive_raise_electrical</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_electrical_wait_electrical</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_electrical" name="Electrical installation work closed">
+      <bpmn:incoming>Flow_raise_electrical_wait_electrical</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_electrical_raise_mechanical</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_electrical" messageRef="Message_wait_electrical" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="raise_mechanical" name="Raise mechanical installation work orders">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dcos.raise-work-orders" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_electrical_raise_mechanical</bpmn:incoming>
+      <bpmn:outgoing>Flow_raise_mechanical_wait_mechanical</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="wait_mechanical" name="Mechanical installation work closed">
+      <bpmn:incoming>Flow_raise_mechanical_wait_mechanical</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_mechanical_ist</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MsgDef_wait_mechanical" messageRef="Message_wait_mechanical" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="ist" name="Integrated systems test (L5)">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Commissioning Engineer" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;P4D&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_wait_mechanical_ist</bpmn:incoming>
+      <bpmn:incoming>Flow_fix_tests_ist</bpmn:incoming>
+      <bpmn:outgoing>Flow_ist_g_ist</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="g_ist" name="IST passed?" default="Flow_g_ist_handover">
+      <bpmn:incoming>Flow_ist_g_ist</bpmn:incoming>
+      <bpmn:outgoing>Flow_g_ist_handover</bpmn:outgoing>
+      <bpmn:outgoing>Flow_g_ist_fix_tests</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="fix_tests" name="Fix failed tests">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="complete-with-evidence" />
+        <zeebe:assignmentDefinition candidateGroups="Vendor Project Manager" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ist_fix_tests</bpmn:incoming>
+      <bpmn:outgoing>Flow_fix_tests_ist</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="handover" name="Hand plant over to operations">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formKey="sign-off" />
+        <zeebe:assignmentDefinition candidateGroups="Facilities Director" />
+        <zeebe:taskSchedule dueDate="=now() + duration(&#34;PT40H&#34;)" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_g_ist_handover</bpmn:incoming>
+      <bpmn:outgoing>Flow_handover_end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="end" name="Plant in service">
+      <bpmn:incoming>Flow_handover_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_design" sourceRef="start" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_design_g_design" sourceRef="design" targetRef="g_design" />
+    <bpmn:sequenceFlow id="Flow_g_design_permits" name="approved" sourceRef="g_design" targetRef="permits">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_design_revise_design" name="rejected" sourceRef="g_design" targetRef="revise_design">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_revise_design_design" sourceRef="revise_design" targetRef="design" />
+    <bpmn:sequenceFlow id="Flow_permits_g_permit" sourceRef="permits" targetRef="g_permit" />
+    <bpmn:sequenceFlow id="Flow_g_permit_order" name="approved" sourceRef="g_permit" targetRef="order">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_permit_chase_permits" name="not yet" sourceRef="g_permit" targetRef="chase_permits">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=approved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_chase_permits_permits" sourceRef="chase_permits" targetRef="permits" />
+    <bpmn:sequenceFlow id="Flow_order_fat" sourceRef="order" targetRef="fat" />
+    <bpmn:sequenceFlow id="Flow_fat_g_fat" sourceRef="fat" targetRef="g_fat" />
+    <bpmn:sequenceFlow id="Flow_g_fat_receive" name="passed" sourceRef="g_fat" targetRef="receive">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_fat_vendor_rework" name="failed" sourceRef="g_fat" targetRef="vendor_rework">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_vendor_rework_fat" sourceRef="vendor_rework" targetRef="fat" />
+    <bpmn:sequenceFlow id="Flow_expedite_receive" sourceRef="expedite" targetRef="receive" />
+    <bpmn:sequenceFlow id="Flow_receive_raise_electrical" sourceRef="receive" targetRef="raise_electrical" />
+    <bpmn:sequenceFlow id="Flow_raise_electrical_wait_electrical" sourceRef="raise_electrical" targetRef="wait_electrical" />
+    <bpmn:sequenceFlow id="Flow_wait_electrical_raise_mechanical" sourceRef="wait_electrical" targetRef="raise_mechanical" />
+    <bpmn:sequenceFlow id="Flow_raise_mechanical_wait_mechanical" sourceRef="raise_mechanical" targetRef="wait_mechanical" />
+    <bpmn:sequenceFlow id="Flow_wait_mechanical_ist" sourceRef="wait_mechanical" targetRef="ist" />
+    <bpmn:sequenceFlow id="Flow_ist_g_ist" sourceRef="ist" targetRef="g_ist" />
+    <bpmn:sequenceFlow id="Flow_g_ist_handover" name="passed" sourceRef="g_ist" targetRef="handover">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_g_ist_fix_tests" name="failed tests" sourceRef="g_ist" targetRef="fix_tests">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=failedTests &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_fix_tests_ist" sourceRef="fix_tests" targetRef="ist" />
+    <bpmn:sequenceFlow id="Flow_handover_end" sourceRef="handover" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_b_delayed_expedite_expedite" sourceRef="b_delayed_expedite" targetRef="expedite" />
+  </bpmn:process>
+  <bpmn:message id="Message_b_delayed_expedite" name="delivery-delayed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_electrical" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_electrical&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_wait_mechanical" name="work-orders-closed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey + &#34;:wait_mechanical&#34;" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_project_mep_plant">
+    <bpmndi:BPMNPlane id="BPMNPlane_project_mep_plant" bpmnElement="Collaboration_project_mep_plant">
+      <bpmndi:BPMNShape id="Participant_project_mep_plant_di" bpmnElement="Participant_project_mep_plant" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2980" height="1320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Project_manager_di" bpmnElement="Lane_Project_manager" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Design_di" bpmnElement="Lane_Design" isHorizontal="true">
+        <dc:Bounds x="190" y="335" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="190" y="590" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Contractor_di" bpmnElement="Lane_Contractor" isHorizontal="true">
+        <dc:Bounds x="190" y="845" width="2950" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Commissioning_di" bpmnElement="Lane_Commissioning" isHorizontal="true">
+        <dc:Bounds x="190" y="1100" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Operations_di" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="190" y="1250" width="2950" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="272" y="137" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="design_di" bpmnElement="design">
+        <dc:Bounds x="400" y="370" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_design_di" bpmnElement="g_design">
+        <dc:Bounds x="605" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="revise_design_di" bpmnElement="revise_design">
+        <dc:Bounds x="740" y="475" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="permits_di" bpmnElement="permits">
+        <dc:Bounds x="740" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_permit_di" bpmnElement="g_permit">
+        <dc:Bounds x="945" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="chase_permits_di" bpmnElement="chase_permits">
+        <dc:Bounds x="1080" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="order_di" bpmnElement="order">
+        <dc:Bounds x="1080" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fat_di" bpmnElement="fat">
+        <dc:Bounds x="1250" y="1135" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_fat_di" bpmnElement="g_fat">
+        <dc:Bounds x="1455" y="1150" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="vendor_rework_di" bpmnElement="vendor_rework">
+        <dc:Bounds x="1590" y="730" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="receive_di" bpmnElement="receive">
+        <dc:Bounds x="1590" y="625" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_delayed_expedite_di" bpmnElement="b_delayed_expedite">
+        <dc:Bounds x="1662" y="687" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="expedite_di" bpmnElement="expedite">
+        <dc:Bounds x="1760" y="730" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_electrical_di" bpmnElement="raise_electrical">
+        <dc:Bounds x="1760" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_electrical_di" bpmnElement="wait_electrical">
+        <dc:Bounds x="1972" y="902" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="raise_mechanical_di" bpmnElement="raise_mechanical">
+        <dc:Bounds x="2100" y="880" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wait_mechanical_di" bpmnElement="wait_mechanical">
+        <dc:Bounds x="2312" y="902" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ist_di" bpmnElement="ist">
+        <dc:Bounds x="2440" y="1135" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ist_di" bpmnElement="g_ist">
+        <dc:Bounds x="2645" y="1150" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fix_tests_di" bpmnElement="fix_tests">
+        <dc:Bounds x="2780" y="985" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="handover_di" bpmnElement="handover">
+        <dc:Bounds x="2780" y="1285" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="2992" y="1307" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_design_di" bpmnElement="Flow_start_design">
+        <di:waypoint x="308" y="155" />
+        <di:waypoint x="375" y="155" />
+        <di:waypoint x="375" y="410" />
+        <di:waypoint x="400" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_design_g_design_di" bpmnElement="Flow_design_g_design">
+        <di:waypoint x="520" y="410" />
+        <di:waypoint x="605" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_permits_di" bpmnElement="Flow_g_design_permits">
+        <di:waypoint x="655" y="410" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="715" y="155" />
+        <di:waypoint x="740" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_design_revise_design_di" bpmnElement="Flow_g_design_revise_design">
+        <di:waypoint x="655" y="410" />
+        <di:waypoint x="715" y="410" />
+        <di:waypoint x="715" y="515" />
+        <di:waypoint x="740" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_revise_design_design_di" bpmnElement="Flow_revise_design_design">
+        <di:waypoint x="800" y="555" />
+        <di:waypoint x="800" y="467" />
+        <di:waypoint x="460" y="467" />
+        <di:waypoint x="460" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_permits_g_permit_di" bpmnElement="Flow_permits_g_permit">
+        <di:waypoint x="860" y="155" />
+        <di:waypoint x="945" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_permit_order_di" bpmnElement="Flow_g_permit_order">
+        <di:waypoint x="995" y="155" />
+        <di:waypoint x="1055" y="155" />
+        <di:waypoint x="1055" y="665" />
+        <di:waypoint x="1080" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_permit_chase_permits_di" bpmnElement="Flow_g_permit_chase_permits">
+        <di:waypoint x="995" y="155" />
+        <di:waypoint x="1055" y="155" />
+        <di:waypoint x="1055" y="260" />
+        <di:waypoint x="1080" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_chase_permits_permits_di" bpmnElement="Flow_chase_permits_permits">
+        <di:waypoint x="1140" y="300" />
+        <di:waypoint x="1140" y="212" />
+        <di:waypoint x="800" y="212" />
+        <di:waypoint x="800" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_order_fat_di" bpmnElement="Flow_order_fat">
+        <di:waypoint x="1200" y="665" />
+        <di:waypoint x="1225" y="665" />
+        <di:waypoint x="1225" y="1175" />
+        <di:waypoint x="1250" y="1175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fat_g_fat_di" bpmnElement="Flow_fat_g_fat">
+        <di:waypoint x="1370" y="1175" />
+        <di:waypoint x="1455" y="1175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_fat_receive_di" bpmnElement="Flow_g_fat_receive">
+        <di:waypoint x="1505" y="1175" />
+        <di:waypoint x="1565" y="1175" />
+        <di:waypoint x="1565" y="665" />
+        <di:waypoint x="1590" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_fat_vendor_rework_di" bpmnElement="Flow_g_fat_vendor_rework">
+        <di:waypoint x="1505" y="1175" />
+        <di:waypoint x="1565" y="1175" />
+        <di:waypoint x="1565" y="770" />
+        <di:waypoint x="1590" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_vendor_rework_fat_di" bpmnElement="Flow_vendor_rework_fat">
+        <di:waypoint x="1650" y="810" />
+        <di:waypoint x="1650" y="1232" />
+        <di:waypoint x="1310" y="1232" />
+        <di:waypoint x="1310" y="1215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_expedite_receive_di" bpmnElement="Flow_expedite_receive">
+        <di:waypoint x="1820" y="810" />
+        <di:waypoint x="1820" y="722" />
+        <di:waypoint x="1650" y="722" />
+        <di:waypoint x="1650" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_receive_raise_electrical_di" bpmnElement="Flow_receive_raise_electrical">
+        <di:waypoint x="1710" y="665" />
+        <di:waypoint x="1735" y="665" />
+        <di:waypoint x="1735" y="920" />
+        <di:waypoint x="1760" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_electrical_wait_electrical_di" bpmnElement="Flow_raise_electrical_wait_electrical">
+        <di:waypoint x="1880" y="920" />
+        <di:waypoint x="1972" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_electrical_raise_mechanical_di" bpmnElement="Flow_wait_electrical_raise_mechanical">
+        <di:waypoint x="2008" y="920" />
+        <di:waypoint x="2100" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_raise_mechanical_wait_mechanical_di" bpmnElement="Flow_raise_mechanical_wait_mechanical">
+        <di:waypoint x="2220" y="920" />
+        <di:waypoint x="2312" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_wait_mechanical_ist_di" bpmnElement="Flow_wait_mechanical_ist">
+        <di:waypoint x="2348" y="920" />
+        <di:waypoint x="2415" y="920" />
+        <di:waypoint x="2415" y="1175" />
+        <di:waypoint x="2440" y="1175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ist_g_ist_di" bpmnElement="Flow_ist_g_ist">
+        <di:waypoint x="2560" y="1175" />
+        <di:waypoint x="2645" y="1175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ist_handover_di" bpmnElement="Flow_g_ist_handover">
+        <di:waypoint x="2695" y="1175" />
+        <di:waypoint x="2755" y="1175" />
+        <di:waypoint x="2755" y="1325" />
+        <di:waypoint x="2780" y="1325" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_g_ist_fix_tests_di" bpmnElement="Flow_g_ist_fix_tests">
+        <di:waypoint x="2695" y="1175" />
+        <di:waypoint x="2755" y="1175" />
+        <di:waypoint x="2755" y="1025" />
+        <di:waypoint x="2780" y="1025" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_fix_tests_ist_di" bpmnElement="Flow_fix_tests_ist">
+        <di:waypoint x="2840" y="1065" />
+        <di:waypoint x="2840" y="1232" />
+        <di:waypoint x="2500" y="1232" />
+        <di:waypoint x="2500" y="1215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_handover_end_di" bpmnElement="Flow_handover_end">
+        <di:waypoint x="2900" y="1325" />
+        <di:waypoint x="2992" y="1325" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_b_delayed_expedite_expedite_di" bpmnElement="Flow_b_delayed_expedite_expedite">
+        <di:waypoint x="1680" y="723" />
+        <di:waypoint x="1680" y="733" />
+        <di:waypoint x="1735" y="733" />
+        <di:waypoint x="1735" y="770" />
+        <di:waypoint x="1760" y="770" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

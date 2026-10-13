@@ -1,0 +1,28 @@
+.planner-wizard-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 260px;
+  gap: var(--vw-space-md);
+  align-items: start;
+}
+.planner-wizard-grid > * { min-width: 0; }
+.planner-wizard-rail { position: sticky; top: 12px; }
+.planner-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--vw-space-sm);
+}
+.planner-type-grid [role="button"] { min-width: 0; overflow-wrap: anywhere; }
+.planner-type-grid [role="button"] > .vw-flex { flex-wrap: wrap; }
+.planner-wizard-actions {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.planner-wizard-actions-group { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 1200px) {
+  .planner-wizard-grid { grid-template-columns: minmax(0, 1fr); }
+  .planner-wizard-rail { position: static; }
+}

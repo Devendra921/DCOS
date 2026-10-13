@@ -1,0 +1,5 @@
+/* Site 360 — page-local layout on top of the Operate kit. */
+.s360-bar { display: flex; flex-direction: column; gap: 10px; padding: 14px 18px; }
+.s360-fold-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.s360-fold.is-folded > .panel-body { display: none; }
+.s360-fold.is-folded > .panel-head { padding-bottom: 14px; }

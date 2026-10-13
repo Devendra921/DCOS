@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "snag-walk",
+  "type": "default",
+  "components": [
+    { "id": "Text_sw_intro", "type": "text", "text": "### Snag walk\nWalk the area and record every snag, with a photo. Open snags go to the contractor to close and the walk is repeated until nothing is open." },
+    { "id": "Field_areas", "type": "textfield", "key": "areas", "label": "Areas walked", "validate": {"required": true}, "layout": {"row": "Row_sw", "columns": 8} },
+    { "id": "Field_walkedWith", "type": "textfield", "key": "walkedWith", "label": "Walked with (optional)", "layout": {"row": "Row_sw", "columns": 8} },
+    { "id": "List_snagList", "type": "dynamiclist", "path": "snagList", "label": "Snags", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 0, "nonCollapsedItems": 10, "showOutline": true, "components": [
+      { "id": "Field_s_snag", "type": "textfield", "key": "snag", "label": "Snag", "validate": {"required": true}, "layout": {"row": "Row_s_1", "columns": 10} },
+      { "id": "Field_s_location", "type": "textfield", "key": "location", "label": "Location", "layout": {"row": "Row_s_1", "columns": 6} },
+      { "id": "Field_s_owner", "type": "textfield", "key": "owner", "label": "Owner", "layout": {"row": "Row_s_2", "columns": 5} },
+      { "id": "Field_s_due", "type": "datetime", "key": "due", "subtype": "date", "dateLabel": "Due", "layout": {"row": "Row_s_2", "columns": 5} },
+      { "id": "Field_s_photo", "type": "filepicker", "key": "photo", "label": "Photo", "multiple": false, "accept": "image/*,.heic,.pdf", "layout": {"row": "Row_s_2", "columns": 6} }
+    ] },
+    { "id": "Field_photos", "type": "filepicker", "key": "photos", "label": "Photos of the area (optional)", "multiple": true, "accept": "image/*,.heic,.pdf" },
+    { "id": "Field_signedBy", "type": "textfield", "key": "signedBy", "label": "Recorded by", "readonly": true, "description": "The signed-in user. If this should be someone else, ask them to complete the task." },
+    { "id": "Expr_snags", "type": "expression", "key": "snags", "expression": "=(if snagList = null then 0 else count(snagList))", "computeOn": "change" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=(if snagList = null then 0 else count(snagList))", "computeOn": "change" }
+  ]
+}

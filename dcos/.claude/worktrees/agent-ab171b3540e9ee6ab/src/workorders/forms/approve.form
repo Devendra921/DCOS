@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 16,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": { "name": "DCOS process generator", "version": "1.0" },
+  "id": "approve",
+  "type": "default",
+  "components": [
+    { "id": "Text_approve_intro", "type": "text", "text": "### Approval\nReview the record context on the right, then record your decision. A rejection sends the work back to the previous step or ends the process, depending on the gateway." },
+    { "id": "Field_approved", "type": "checkbox", "key": "approved", "label": "Approve", "description": "Leave unticked to reject.", "defaultValue": true },
+    { "id": "Field_riskAccepted", "type": "select", "key": "riskAccepted", "label": "Residual risk accepted", "values": [
+      { "label": "Yes — within policy", "value": "within-policy" },
+      { "label": "Yes — with conditions", "value": "with-conditions" },
+      { "label": "No", "value": "no" }
+    ], "defaultValue": "within-policy" },
+    { "id": "Field_comment", "type": "textarea", "key": "comment", "label": "Comment", "description": "Conditions, caveats or the reason for rejection." }
+  ]
+}

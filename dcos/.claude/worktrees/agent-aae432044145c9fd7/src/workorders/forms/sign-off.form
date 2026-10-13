@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 16,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": { "name": "DCOS process generator", "version": "1.0" },
+  "id": "sign-off",
+  "type": "default",
+  "components": [
+    { "id": "Text_so_intro", "type": "text", "text": "### Sign-off\nFormal acceptance. Your name and the timestamp are written to the audit trail." },
+    { "id": "Field_approved", "type": "checkbox", "key": "approved", "label": "I sign off this step", "defaultValue": true, "validate": { "required": true } },
+    { "id": "Field_signedBy", "type": "textfield", "key": "signedBy", "label": "Signed by", "validate": { "required": true } },
+    { "id": "Field_conditions", "type": "textarea", "key": "conditions", "label": "Conditions / outstanding items" }
+  ]
+}

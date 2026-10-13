@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "decide-reconciliation",
+  "type": "default",
+  "components": [
+    { "id": "Text_dr_intro", "type": "text", "text": "### Reconciliation decision\nDiscovery and the record disagree. Decide which one is right, or send someone to check on site." },
+    { "id": "Field_decision", "type": "radio", "key": "decision", "label": "Decision", "values": [{"label": "Discovery is right: update the record", "value": "accept"}, {"label": "The record is right: keep it", "value": "keep"}, {"label": "Not sure: send a technician to check", "value": "walk"}], "validate": {"required": true} },
+    { "id": "Field_reason", "type": "textarea", "key": "reason", "label": "Reason", "description": "What you based the decision on.", "validate": {"required": true} },
+    { "id": "Field_evidence", "type": "filepicker", "key": "evidence", "label": "Screenshots or photos (optional)", "multiple": true, "accept": "image/*,.heic,.pdf" }
+  ]
+}

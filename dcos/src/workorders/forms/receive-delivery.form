@@ -1,0 +1,31 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "schemaVersion": 18,
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.7.0",
+  "exporter": {
+    "name": "DCOS process generator",
+    "version": "1.1"
+  },
+  "id": "receive-delivery",
+  "type": "default",
+  "components": [
+    { "id": "Text_rd_intro", "type": "text", "text": "### Receive and inspect the delivery\nCheck the delivery against the order before it goes into stock or staging. Record anything damaged, short or wrong; each problem is followed up with the supplier." },
+    { "id": "Field_deliveryRef", "type": "textfield", "key": "deliveryRef", "label": "Delivery note or PO number", "validate": {"required": true}, "layout": {"row": "Row_rd_1", "columns": 8} },
+    { "id": "Field_receivedOn", "type": "datetime", "key": "receivedOn", "subtype": "date", "dateLabel": "Received on", "validate": {"required": true}, "layout": {"row": "Row_rd_1", "columns": 8} },
+    { "id": "Field_itemsExpected", "type": "number", "key": "itemsExpected", "label": "Items expected", "validate": {"min": 0}, "layout": {"row": "Row_rd_2", "columns": 8} },
+    { "id": "Field_itemsReceived", "type": "number", "key": "itemsReceived", "label": "Items received", "validate": {"required": true, "min": 0}, "layout": {"row": "Row_rd_2", "columns": 8} },
+    { "id": "Field_condition", "type": "radio", "key": "condition", "label": "Condition on arrival", "values": [{"label": "Everything as ordered and undamaged", "value": "ok"}, {"label": "Some items are damaged, short or wrong", "value": "issues"}], "validate": {"required": true} },
+    { "id": "List_deliveryIssues", "type": "dynamiclist", "path": "deliveryIssues", "label": "Problems found", "isRepeating": true, "allowAddRemove": true, "defaultRepetitions": 1, "nonCollapsedItems": 10, "showOutline": true, "conditional": {"hide": "=not(condition = \"issues\")"}, "components": [
+      { "id": "Field_di_item", "type": "textfield", "key": "item", "label": "Item", "validate": {"required": true}, "layout": {"row": "Row_di_1", "columns": 8} },
+      { "id": "Field_di_issue", "type": "select", "key": "issue", "label": "Problem", "values": [{"label": "Damaged", "value": "damaged"}, {"label": "Short", "value": "short"}, {"label": "Wrong item", "value": "wrong"}, {"label": "Missing documents", "value": "documents"}], "validate": {"required": true}, "layout": {"row": "Row_di_1", "columns": 4} },
+      { "id": "Field_di_quantity", "type": "number", "key": "quantity", "label": "Quantity", "defaultValue": 1, "validate": {"min": 1}, "layout": {"row": "Row_di_1", "columns": 4} },
+      { "id": "Field_di_note", "type": "textfield", "key": "note", "label": "Note", "layout": {"row": "Row_di_2", "columns": 8} },
+      { "id": "Field_di_photo", "type": "filepicker", "key": "photo", "label": "Photo", "multiple": true, "accept": "image/*,.heic,.pdf", "validate": {"required": true}, "layout": {"row": "Row_di_2", "columns": 8} }
+    ] },
+    { "id": "Field_storageLocation", "type": "textfield", "key": "storageLocation", "label": "Where it is stored or staged", "validate": {"required": true} },
+    { "id": "Field_photos", "type": "filepicker", "key": "photos", "label": "Photos of the delivery and labels (optional)", "multiple": true, "accept": "image/*,.heic,.pdf" },
+    { "id": "Field_summary", "type": "textarea", "key": "summary", "label": "Notes (optional)" },
+    { "id": "Expr_openItems", "type": "expression", "key": "openItems", "expression": "=if condition = \"issues\" then (if deliveryIssues = null then 0 else count(deliveryIssues)) else 0", "computeOn": "change" }
+  ]
+}

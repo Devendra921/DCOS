@@ -1,0 +1,193 @@
+/* ============================================================
+   NST Design System — Layout utilities
+   Ported from core-mixin.scss per guidelines vw-cards-ext page.
+   ============================================================ */
+
+/* Display */
+.vw-flex        { display: flex; }
+.vw-inline-flex { display: inline-flex; }
+.vw-grid        { display: grid; }
+
+/* Direction */
+.vw-flex-row { flex-direction: row; }
+.vw-flex-col { flex-direction: column; }
+
+/* Align */
+.vw-items-start    { align-items: flex-start; }
+.vw-items-center   { align-items: center; }
+.vw-items-end      { align-items: flex-end; }
+.vw-items-baseline { align-items: baseline; }
+.vw-items-stretch  { align-items: stretch; }
+
+/* Justify */
+.vw-justify-start   { justify-content: flex-start; }
+.vw-justify-center  { justify-content: center; }
+.vw-justify-end     { justify-content: flex-end; }
+.vw-justify-between { justify-content: space-between; }
+.vw-justify-around  { justify-content: space-around; }
+.vw-justify-evenly  { justify-content: space-evenly; }
+
+/* Wrap */
+.vw-wrap   { flex-wrap: wrap; }
+.vw-nowrap { flex-wrap: nowrap; }
+
+/* Page gap utilities (flex/grid gap) */
+.vw-page-gap     { gap: var(--vw-page-gap); }
+.vw-page-gap-xl  { gap: var(--vw-space-xl); }
+.vw-page-gap-md  { gap: var(--vw-space-md); }
+.vw-page-gap-sm  { gap: var(--vw-space-sm); }
+.vw-page-gap-xxs { gap: var(--vw-space-xxs); }
+
+/* Gap utilities */
+.vw-gap-none { gap: var(--vw-space-none); }
+.vw-gap-xxs  { gap: var(--vw-space-xxs); }
+.vw-gap-xs   { gap: var(--vw-space-xs); }
+.vw-gap-sm   { gap: var(--vw-space-sm); }
+.vw-gap-md   { gap: var(--vw-space-md); }
+.vw-gap-lg   { gap: var(--vw-space-lg); }
+.vw-gap-xl   { gap: var(--vw-space-xl); }
+
+/* Grid helpers. Tracks use minmax(0, 1fr), not bare 1fr — bare 1fr computes as
+   minmax(auto, 1fr), and "auto" enforces a floor equal to the cell's
+   min-content width. A grid cell holding a nowrap-heavy child (a data table,
+   a long unbreakable string) then forces the whole track — and the page —
+   wider than the viewport instead of staying inside its container. Found via
+   a real consuming app: a 2-up row holding `.nst-table` (whose th/td are
+   white-space: nowrap) overflowed the entire page at ordinary laptop widths
+   (measured body.scrollWidth > document width). minmax(0, 1fr) removes that
+   floor so the track — and any overflow-x handling inside it, e.g.
+   .nst-table-wrap — can actually take effect instead of being overridden. */
+.vw-grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vw-grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vw-grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.vw-grid-cols-auto-320 {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+/* Responsive reflow for the fixed-column-count grids above — found missing via
+   a real consuming app (a 4-up KPI row overflowed/cramped on narrower screens,
+   since repeat(4, 1fr) alone has no reflow behavior). .vw-grid-cols-auto-320
+   doesn't need this: auto-fill/minmax already reflows on its own.
+   768px / 480px are this design system's first responsive breakpoints —
+   match them if more fixed-column grid utilities are added later. */
+@media (max-width: 768px) {
+  .vw-grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vw-grid-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .vw-grid-cols-2,
+  .vw-grid-cols-3,
+  .vw-grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+.vw-items-start-grid {
+  align-items: start;
+}
+
+.vw-w-full {
+  width: 100%;
+}
+
+/* Field color helpers (core-mixin) */
+.field-label-color {
+  color: var(--fieldLabelColor);
+  font-weight: var(--fieldLabelFontWeight);
+}
+
+.field-text-color {
+  color: var(--fieldTextColor);
+  font-weight: var(--fieldTextFontWeight);
+}
+
+.field-disabled-label-color {
+  color: var(--fieldDisabledLabelColor);
+}
+
+.field-disabled-text-color {
+  color: var(--fieldDisabledTextColor);
+}
+
+/* ============================================================
+   Visually hidden — .vw-sr-only
+
+   hideLabel in the guidelines: hide a label from sight while
+   keeping it for screen readers and form association. The one
+   correct way to do this; display:none and visibility:hidden
+   both remove it from the accessibility tree, which is the
+   opposite of what is wanted.
+   ============================================================ */
+
+.vw-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip-links and the like: hidden until focused. */
+.vw-sr-only-focusable:focus,
+.vw-sr-only-focusable:focus-visible {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+
+/* ============================================================
+   Divider — .vw-divider
+
+   A rule between things. Horizontal by default, vertical with
+   --vertical, which is what separates a title from its subtitle
+   in the shell topbar ("NOC | Network Operations Center").
+
+   Deliberately an <hr> or a decorative <span>, not a border on
+   a neighbour: a border belongs to whichever element owns it,
+   so two adjacent sections both wanting one produce a double
+   line. A divider is its own thing and there is exactly one.
+
+   Use aria-hidden on the vertical form — it is decoration, not
+   structure, and a screen reader announcing "separator" between
+   a title and its subtitle is noise. The horizontal <hr> form
+   already carries role="separator" natively and is worth keeping
+   when the break is a real one between sections.
+   ============================================================ */
+
+.vw-divider {
+  border: 0;
+  border-top: 1px solid var(--vw-color-gray-200);
+  margin: 0;
+  width: 100%;
+  height: 0;
+  flex-shrink: 0;
+}
+
+.vw-divider--vertical {
+  border-top: 0;
+  border-left: 1px solid var(--vw-color-gray-200);
+  width: 0;
+  height: auto;
+  align-self: stretch;
+  /* inset so it does not run the full height of a toolbar row */
+  margin: var(--vw-space-sm) 0;
+}

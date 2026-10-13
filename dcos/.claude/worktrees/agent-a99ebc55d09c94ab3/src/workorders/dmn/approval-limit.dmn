@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_approval_limit" name="Approval limit" namespace="http://dcos.example.com/dmn" exporter="DCOS process generator" exporterVersion="1.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="approval-limit" name="Approval limit">
+    <description>Routes a budget amount (USD) to the role allowed to approve it under the delegation-of-authority policy, and flags whether a written business case is required. Hit policy UNIQUE — the amount bands do not overlap.</description>
+    <decisionTable id="DecisionTable_approval_limit" hitPolicy="UNIQUE">
+      <input id="Input_amount" label="Amount (USD)">
+        <inputExpression id="InputExpression_amount" typeRef="number">
+          <text>amount</text>
+        </inputExpression>
+      </input>
+      <output id="Output_approverRole" label="Approver role" name="approverRole" typeRef="string" />
+      <output id="Output_businessCase" label="Business case required" name="businessCaseRequired" typeRef="boolean" />
+      <rule id="Rule_al_1">
+        <description>Operational spend</description>
+        <inputEntry id="UnaryTests_al_1_1"><text>&lt;= 50000</text></inputEntry>
+        <outputEntry id="LiteralExpression_al_1_1"><text>"Capacity Planner"</text></outputEntry>
+        <outputEntry id="LiteralExpression_al_1_2"><text>false</text></outputEntry>
+      </rule>
+      <rule id="Rule_al_2">
+        <description>Departmental budget</description>
+        <inputEntry id="UnaryTests_al_2_1"><text>]50000..250000]</text></inputEntry>
+        <outputEntry id="LiteralExpression_al_2_1"><text>"Finance Manager"</text></outputEntry>
+        <outputEntry id="LiteralExpression_al_2_2"><text>false</text></outputEntry>
+      </rule>
+      <rule id="Rule_al_3">
+        <description>Site programme</description>
+        <inputEntry id="UnaryTests_al_3_1"><text>]250000..1000000]</text></inputEntry>
+        <outputEntry id="LiteralExpression_al_3_1"><text>"Facilities Director"</text></outputEntry>
+        <outputEntry id="LiteralExpression_al_3_2"><text>true</text></outputEntry>
+      </rule>
+      <rule id="Rule_al_4">
+        <description>Capital programme</description>
+        <inputEntry id="UnaryTests_al_4_1"><text>&gt; 1000000</text></inputEntry>
+        <outputEntry id="LiteralExpression_al_4_1"><text>"Executive"</text></outputEntry>
+        <outputEntry id="LiteralExpression_al_4_2"><text>true</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_approval_limit">
+      <dmndi:DMNShape id="DMNShape_approval_limit" dmnElementRef="approval-limit">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
